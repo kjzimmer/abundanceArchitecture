@@ -12,8 +12,8 @@
 
   :root {
     --ink: #1a1917;
-    --ink-mid: #4a4844;
-    --ink-light: #8a8780;
+    --ink-mid: #38362f;
+    --ink-light: #6b6764;
     --paper: #f7f5f0;
     --paper-warm: #ede9e0;
     --rule: rgba(26,25,23,0.12);
@@ -34,7 +34,11 @@
   }
 
   .masthead {
-    border-bottom: 1px solid var(--rule);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--ink);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.18);
     padding: 1.5rem 2rem;
     display: flex;
     align-items: center;
@@ -47,7 +51,7 @@
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--ink-mid);
+    color: var(--paper);
   }
 
   .masthead-links {
@@ -61,12 +65,12 @@
     font-weight: 400;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--ink-light);
+    color: rgba(247,245,240,0.6);
     text-decoration: none;
     transition: color 0.2s;
   }
 
-  .masthead-links a:hover { color: var(--ink); }
+  .masthead-links a:hover { color: var(--paper); }
 
   .hero {
     max-width: 760px;
