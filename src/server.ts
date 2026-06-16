@@ -1,9 +1,11 @@
 // src/server.ts
-// Express app for the Abundance Architecture teaser site. Serves the static
-// landing page and a stub /api/subscribe endpoint (no email service wired yet).
+// Express app entry point: mounts static file serving, the subscribe route,
+// and the health check. Env vars are loaded via --env-file .env in dev;
+// Railway injects them directly in production.
 
 import express, { Request, Response } from 'express';
 import path from 'path';
+import subscribeRouter from './routes/subscribe';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,31 +13,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-interface SubscribeRequestBody {
-  email?: string;
-}
-
-interface SubscribeResponseBody {
-  success: boolean;
-  error?: string;
-}
-
-app.post(
-  '/api/subscribe',
-  (req: Request<unknown, SubscribeResponseBody, SubscribeRequestBody>, res: Response<SubscribeResponseBody>) => {
-    const { email } = req.body;
-
-    if (!email || !EMAIL_PATTERN.test(email)) {
-      res.status(400).json({ success: false, error: 'Invalid email' });
-      return;
-    }
-
-    console.log(`[subscribe] ${email}`);
-    res.json({ success: true });
-  }
-);
+app.use('/api/subscribe', subscribeRouter);
 
 app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });

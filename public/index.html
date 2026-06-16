@@ -404,7 +404,7 @@
   <section class="follow-section">
     <p class="section-label">Stay Connected</p>
     <p class="follow-text">This is a long-term project. Essays, updates, and invitations to dialog will be shared as the inquiry develops.</p>
-    <form class="email-form" onsubmit="handleSubmit(event)">
+    <form class="email-form">
       <input type="email" placeholder="your@email.com" required>
       <button type="submit">Follow this project</button>
     </form>
@@ -420,17 +420,7 @@
   </nav>
 </footer>
 
-<script>
-function handleSubmit(e) {
-  e.preventDefault();
-  const btn = e.target.querySelector('button');
-  const input = e.target.querySelector('input');
-  btn.textContent = 'Thank you';
-  btn.style.background = '#1e3a1e';
-  input.disabled = true;
-  btn.disabled = true;
-}
-</script>
+<script src="/js/main.js"></script>
 
 </body>
 </html>
