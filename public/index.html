@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abundance Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1917;
+    --ink-mid: #4a4844;
+    --ink-light: #8a8780;
+    --paper: #f7f5f0;
+    --paper-warm: #ede9e0;
+    --rule: rgba(26,25,23,0.12);
+    --accent: #2d4a2d;
+    --accent-light: #e8efe8;
+    --serif: 'EB Garamond', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+
+  html { font-size: 18px; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .masthead {
+    border-bottom: 1px solid var(--rule);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .masthead-title {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+  }
+
+  .masthead-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .masthead-links a {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .masthead-links a:hover { color: var(--ink); }
+
+  .hero {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 6rem 2rem 5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(2.8rem, 6vw, 4.2rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 1.2rem;
+  }
+
+  .hero-subtitle {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--ink-mid);
+    margin-bottom: 2rem;
+    line-height: 1.5;
+  }
+
+  .hero-lede {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--ink-mid);
+    max-width: 600px;
+  }
+
+  .content {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .section {
+    padding: 4rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .section-label {
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 2rem;
+  }
+
+  .thesis-statement {
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .thesis-aside {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--ink-light);
+    margin-bottom: 2rem;
+    font-style: normal;
+  }
+
+  .body-text {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--ink-mid);
+    margin-bottom: 1.5rem;
+  }
+
+  .three-questions {
+    margin: 2.5rem 0;
+    border-left: 2px solid var(--accent);
+    padding-left: 1.5rem;
+  }
+
+  .question-block {
+    margin-bottom: 2rem;
+  }
+
+  .question-block:last-child { margin-bottom: 0; }
+
+  .question-q {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+
+  .question-a {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--ink-mid);
+  }
+
+  .ecosystem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .site-card {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.5rem;
+  }
+
+  .site-card-name {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .site-card-domain {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    color: var(--ink-light);
+    margin-bottom: 0.75rem;
+  }
+
+  .site-card-desc {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--ink-mid);
+  }
+
+  .site-card-status {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+  }
+
+  .status-live {
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+
+  .status-dev {
+    background: var(--paper-warm);
+    color: var(--ink-light);
+  }
+
+  .follow-section {
+    padding: 4rem 0 5rem;
+  }
+
+  .follow-text {
+    font-size: 1rem;
+    color: var(--ink-mid);
+    margin-bottom: 1.5rem;
+    max-width: 480px;
+  }
+
+  .email-form {
+    display: flex;
+    gap: 0;
+    max-width: 420px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+    background: white;
+  }
+
+  .email-form input[type="email"] {
+    flex: 1;
+    border: none;
+    padding: 0.7rem 1rem;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: transparent;
+    outline: none;
+  }
+
+  .email-form input[type="email"]::placeholder {
+    color: var(--ink-light);
+  }
+
+  .email-form button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.25rem;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .email-form button:hover {
+    background: #1e3a1e;
+  }
+
+  .footer {
+    border-top: 1px solid var(--rule);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-brand {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .footer-links a {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    color: var(--ink-light);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--ink); }
+
+  @media (max-width: 600px) {
+    .masthead { padding: 1rem; }
+    .masthead-links { display: none; }
+    .hero { padding: 3rem 1.25rem 3rem; }
+    .content { padding: 0 1.25rem; }
+    .footer { padding: 1.25rem; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <span class="masthead-title">Abundance Architecture</span>
+  <nav class="masthead-links">
+    <a href="https://freemarketwatch.world">FreeMarketWatch.world</a>
+    <a href="https://healthunveiled.world">HealthUnveiled.world</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <p class="eyebrow">A public inquiry into human flourishing</p>
+  <h1 class="hero-title">Abundance<br>Architecture</h1>
+  <p class="hero-subtitle">What is abundance? How do we get there? How do we stay there?</p>
+  <p class="hero-lede">Human flourishing requires more than sound money, more than good technology, and more than good intentions. It requires deliberate choices about how the systems governing daily human life are built — and those choices are being made right now, largely without public deliberation, with consequences that will be very difficult to reverse. This is a long-term inquiry into that architecture: what it is, how it fails, and what it would take to build it well.</p>
+</section>
+
+<main class="content">
+
+  <section class="section">
+    <p class="section-label">The Thesis</p>
+    <p class="thesis-statement">Centralization of complex adaptive systems is the primary structural barrier to abundance.</p>
+    <p class="thesis-aside">Not a political claim. A structural one.</p>
+    <p class="body-text">The monetary system is one layer of a deeper architecture. Sound money removes distortion from the foundation — and that matters enormously. But it does not determine what gets built above it. The coordination layer through which production capability reaches human beings determines whether near-zero cost production distributes abundance or concentrates it. And that layer is being designed right now, largely without public deliberation, by a small number of actors with concentrated interests.</p>
+    <p class="body-text">The book <em>Abundance Architecture</em> introduces this argument in depth. This site is the extended inquiry — understanding what abundance actually requires, and learning to build and practice it. Three questions organize the exploration.</p>
+
+    <div class="three-questions">
+      <div class="question-block">
+        <p class="question-q">What is abundance?</p>
+        <p class="question-a">Not material wealth. Not consumption. The condition in which individuals and communities are secure enough, healthy enough, and free enough to choose long-term creation over short-term survival. Abundance is reclaimed agency.</p>
+      </div>
+      <div class="question-block">
+        <p class="question-q">How do we get there?</p>
+        <p class="question-a">Through deliberate construction of polycentric institutions at every layer — monetary, productive, informational, governmental — with the structural properties that allow complex adaptive systems to function: local knowledge, genuine feedback loops, distributed authority, accessible conflict resolution.</p>
+      </div>
+      <div class="question-block">
+        <p class="question-q">How do we stay there?</p>
+        <p class="question-a">By understanding what threatens it. The centralization ratchet turns. Systems that produce abundance attract extraction. The capacities required to build abundance — curiosity, critical thinking, financial health, physical health, emotional health, and trust across difference — are also the capacities required to defend it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <p class="section-label">The Project</p>
+    <p class="body-text">This site is the hub of a longer public inquiry. Two related sites carry the same framework into specific domains — the monetary system and the health system — where the structural argument plays out in daily life.</p>
+
+    <div class="ecosystem-grid">
+      <div class="site-card">
+        <p class="site-card-name">Free Market Watch</p>
+        <p class="site-card-domain">FreeMarketWatch.world</p>
+        <p class="site-card-desc">The monetary layer in practice. Tracking developments in sound money, monetary policy, and the transition toward a hard money economy.</p>
+        <span class="site-card-status status-live">Live now</span>
+      </div>
+      <div class="site-card">
+        <p class="site-card-name">Health Unveiled</p>
+        <p class="site-card-domain">HealthUnveiled.world</p>
+        <p class="site-card-desc">The same structural argument applied to medicine: a system designed not to create health but to create customers. The architecture of health sovereignty.</p>
+        <span class="site-card-status status-dev">In development</span>
+      </div>
+    </div>
+
+    <p class="body-text" style="margin-top: 2rem;">The inquiry begins with a book — <em>Abundance Architecture</em>, in development — and extends through the sites, the conversation, and the public dialog that follows. The goal is a conversation serious enough to match the scale of what is at stake.</p>
+  </section>
+
+  <section class="follow-section">
+    <p class="section-label">Stay Connected</p>
+    <p class="follow-text">This is a long-term project. Essays, updates, and invitations to dialog will be shared as the inquiry develops.</p>
+    <form class="email-form" onsubmit="handleSubmit(event)">
+      <input type="email" placeholder="your@email.com" required>
+      <button type="submit">Follow this project</button>
+    </form>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span class="footer-brand">AbundanceArchitecture.world</span>
+  <nav class="footer-links">
+    <a href="https://freemarketwatch.world">FreeMarketWatch.world</a>
+    <a href="https://healthunveiled.world">HealthUnveiled.world</a>
+  </nav>
+</footer>
+
+<script>
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  const input = e.target.querySelector('input');
+  btn.textContent = 'Thank you';
+  btn.style.background = '#1e3a1e';
+  input.disabled = true;
+  btn.disabled = true;
+}
+</script>
+
+</body>
+</html>
