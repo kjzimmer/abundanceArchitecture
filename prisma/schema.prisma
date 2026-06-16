@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionStatus {
+  SUBSCRIBED
+  UNSUBSCRIBED
+}
+
+model People {
+  id           Int                @id @default(autoincrement())
+  email        String             @unique
+  status       SubscriptionStatus @default(SUBSCRIBED)
+  subscribedAt DateTime           @default(now()) @map("subscribed_at")
+  sourceSite   String             @default("abundance-architecture") @map("source_site")
+
+  @@map("people")
+}
