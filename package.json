@@ -16,7 +16,7 @@
     "build:admin": "vite build --config admin/vite.config.ts",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "seed:admin": "tsx --env-file .env scripts/seed-admin.ts",
+    "seed:admin": "tsx scripts/seed-admin.ts",
     "postinstall": "prisma generate"
   },
   "keywords": [],

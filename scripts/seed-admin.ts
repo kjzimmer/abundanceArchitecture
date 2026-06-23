@@ -1,3 +1,5 @@
+import { config } from 'dotenv';
+config(); // loads .env locally; no-op on Railway where vars are injected
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 
