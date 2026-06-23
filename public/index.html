@@ -244,6 +244,61 @@
     color: var(--ink-light);
   }
 
+  .contact-section {
+    padding: 4rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .contact-form {
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-top: 1.5rem;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 0.65rem 0.9rem;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: white;
+    outline: none;
+    width: 100%;
+  }
+
+  .contact-form textarea {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .contact-form input::placeholder,
+  .contact-form textarea::placeholder { color: var(--ink-light); }
+
+  .contact-form button {
+    align-self: flex-start;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .contact-form button:hover { background: #1e3a1e; }
+
   .follow-section {
     padding: 4rem 0 5rem;
   }
@@ -403,6 +458,18 @@
     </div>
 
     <p class="body-text" style="margin-top: 2rem;">The inquiry begins with a book — <em>Abundance Architecture</em>, in development — and extends through the sites, the conversation, and the public dialog that follows. The goal is a conversation serious enough to match the scale of what is at stake.</p>
+  </section>
+
+  <section class="contact-section">
+    <p class="section-label">Ask a Question</p>
+    <p class="follow-text">A question, a pushback, a point of contact — all welcome. This is a conversation, not a broadcast.</p>
+    <form class="contact-form" id="contact-form">
+      <input type="text" name="name" placeholder="Your name" required>
+      <input type="email" name="email" placeholder="your@email.com" required>
+      <input type="text" name="subject" placeholder="Subject" required>
+      <textarea name="message" placeholder="Your message" required></textarea>
+      <button type="submit" id="contact-btn">Send</button>
+    </form>
   </section>
 
   <section class="follow-section">
