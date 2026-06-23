@@ -7,17 +7,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum SubscriptionStatus {
-  SUBSCRIBED
-  UNSUBSCRIBED
+model Person {
+  id           String   @id @default(cuid())
+  name         String?
+  email        String   @unique
+  phone        String?
+  notes        String?
+  tags         String[] @default([])
+  isAdmin      Boolean  @default(false) @map("is_admin")
+  passwordHash String?  @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  newsletter NewsletterSubscriber?
+  contacts   ContactMessage[]
+
+  @@map("person")
 }
 
-model People {
-  id           Int                @id @default(autoincrement())
-  email        String             @unique
-  status       SubscriptionStatus @default(SUBSCRIBED)
-  subscribedAt DateTime           @default(now()) @map("subscribed_at")
-  sourceSite   String             @default("abundance-architecture") @map("source_site")
+model NewsletterSubscriber {
+  id           String   @id @default(cuid())
+  personId     String   @unique @map("person_id")
+  person       Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  active       Boolean  @default(true)
+  sourceSite   String   @map("source_site")
+  subscribedAt DateTime @default(now()) @map("subscribed_at")
 
-  @@map("people")
+  @@map("newsletter_subscriber")
+}
+
+model ContactMessage {
+  id         String   @id @default(cuid())
+  personId   String?  @map("person_id")
+  person     Person?  @relation(fields: [personId], references: [id], onDelete: SetNull)
+  name       String
+  email      String
+  phone      String?
+  subject    String
+  message    String
+  read       Boolean  @default(false)
+  sourceSite String   @map("source_site")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("contact_message")
+}
+
+model DailyAnalytics {
+  id             String   @id @default(cuid())
+  date           DateTime @unique
+  site           String
+  uniqueVisitors Int      @map("unique_visitors")
+  pageViews      Int      @map("page_views")
+  requests       Int
+  bandwidthBytes BigInt   @map("bandwidth_bytes")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("daily_analytics")
 }

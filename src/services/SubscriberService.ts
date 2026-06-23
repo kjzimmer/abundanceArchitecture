@@ -1,9 +1,5 @@
-// src/services/SubscriberService.ts
-// Owns all subscriber persistence logic. Swap out or extend here when a
-// real email service is wired up, without touching the route layer.
-
 import prisma from '../db';
-import { SubscriptionStatus } from '@prisma/client';
+import { upsertPerson } from './PersonService';
 
 export interface SubscribeResult {
   isNew: boolean;
@@ -13,18 +9,24 @@ export async function subscribe(
   email: string,
   sourceSite = 'abundance-architecture'
 ): Promise<SubscribeResult> {
-  const existing = await prisma.people.findUnique({ where: { email } });
+  const person = await upsertPerson(email);
+
+  const existing = await prisma.newsletterSubscriber.findUnique({
+    where: { personId: person.id },
+  });
 
   if (!existing) {
-    await prisma.people.create({ data: { email, sourceSite } });
+    await prisma.newsletterSubscriber.create({
+      data: { personId: person.id, sourceSite },
+    });
     console.log(`[subscribe] new ${email}`);
     return { isNew: true };
   }
 
-  if (existing.status === SubscriptionStatus.UNSUBSCRIBED) {
-    await prisma.people.update({
-      where: { email },
-      data: { status: SubscriptionStatus.SUBSCRIBED },
+  if (!existing.active) {
+    await prisma.newsletterSubscriber.update({
+      where: { personId: person.id },
+      data: { active: true },
     });
     console.log(`[subscribe] reactivated ${email}`);
   } else {
