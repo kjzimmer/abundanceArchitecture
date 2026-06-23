@@ -294,11 +294,14 @@ POST /api/auth/login    Public — verifies email+password, returns JWT (7d expi
 ### Seed script
 
 ```bash
-npx tsx --env-file .env scripts/seed-admin.ts <email> <password>
+npm run seed:admin <email> <password>
+# or directly:
+npx tsx scripts/seed-admin.ts <email> <password>
 ```
 
 Bcrypt-hashes the password (cost 12), upserts a Person with `isAdmin: true`. Safe to re-run
-to reset a password.
+to reset a password. The script uses `dotenv` internally — no `--env-file` flag needed. On
+Railway, env vars are injected automatically; locally, a `.env` file is loaded if present.
 
 ### Frontend token handling
 
@@ -313,7 +316,7 @@ Apply rate limiting to all public-facing form endpoints to prevent spam. A simpl
 limiter (e.g. `express-rate-limit`) is sufficient for single-instance deployments:
 
 ```
-15 requests per 15-minute window per IP on POST /api/subscribe and POST /api/contact
+10 requests per 15-minute window per IP on POST /api/subscribe and POST /api/contact
 ```
 
 For multi-instance deployments (Railway horizontal scaling), switch to a Redis-backed store.
@@ -333,6 +336,41 @@ CF_ZONE_ID=                    # Optional — Cloudflare analytics
 CF_ACCOUNT_ID=                 # Optional — Cloudflare analytics
 CF_WEB_ANALYTICS_SITE_TAG=     # Optional — Cloudflare RUM beacon
 ```
+
+---
+
+## Deployment Gotchas
+
+### Express 5 wildcard routes
+
+Express 5 uses `path-to-regexp` v8+ which requires **named** wildcards. Bare `*` is invalid
+and crashes the server at startup with `PathError: Missing parameter name`.
+
+```typescript
+// Wrong — crashes Express 5
+app.get(['/admin', '/admin/*'], handler);
+
+// Correct
+app.get(['/admin', '/admin/*path'], handler);
+```
+
+This error only surfaces at runtime, not during TypeScript compilation.
+
+### Vite admin SPA base path
+
+When the admin SPA is served at a sub-path (e.g. `/admin`), Vite must be told the base path
+so that built asset references resolve correctly. Without `base`, the HTML references
+`/assets/...` (root-relative) but the files live at `/admin/assets/...`.
+
+```typescript
+// admin/vite.config.ts
+export default defineConfig({
+  base: '/admin/',
+  // ...
+});
+```
+
+This affects both local dev (proxy must forward `/admin` correctly) and the production build.
 
 ---
 
