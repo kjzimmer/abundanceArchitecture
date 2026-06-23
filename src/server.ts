@@ -28,7 +28,7 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // Serve the admin SPA for any /admin path not matched by static files
-app.get(['/admin', '/admin/*'], (_req: Request, res: Response) => {
+app.get(['/admin', '/admin/*path'], (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'index.html'));
 });
 
