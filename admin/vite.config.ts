@@ -4,6 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   root: path.resolve(__dirname),
+  base: '/admin/',
   plugins: [react()],
   server: {
     port: 5173,
