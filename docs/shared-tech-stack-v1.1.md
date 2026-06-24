@@ -1,5 +1,5 @@
 # Shared Tech Stack Decisions
-*Version: 1.1*
+*Version: 1.2*
 *Last updated: June 2026*
 *Applies to: All projects — Future of Abundance ecosystem and Client/Retail Web Dev*
 
@@ -11,6 +11,7 @@
 |---------|------|---------|
 | 1.0 | March 2026 | Initial document |
 | 1.1 | June 2026 | Added TypeScript as required language; added teaser page pattern |
+| 1.2 | June 2026 | ORM decided (Prisma); admin pattern established; auth clarified |
 
 ---
 
@@ -47,7 +48,7 @@ Custom-built applications over CMS platforms. The developer has a background in 
 | Framework | Express | Familiar, lightweight, sufficient for all planned use cases |
 | Frontend | React | Component-based; SSR considered per-site based on SEO needs |
 | Database | PostgreSQL | Hosted on Railway; relational model fits all planned data structures |
-| ORM | To be decided per project | Prisma or Drizzle preferred for type safety |
+| ORM | Prisma 6 | Decided — type-safe, excellent Railway + PostgreSQL integration |
 
 ### TypeScript Requirements
 - All source files use `.ts` or `.tsx` extensions — no `.js` in `src/`
@@ -98,11 +99,20 @@ Custom-built applications over CMS platforms. The developer has a background in 
 
 ## Authentication
 
-**Clerk** or **Auth.js** — do not roll custom auth.
+Two distinct auth contexts are in use across the suite:
+
+### Admin panel auth (established)
+DB-stored credentials on the `Person` model (`isAdmin`, `passwordHash`). bcryptjs for
+hashing, jsonwebtoken for stateless sessions (7-day JWT). No third-party dependency.
+Pattern is fully specified in `docs/REUSABLE_ADMIN_MODULES.md` — use it as-is on every site.
+
+### User-facing auth (future)
+**Clerk** or **Auth.js** when sites need public user accounts.
 
 - Clerk preferred for faster integration and managed sessions
 - Auth.js acceptable if deeper control is needed
 - Decision made per project at initiation
+- Do not roll custom user auth — admin auth pattern does not extend to public users
 
 ---
 
@@ -129,6 +139,37 @@ All payment logic must sit behind a `PaymentService` interface from day one. No 
     StripePaymentService.ts  ← Stripe implementation
     BtcPayService.ts         ← added later
 ```
+
+---
+
+## Admin Foundation Pattern
+
+Every site in the suite ships with the same admin foundation. The spec lives in
+`docs/REUSABLE_ADMIN_MODULES.md` in the abundanceArchitecture repo and should be
+copied into each new site's `docs/` folder at project initiation.
+
+### What the pattern includes
+- **Person-as-hub CRM** — every form submission upserts a unified contact record
+- **Newsletter subscriber tracking** — active/inactive, per-site source tagging
+- **Contact/inquiry inbox** — admin-only, mark-read, optional notification webhook
+- **Cloudflare analytics** — Zone Analytics via GraphQL, retained in DB past 30-day limit
+- **DB-based admin auth** — `isAdmin` + `passwordHash` on Person; JWT sessions
+- **Rate limiting** — 10 req / 15 min / IP on all public form endpoints
+- **React admin SPA** — served at `/admin` from the same Express server
+
+The backend contracts (DB schema, API routes, service layer structure, auth middleware)
+are prescriptive and identical across all sites. The frontend implementation is
+non-prescriptive — each site uses whatever stack fits.
+
+### Prisma version pin
+
+Pin to `prisma@6` and `@prisma/client@6` until local dev Node version reaches >=20.19.
+Prisma 7 requires Node >=20.19. Railway runs Node 24 and is fine with either; the
+constraint is local development.
+
+Always use `provider = "prisma-client-js"` in the generator block. The new default
+`provider = "prisma-client"` generates output inside `src/` which conflicts with
+`rootDir: ./src` in tsconfig.
 
 ---
 
@@ -199,6 +240,6 @@ Each of these is either built when needed, handled by a focused library, or cons
 ## Decisions Still Open
 
 - SSR strategy: Next.js vs plain React + Express (decide at first site initiation based on SEO requirements)
-- ORM: Prisma vs Drizzle (decide at first site initiation)
 - Email: Resend or Postmark for transactional email (decide when first site needs it)
-- Email capture service for teaser pages: Mailchimp, ConvertKit, or Buttondown (decide before teaser goes live)
+- Email capture service for newsletters: Mailchimp, ConvertKit, or Buttondown (decide before first broadcast)
+- User-facing auth provider: Clerk vs Auth.js (decide when first site needs public accounts)

@@ -1,5 +1,5 @@
 # CLAUDE.md — Abundance Architecture Web Project
-*For Claude Code sessions on the foa-abundance-architecture repository*
+*For Claude Code sessions on the abundanceArchitecture repository*
 
 ---
 
@@ -8,144 +8,187 @@
 AbundanceArchitecture.world is the hub site for a long-term public inquiry into the
 structural conditions required for human flourishing. It is the home of the book
 *Abundance Architecture* (in development) and the parent site to two related properties:
-FreeMarketWatch.world and HealthUnveiled.world.
+FreeMarketWatch.world and HealthUnveiled.world. Together these form the Future of Abundance
+(FoA) suite.
 
-The current build goal is a teaser landing page — a static page that introduces the
-project, signals intellectual seriousness, and captures email signups while full
-development proceeds.
-
----
-
-## Current Task: Teaser Landing Page
-
-### Scope
-Deploy a teaser page at AbundanceArchitecture.world. This is a static HTML page
-served by Express. No database, no auth, no React build step required for this phase.
-
-### The HTML File
-The file `public/index.html` is the final design. It was designed externally and
-approved. **Treat it as pixel-perfect spec — do not restyle, restructure, or
-"improve" the design.** Your job is to wire it into the Express app and deploy it,
-not to redesign it.
-
-### What Needs to Be Built
-1. Express app in TypeScript (`src/server.ts`) that:
-   - Serves `public/` as static files
-   - Has a `POST /api/subscribe` endpoint that accepts `{ email: string }`,
-     validates it, logs it, and returns `{ success: true }` (stub — no email
-     service wired yet)
-   - Has a health check at `GET /health` returning `{ status: 'ok' }`
-2. `package.json` with all dependencies and scripts
-3. `tsconfig.json` per the shared tech stack TypeScript requirements
-4. `.env.example` documenting all environment variables
-5. `README.md` with local setup and deployment instructions
-6. Railway deployment configuration
-
-### Hero Image
-The hero background image slot is `public/images/hero.jpg`. This file does not
-exist yet — artwork is being generated separately. Leave the slot wired in the
-HTML as-is. When the image is ready it drops into that path with no code changes.
-
-### Email Form
-The form in `index.html` submits to `POST /api/subscribe`. Wire it to the stub
-endpoint. Do not integrate an email service yet — that decision is pending.
-The stub should:
-- Validate that email is present and is a valid email format
-- Log the submission to console (for Railway log visibility)
-- Return `{ success: true }` on valid submission
-- Return `{ success: false, error: 'Invalid email' }` on invalid submission
+The teaser landing page is live. The current build phase is the admin foundation — subscriber
+management, contact inbox, analytics, and admin auth — which is also being designed as a
+reusable pattern across all FoA sites (see `docs/REUSABLE_ADMIN_MODULES.md`).
 
 ---
 
-## Tech Stack for This Project
+## Current State
 
-See `shared-tech-stack.md` for full details. Key points:
+- **Teaser page** live at AbundanceArchitecture.world — `public/index.html`
+- **Subscribe form** — `POST /api/subscribe`, persists to `NewsletterSubscriber` via Person hub
+- **Contact form** — `POST /api/contact`, persists to `ContactMessage` via Person hub
+- **Admin panel** — React SPA at `/admin`, protected by DB-based JWT auth
+- **People CRM** — unified contact records auto-created from all form submissions
+- **Analytics** — Cloudflare Zone Analytics via GraphQL, retained in `DailyAnalytics` table
+- **Admin seed** — `npm run seed:admin <email> <password>`
 
-- **TypeScript required** — all source files `.ts`, strict mode, no `any` without comment
-- **Node.js** current LTS
-- **Express** for the server
-- **Railway** for hosting — GitHub integration for automated deploys
-- **No database** for teaser phase
-- **No auth** for teaser phase
-- **No React** for teaser phase — pure static HTML
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Language | TypeScript (strict mode) |
+| Runtime | Node.js (Railway runs 24.x) |
+| Framework | Express 5 |
+| Admin frontend | React 19 + Vite 5 (SPA at `/admin`) |
+| Database | PostgreSQL via Railway |
+| ORM | Prisma 6 (`provider = "prisma-client-js"`) |
+| Auth | bcryptjs + jsonwebtoken (DB-stored admin credentials) |
+| Rate limiting | express-rate-limit |
+
+### Critical version constraints
+
+- **Prisma 6** — pinned because Prisma 7 requires Node >=20.19; local Node may be older
+- **Vite 5** — pinned because Vite 8 requires Node >=20.19
+- **Prisma generator must be `provider = "prisma-client-js"`** — the new default
+  `provider = "prisma-client"` generates to `src/generated/` which breaks `rootDir: ./src`
+
+### Express 5 wildcard routes
+
+Express 5 requires **named** wildcards — bare `*` crashes at startup:
+
+```typescript
+// Wrong
+app.get('/admin/*', handler);
+
+// Correct
+app.get('/admin/*path', handler);
+```
+
+### Vite sub-path deployment
+
+The admin SPA is served at `/admin`, so `vite.config.ts` must set `base: '/admin/'`.
+Without it, asset paths resolve from `/` (root) instead of `/admin/` and the page is blank.
 
 ---
 
 ## Repository Structure
 
 ```
-foa-abundance-architecture/
+abundanceArchitecture/
 ├── src/
-│   └── server.ts
+│   ├── server.ts              ← Express entry point
+│   ├── db.ts                  ← Prisma client singleton
+│   ├── middleware/
+│   │   └── auth.ts            ← requireAdmin JWT middleware
+│   ├── routes/
+│   │   ├── auth.ts            ← POST /api/auth/login
+│   │   ├── subscribe.ts       ← POST /api/subscribe
+│   │   ├── contact.ts         ← POST /api/contact + admin routes
+│   │   ├── people.ts          ← admin-only CRUD
+│   │   └── analytics.ts       ← Cloudflare GraphQL + DailyAnalytics cache
+│   └── services/
+│       ├── PersonService.ts   ← upsertPerson hub helper
+│       ├── SubscriberService.ts
+│       └── ContactService.ts
+├── admin/                     ← React admin SPA (Vite)
+│   ├── index.html
+│   ├── vite.config.ts         ← base: '/admin/', outDir: ../public/admin
+│   ├── tsconfig.json
+│   └── src/
+│       ├── main.tsx
+│       ├── App.tsx
+│       ├── api.ts             ← apiFetch wrapper + token management
+│       └── components/
+│           ├── Login.tsx
+│           ├── AdminLayout.tsx
+│           ├── AdminPeople.tsx
+│           ├── AdminContact.tsx
+│           └── AdminAnalytics.tsx
+├── prisma/
+│   ├── schema.prisma
+│   └── migrations/
+├── scripts/
+│   └── seed-admin.ts          ← CLI admin seeder (uses dotenv internally)
 ├── public/
-│   ├── index.html          ← teaser page — DO NOT MODIFY
+│   ├── index.html             ← teaser page — DO NOT RESTYLE
+│   ├── js/main.js             ← subscribe + contact form handlers
 │   ├── images/
-│   │   └── hero.jpg        ← placeholder slot; file not present yet
-│   └── (any extracted CSS if needed)
+│   └── admin/                 ← Vite build output (committed)
 ├── docs/
-│   └── adr/                ← ADRs go here; create ADR-001 for any significant decisions
+│   ├── CLAUDE.md              ← this file
+│   ├── REUSABLE_ADMIN_MODULES.md ← suite-wide admin spec
+│   ├── shared-tech-stack-v1.1.md
+│   └── adr/
+├── railway.json
 ├── .env.example
-├── .gitignore
 ├── package.json
-├── tsconfig.json
-├── README.md
-└── CHANGELOG.md
+└── tsconfig.json
 ```
 
 ---
 
-## Coding and Documentation Standards
+## Scripts
 
-See `coding-and-documentation-standards.md` for full standards. Key points:
+```bash
+npm run dev:server    # tsx watch src/server.ts (loads .env)
+npm run dev:admin     # vite dev server on :5173 with /api proxy to :3000
+npm run build         # prisma generate + tsc + vite build (Railway uses this)
+npm run start         # node dist/server.js (Railway uses this)
+npm run seed:admin    # npx tsx scripts/seed-admin.ts <email> <password>
+```
 
-- Every file gets a header comment explaining its purpose and role
-- Non-obvious decisions get inline comments explaining *why*, not *what*
-- Any significant architectural decision gets an ADR in `docs/adr/`
-- `.env.example` documents every environment variable
-- `README.md` must include: what this is, local setup steps, environment variables,
-  deployment instructions
+---
+
+## Environment Variables
+
+```env
+DATABASE_URL=                  # PostgreSQL (set by Railway automatically)
+JWT_SECRET=                    # 32+ char random string — required
+PORT=                          # set by Railway automatically
+NOTIFICATION_EMAIL_ENDPOINT=   # optional — fire-and-forget contact notification
+CF_ANALYTICS_TOKEN=            # Cloudflare API token (Read analytics for zone)
+CF_ZONE_ID=                    # Cloudflare zone ID
+CF_ACCOUNT_ID=                 # Cloudflare account ID
+CF_WEB_ANALYTICS_SITE_TAG=     # optional — Cloudflare RUM beacon data
+```
 
 ---
 
 ## Deployment
 
-- Railway project: `foa-abundance-architecture`
-- Branch `main` deploys to production at AbundanceArchitecture.world
-- Branch `staging` deploys to staging environment
-- Railway start command: `npm run start` (runs compiled JS from `dist/`)
-- Build command: `npm run build` (runs `tsc`)
+- **Railway project**: foa-abundance-architecture
+- **Domain**: AbundanceArchitecture.world (DNS via Cloudflare)
+- **Branch `main`** → auto-deploy to production
+- **Build**: `npm run build` (via `railway.json`)
+- **Start**: `npx prisma migrate deploy && npm run start` (via `railway.json`)
 
-### Required Environment Variables
-```
-PORT=3000
-NODE_ENV=production
-```
-Document any additions in `.env.example`.
+Migrations run automatically at boot. Schema changes go through `prisma migrate dev`
+locally first, then the migration file is committed and Railway applies it on next deploy.
 
 ---
 
 ## What Not to Change
 
-- `public/index.html` — final design, do not touch
-- The visual design — typography, colors, layout are approved and final
-- The copy — all text content in the HTML is approved and final
+- `public/index.html` — final approved design, do not restyle or restructure
+- All copy in the HTML — content is approved and final
+- The visual design (typography, colors, layout) is approved and final
 
 ---
 
-## ADR Guidance for This Session
+## Related Projects (FoA Suite)
 
-If you make any decision that affects how this project will be built or extended —
-choice of middleware, project structure deviations, how the email stub is designed —
-write a brief ADR in `docs/adr/`. The template is in `coding-and-documentation-standards.md`.
+- `abundanceArchitecture` — this repo, AbundanceArchitecture.world
+- `healthUnveiled` — HealthUnveiled.world
+- `freeMarketWatch` — FreeMarketWatch.world
 
-The goal is that a future Claude Code session opening this repo cold can read the
-ADRs and understand why things are the way they are without having to reverse-engineer
-the code.
+All three sites share the same tech stack and admin module design. See
+`docs/REUSABLE_ADMIN_MODULES.md` for the backend/schema/API spec that applies across
+all sites. Frontend implementation varies per site.
 
 ---
 
-## Related Projects
+## ADR Index
 
-- `foa-free-market-watch` — FreeMarketWatch.world, live
-- `foa-health-unveiled` — HealthUnveiled.world, teaser page coming
-- Both sites share the same tech stack and coding standards
+| ADR | Decision |
+|-----|----------|
+| 0001 | Express server for teaser (vs static hosting) |
+| 0002 | Bootstrap commit directly to main |
+| 0003 | Subscriber persistence approach |
+| 0004 | Railway topology — separate projects per site |
