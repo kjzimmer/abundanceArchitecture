@@ -14,16 +14,18 @@ app.use(express.json());
 
 // Rate limit public form submissions
 const formLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false });
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false });
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth', authRouter);
 app.use('/api/subscribe', formLimiter, subscribeRouter);
 app.use('/api/contact', formLimiter, contactRouter);
 app.use('/api/people', peopleRouter);
 app.use('/api/analytics', analyticsRouter);
 
-app.get('/health', (_req: Request, res: Response) => {
+app.get(['/health', '/api/health'], (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
 
