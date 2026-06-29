@@ -194,26 +194,33 @@ NODE_ENV=production        # Must be set explicitly in Railway — do not rely o
 
 ---
 
-## Folder Notes (Pre-PR2)
+## Folder Notes
 
 ```
-src/
-  server.ts          — Express entry point; registers all routers
-  db.ts              — Prisma client singleton
-  middleware/
-    auth.ts          — requireAdmin: verifies Bearer JWT
-  routes/
-    auth.ts          — POST /api/auth/login
-    subscribe.ts     — POST /api/subscribe
-    contact.ts       — POST /api/contact + admin GET/PATCH
-    people.ts        — admin CRUD (all routes use requireAdmin)
-    analytics.ts     — Cloudflare GraphQL + DailyAnalytics cache
-  services/
-    PersonService.ts     — upsertPerson hub helper
-    SubscriberService.ts
-    ContactService.ts
+server/
+  package.json       — server dependencies (all build tools in dependencies, not devDependencies)
+  tsconfig.json      — rootDir: ./src, outDir: ./dist
+  src/
+    index.ts         — Express entry point; registers all routers
+    db.ts            — Prisma client singleton
+    middleware/
+      auth.ts        — requireAdmin: verifies Bearer JWT
+    routes/
+      auth.ts        — POST /api/auth/login
+      subscribe.ts   — POST /api/subscribe
+      contact.ts     — POST /api/contact + admin GET/PATCH
+      people.ts      — admin CRUD (all routes use requireAdmin)
+      analytics.ts   — Cloudflare GraphQL + DailyAnalytics cache
+    services/
+      PersonService.ts     — upsertPerson hub helper
+      SubscriberService.ts
+      ContactService.ts
+    scripts/
+      seed-admin.ts  — CLI admin seeder; uses dotenv internally
+  dist/              — compiled output (gitignored); entry point: dist/index.js
 
-admin/               — React + Vite admin SPA
+client/              — React + Vite admin SPA
+  package.json       — client dependencies (all build tools in dependencies, not devDependencies)
   index.html         — Vite entry point
   vite.config.ts     — base: '/admin/', outDir: ../public/admin
   tsconfig.json
@@ -228,9 +235,6 @@ admin/               — React + Vite admin SPA
       AdminContact.tsx
       AdminAnalytics.tsx
 
-scripts/
-  seed-admin.ts      — CLI admin seeder; uses dotenv internally
-
 prisma/
   schema.prisma
   migrations/        — never delete these
@@ -241,6 +245,10 @@ public/
   images/
   admin/             — Vite build output (committed to git)
 ```
+
+### Path note for server index.ts
+
+`__dirname` at runtime is `server/dist/`. Static files are served with `path.join(__dirname, '..', '..', 'public')` — two levels up to reach the repo root's `public/`.
 
 ---
 

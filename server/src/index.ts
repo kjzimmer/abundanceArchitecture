@@ -12,11 +12,11 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Rate limit public form submissions
 const formLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false });
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false });
 
-app.use(express.static(path.join(__dirname, '..', 'public')));
+// Compiled output is server/dist/index.js — public/ is two levels up
+app.use(express.static(path.join(__dirname, '..', '..', 'public')));
 
 app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth', authRouter);
@@ -29,9 +29,8 @@ app.get(['/health', '/api/health'], (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
 
-// Serve the admin SPA for any /admin path not matched by static files
 app.get(['/admin', '/admin/*path'], (_req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', '..', 'public', 'admin', 'index.html'));
 });
 
 app.listen(port, () => {

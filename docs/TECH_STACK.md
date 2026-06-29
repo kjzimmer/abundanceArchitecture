@@ -18,23 +18,6 @@ When local Node is upgraded past 20.19, unpin both and upgrade together.
 
 ---
 
-## Folder Structure (Pre-PR2)
-
-The current structure deviates from the shared standard. This is a known gap
-being resolved in PR2 (folder restructure).
-
-| Standard | Current (pre-PR2) |
-|----------|------------------|
-| `server/src/` | `src/` |
-| `client/src/` | `admin/src/` |
-| `server/src/scripts/seed-admin.ts` | `scripts/seed-admin.ts` |
-| `root package.json` (scripts only) | `root package.json` (has all dependencies) |
-
-Do not create new files in the `server/` or `client/` paths until PR2 is complete.
-All new source files go in `src/` or `admin/src/` until then.
-
----
-
 ## Admin SPA Build Output
 
 The Vite build output (`public/admin/`) is committed to git rather than being
@@ -44,13 +27,6 @@ site is always in a deployable state from any checkout.
 
 **Implication:** After any change to admin source files, run `npm run build:admin`
 and commit the updated `public/admin/` alongside the source changes.
-
----
-
-## Railway Configuration
-
-Currently uses `railway.json` (being converted to `railway.toml` in PR1).
-See `shared/SHARED_TECH_STACK.md` for the standard `railway.toml` format.
 
 ---
 
