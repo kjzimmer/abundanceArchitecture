@@ -25,11 +25,10 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - Rate limiting on subscribe, contact, and login endpoints
 
 **In flight:**
-- PR1: Docs restructure + minor fixes (this session — branch `feature/transition-pr1-docs-and-fixes`)
+- PR2: Folder restructure — `src/` → `server/`, `admin/` → `client/` (branch `feature/transition-pr2-folder-restructure`)
 
 **Deferred:**
-- PR2: Folder restructure — `src/` → `server/`, `admin/` → `client/` — wait for PR1 deploy confirmation
-- PR3: Auth hardening — 15-min access token + HttpOnly refresh token — wait for PR2 confirmation
+- PR3: Auth hardening — 15-min access token + HttpOnly refresh token — wait for PR2 deploy confirmation
 - Admin UI left-nav migration (Module 6 from SHARED_ADMIN_MODULES.md) — current admin uses
   top-tab nav; redesign scheduled for after auth hardening
 - First-run admin setup via Resend (currently using `seed:admin` CLI script)
@@ -57,9 +56,9 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - **Vite base path** — `base: '/admin/'` required in `admin/vite.config.ts` or admin SPA loads blank
 - **Prisma generator** — always `provider = "prisma-client-js"` not `provider = "prisma-client"`
 - **Prisma workflow** — `prisma migrate dev` locally, `prisma migrate deploy` on Railway. Never `db push`
-- **Folder structure pre-PR2** — current structure uses `src/` (not `server/`) and `admin/` (not
-  `client/`). The Standing Rules below reference the target post-PR2 structure. Until PR2 ships,
-  source files live in `src/` and `admin/`
+- **Admin SPA build output committed** — `public/admin/` is committed to git. After changes to
+  `client/src/`, run `npm run build` (or `cd client && npm run build`) and commit the updated
+  `public/admin/` alongside the source changes or Railway serves stale output
 - **NODE_ENV=production** — must be set explicitly in Railway environment variables. If a Railway
   deploy appears to succeed but the live site reflects old code, this is the first thing to check.
   See SHARED_TECH_STACK.md Gotchas for full explanation
