@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { setToken } from '../api';
+import { setAccessToken } from '../api';
 
 interface Props {
   onLogin: () => void;
@@ -19,14 +19,15 @@ export default function Login({ onLogin }: Props) {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json() as { token?: string; error?: string };
-      if (!res.ok || !data.token) {
+      const data = await res.json() as { success?: boolean; accessToken?: string; error?: string };
+      if (!res.ok || !data.accessToken) {
         setError(data.error ?? 'Login failed');
         return;
       }
-      setToken(data.token);
+      setAccessToken(data.accessToken);
       onLogin();
     } catch {
       setError('Network error — please try again');

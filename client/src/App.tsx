@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { getToken } from './api';
+import { useState, useEffect } from 'react';
+import { tryRestoreSession } from './api';
 import Login from './components/Login';
 import AdminLayout from './components/AdminLayout';
 import AdminPeople from './components/AdminPeople';
@@ -9,9 +9,19 @@ import AdminAnalytics from './components/AdminAnalytics';
 type Tab = 'people' | 'contact' | 'analytics';
 
 export default function App() {
-  const [authed, setAuthed] = useState(() => !!getToken());
+  const [authed, setAuthed] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [tab, setTab] = useState<Tab>('contact');
   const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    tryRestoreSession().then((ok) => {
+      setAuthed(ok);
+      setChecking(false);
+    });
+  }, []);
+
+  if (checking) return null;
 
   if (!authed) {
     return <Login onLogin={() => setAuthed(true)} />;

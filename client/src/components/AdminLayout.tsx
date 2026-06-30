@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { clearToken } from '../api';
+import { apiFetch, clearAccessToken } from '../api';
 
 type Tab = 'people' | 'contact' | 'analytics';
 
@@ -17,8 +17,13 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 export default function AdminLayout({ activeTab, onTabChange, unreadCount = 0, children }: Props) {
-  function handleLogout() {
-    clearToken();
+  async function handleLogout() {
+    try {
+      await apiFetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // proceed regardless
+    }
+    clearAccessToken();
     window.location.reload();
   }
 
