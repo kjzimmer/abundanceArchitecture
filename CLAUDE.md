@@ -24,14 +24,19 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - People CRM, contact inbox, Cloudflare Zone Analytics in admin panel
 - Rate limiting on subscribe, contact, and login endpoints
 
-**In flight:**
-- PR2: Folder restructure — `src/` → `server/`, `admin/` → `client/` (branch `feature/transition-pr2-folder-restructure`)
+**Transition complete (all three PRs merged):**
+- PR1: Docs + minor fixes
+- PR2: Folder restructure — `src/` → `server/`, `admin/` → `client/`
+- PR3: Auth hardening — 15-min access token (memory-only) + 7-day HttpOnly refresh cookie,
+  refresh/logout/me routes, RefreshToken DB table with bcrypt-hashed storage, token rotation on refresh
 
 **Deferred:**
-- PR3: Auth hardening — 15-min access token + HttpOnly refresh token — wait for PR2 deploy confirmation
 - Admin UI left-nav migration (Module 6 from SHARED_ADMIN_MODULES.md) — current admin uses
-  top-tab nav; redesign scheduled for after auth hardening
+  top-tab nav; redesign scheduled for a future session
 - First-run admin setup via Resend (currently using `seed:admin` CLI script)
+
+**Post-transition cleanup needed:**
+- Remove `docs/_transition/` folder (manual step after PR3 deploys successfully)
 
 ---
 
