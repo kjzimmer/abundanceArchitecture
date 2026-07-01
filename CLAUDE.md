@@ -31,8 +31,6 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   refresh/logout/me routes, RefreshToken DB table with bcrypt-hashed storage, token rotation on refresh
 
 **Deferred:**
-- Admin UI left-nav migration (Module 6 from SHARED_ADMIN_MODULES.md) — current admin uses
-  top-tab nav; redesign scheduled for a future session
 - First-run admin setup via Resend (currently using `seed:admin` CLI script)
 
 **Post-transition cleanup needed:**
