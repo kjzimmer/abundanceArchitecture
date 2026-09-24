@@ -296,6 +296,11 @@ subject prefix, so Gmail filters can label them automatically (filter: `subject:
 
 ---
 
+## Follow-ups (outside this feature)
+
+- **`trust proxy` / rate limiting:** see CLAUDE.md → Known issues. Affects the per-IP formLimiter and
+  linkLimiter used by these endpoints. Turnstile is the main bot defense in the meantime
+
 ## Status
 
 - [x] Infrastructure (Cloudflare routing, Resend domain, DMARC, API key)

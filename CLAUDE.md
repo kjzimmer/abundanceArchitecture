@@ -41,6 +41,15 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - PR3: Auth hardening — 15-min access token (memory-only) + 7-day HttpOnly refresh cookie,
   refresh/logout/me routes, RefreshToken DB table with bcrypt-hashed storage, token rotation on refresh
 
+**Known issues (open):**
+- **`trust proxy` not set** (found 2026-09-24): Express sees Railway's proxy IP as `req.ip` for every
+  visitor, so the form and login rate limits are shared site-wide, not applied per visitor (a bot can lock
+  the admin out of login). Fix: `app.set('trust proxy', N)`, with N set to the measured hop count
+  (Cloudflare → Railway edge). **Never `true`**: that trusts a spoofable X-Forwarded-For. Measure first
+  by logging `X-Forwarded-For` / `CF-Connecting-IP` for one production request. Also consider that
+  `*.up.railway.app` bypasses Cloudflare. Check Railway logs for `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`.
+  Planned as its own small PR after email PR A
+
 **Deferred:**
 - First-run admin setup via Resend (currently using `seed:admin` CLI script) — unblocked
   once email PR A ships
