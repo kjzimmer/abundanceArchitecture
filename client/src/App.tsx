@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { tryRestoreSession } from './api';
+import { apiFetch, tryRestoreSession } from './api';
 import Login from './components/Login';
 import AdminLayout from './components/AdminLayout';
 import type { Tab } from './components/AdminLayout';
@@ -19,6 +19,14 @@ export default function App() {
       setChecking(false);
     });
   }, []);
+
+  // Load unread count on login so the Inbox badge is correct before the Inbox is opened
+  useEffect(() => {
+    if (!authed) return;
+    apiFetch<{ read: boolean }[]>('/api/contact')
+      .then((data) => setUnreadCount(data.filter((m) => !m.read).length))
+      .catch(() => {});
+  }, [authed]);
 
   if (checking) return null;
 
