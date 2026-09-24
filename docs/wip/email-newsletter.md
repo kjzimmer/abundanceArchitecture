@@ -298,17 +298,43 @@ subject prefix, so Gmail filters can label them automatically (filter: `subject:
 
 ## Follow-ups (outside this feature)
 
+Next small PR (found during PR A production testing, 2026-09-24):
+
 - **`trust proxy` / rate limiting:** see CLAUDE.md → Known issues. Affects the per-IP formLimiter and
-  linkLimiter used by these endpoints. Turnstile is the main bot defense in the meantime
+  linkLimiter used by these endpoints. Turnstile is the main bot defense in the meantime. Confirmed in
+  Railway logs: `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`
+- **Log missing Turnstile token:** `verifyTurnstile` returns false silently on an empty token. Add
+  `[turnstile] missing token` so stale-script and blocked-widget cases show up in logs
+- **Log successful sends:** live mode only logs failures. Add one line per send (kind, masked recipient, resendId)
+- **Clear `aa_subscribed` on unsubscribe:** the unsubscribe result page should run
+  `localStorage.removeItem('aa_subscribed')` (same origin) so the home-page form re-enables for resubscribing
+- **Cloudflare Browser Cache TTL:** Karl to set "Respect Existing Headers". The default 4h override kept
+  the old `main.js` in browsers after deploy (subscribe 403s until the cache expired)
 
 ## Status
 
 - [x] Infrastructure (Cloudflare routing, Resend domain, DMARC, API key)
-- [ ] PR A — Email foundation: code complete and locally tested 2026-09-24; deploy steps pending
-  - [ ] Cloudflare Turnstile widget created, keys in Railway
-  - [ ] Railway env: `EMAIL_MODE=live`, `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_NOTIFY_EMAIL`,
-        `PUBLIC_BASE_URL`, `TURNSTILE_*`; remove `NOTIFICATION_EMAIL_ENDPOINT`
-  - [ ] Resend webhook endpoint created (all `email.*` events) → `RESEND_WEBHOOK_SECRET` in Railway
-  - [ ] Production smoke test: subscribe → confirm → unsubscribe; contact form; admin "Send test email"
+- [x] PR A — Email foundation: merged as PR #11, deployed 2026-09-24
+  - [x] Cloudflare Turnstile widget created, keys in Railway (verified: tokenless POST → 403)
+  - [x] Railway env set; `NOTIFICATION_EMAIL_ENDPOINT` removed
+  - [x] Resend webhook configured (verified: webhook POSTs return 200, sent + delivered per email)
+  - [x] Prod: subscribe → confirmation email → confirm → `[AA Subscriber]` notice; admin shows subscriber
+  - [x] Prod: unsubscribe via tokened link works; resubscribe works (after clearing `aa_subscribed`)
+  - [x] Prod: contact → ack received; inquiry in admin Inbox; notice delivered per webhook logs
+  - [ ] Karl to confirm `[AA Inquiry]` notice arrived in EE (maybe grouped in Gmail or in Spam)
+  - [ ] Admin → Email → "Send test email" → shows `delivered`
+  - [ ] Admin → People: grandfathered subscribers show as confirmed
+- [ ] Follow-up PR (see Follow-ups above)
+
+### Production testing notes (2026-09-24)
+
+- Stale-script 403s: Cloudflare's 4h browser cache override kept old `main.js` after deploy. Fix is in Follow-ups
+- To test the unsubscribe page, use the tokened link from the email (`/unsubscribe?t=…`). The page shown
+  after confirming has no token in its URL
+- `aa_subscribed` in localStorage disables the home-page form after subscribing (private window or
+  DevTools to reset). Fix is in Follow-ups
+- Replies to acknowledgements currently go to `hello@` → EE via catch-all, not linked in the app.
+  PR B links them via `reply+c-<id>@` Reply-To and In-Reply-To. Pre-PR-B sends can be matched using
+  `message_id` saved in `email_event.payload`
 - [ ] PR B — Inbound + conversations
 - [ ] PR C — Newsletter + first issue
