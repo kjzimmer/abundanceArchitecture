@@ -1,5 +1,12 @@
+import { EmailKind } from '@prisma/client';
 import prisma from '../db';
 import { upsertPerson } from './PersonService';
+import * as EmailService from './EmailService';
+import { contactAck } from '../lib/email/templates';
+import { emailFromAddress } from '../lib/email/config';
+
+// At most one acknowledgement per address per hour, however many messages arrive
+const ACK_WINDOW_MS = 60 * 60 * 1000;
 
 export interface ContactInput {
   name: string;
@@ -8,6 +15,17 @@ export interface ContactInput {
   subject: string;
   message: string;
   sourceSite?: string;
+}
+
+async function sendAck(email: string, personId: string) {
+  if (await EmailService.sentRecently(email, EmailKind.CONTACT_ACK, ACK_WINDOW_MS)) return;
+  await EmailService.send({
+    ...contactAck(),
+    to: email,
+    kind: EmailKind.CONTACT_ACK,
+    personId,
+    replyTo: emailFromAddress(),
+  });
 }
 
 export async function createMessage(input: ContactInput) {
@@ -19,13 +37,18 @@ export async function createMessage(input: ContactInput) {
     data: { personId: person.id, name, email, phone: phone || null, subject, message, sourceSite },
   });
 
-  if (process.env.NOTIFICATION_EMAIL_ENDPOINT) {
-    fetch(process.env.NOTIFICATION_EMAIL_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, subject, message, sourceSite }),
-    }).catch((err) => console.error('[contact] notification failed:', err));
-  }
+  // Background — never block the response on email
+  sendAck(email, person.id).catch((err) => console.error('[contact] ack failed:', err));
+  EmailService.notifyAdmin({
+    type: 'Inquiry',
+    title: `${subject} — ${name}`,
+    rows: [
+      ['From', `${name} <${email}>`],
+      ...(phone ? ([['Phone', phone]] as [string, string][]) : []),
+      ['Subject', subject],
+    ],
+    body: message,
+  });
 
   return msg;
 }

@@ -10,7 +10,7 @@ router.get('/', async (_req, res: Response) => {
   const people = await prisma.person.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
-      newsletter: { select: { active: true, sourceSite: true, subscribedAt: true } },
+      newsletter: { select: { active: true, confirmedAt: true, sourceSite: true, subscribedAt: true } },
       _count: { select: { contacts: true } },
     },
   });
@@ -21,8 +21,16 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
   const person = await prisma.person.findUnique({
     where: { id: req.params.id },
     include: {
-      newsletter: true,
+      // token omitted — it grants confirm/unsubscribe and has no use in the admin UI
+      newsletter: {
+        select: { active: true, confirmedAt: true, unsubscribedAt: true, sourceSite: true, subscribedAt: true },
+      },
       contacts: { orderBy: { createdAt: 'desc' } },
+      outboundEmails: {
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+        select: { id: true, subject: true, kind: true, status: true, createdAt: true },
+      },
     },
   });
   if (!person) { res.status(404).json({ error: 'Not found' }); return; }

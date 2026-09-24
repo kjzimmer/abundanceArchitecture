@@ -22,7 +22,18 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - Newsletter subscriber and contact message persistence (PostgreSQL via Prisma)
 - Admin panel at `/admin` — React SPA, DB-backed JWT auth
 - People CRM, contact inbox, Cloudflare Zone Analytics in admin panel
+- Admin left-nav layout (Module 6) — PR #9, badge fix PR #10
 - Rate limiting on subscribe, contact, and login endpoints
+- Email infrastructure (2026-09-24): Cloudflare Email Routing (catch-all → admin's inbox),
+  Resend sending domain verified, DMARC `p=none`. No app code uses it yet
+
+**In flight:**
+- Email + newsletter — spec `docs/wip/email-newsletter.md`, branch `feature/email-newsletter`
+  (PR A foundation → PR B inbound → PR C newsletter). PR A code complete + locally tested;
+  awaiting Turnstile/Railway/Resend-webhook setup and deploy (checklist in the wip spec)
+- SHARED_FEEDBACK logged 2026-09-24: email/newsletter module gap, `worker/` folder +
+  email decision gap, stale ARCHITECTURE.md, wrong SITE_DESIGN.md teaser tokens,
+  Prisma client generation location
 
 **Transition complete (all three PRs merged):**
 - PR1: Docs + minor fixes
@@ -31,10 +42,10 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   refresh/logout/me routes, RefreshToken DB table with bcrypt-hashed storage, token rotation on refresh
 
 **Deferred:**
-- First-run admin setup via Resend (currently using `seed:admin` CLI script)
+- First-run admin setup via Resend (currently using `seed:admin` CLI script) — unblocked
+  once email PR A ships
 
-**Post-transition cleanup needed:**
-- Remove `docs/_transition/` folder (manual step after PR3 deploys successfully)
+**Post-transition cleanup:** done — `docs/_transition/` removed
 
 ---
 

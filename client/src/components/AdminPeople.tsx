@@ -3,8 +3,25 @@ import { apiFetch } from '../api';
 
 interface Newsletter {
   active: boolean;
+  confirmedAt: string | null;
+  unsubscribedAt?: string | null;
   sourceSite: string;
   subscribedAt: string;
+}
+
+interface SentEmail {
+  id: string;
+  subject: string;
+  kind: string;
+  status: string;
+  createdAt: string;
+}
+
+type SubState = 'confirmed' | 'pending' | 'unsubscribed';
+
+function subState(n: Newsletter): SubState {
+  if (!n.active) return 'unsubscribed';
+  return n.confirmedAt ? 'confirmed' : 'pending';
 }
 
 interface Person {
@@ -19,6 +36,7 @@ interface Person {
   newsletter: Newsletter | null;
   _count?: { contacts: number };
   contacts?: ContactMsg[];
+  outboundEmails?: SentEmail[];
 }
 
 interface ContactMsg {
@@ -68,9 +86,9 @@ export default function AdminPeople() {
   }
 
   function copyEmails() {
-    const emails = people.filter((p) => p.newsletter?.active).map((p) => p.email).join(', ');
-    navigator.clipboard.writeText(emails);
-    alert(`Copied ${people.filter((p) => p.newsletter?.active).length} subscriber emails`);
+    const confirmed = people.filter((p) => p.newsletter && subState(p.newsletter) === 'confirmed');
+    navigator.clipboard.writeText(confirmed.map((p) => p.email).join(', '));
+    alert(`Copied ${confirmed.length} confirmed subscriber emails`);
   }
 
   if (loading) return <p style={{ color: '#888' }}>Loading…</p>;
@@ -93,7 +111,8 @@ export default function AdminPeople() {
               <div style={styles.cardName}>{p.name ?? <em style={{ color: '#aaa' }}>no name</em>}</div>
               <div style={styles.cardEmail}>{p.email}</div>
               <div style={styles.badges}>
-                {p.newsletter?.active && <span style={styles.badgeGreen}>subscriber</span>}
+                {p.newsletter && subState(p.newsletter) === 'confirmed' && <span style={styles.badgeGreen}>subscriber</span>}
+                {p.newsletter && subState(p.newsletter) === 'pending' && <span style={styles.badgeAmber}>pending</span>}
                 {(p._count?.contacts ?? 0) > 0 && <span style={styles.badgeBlue}>{p._count!.contacts} msg</span>}
                 {p.isAdmin && <span style={styles.badgeGray}>admin</span>}
               </div>
@@ -147,8 +166,25 @@ export default function AdminPeople() {
               <div style={styles.section}>
                 <h4 style={styles.sectionTitle}>Newsletter</h4>
                 <p style={{ fontSize: '0.85rem', color: '#555' }}>
-                  {selected.newsletter.active ? '✅ Active' : '❌ Unsubscribed'} · {selected.newsletter.sourceSite} · subscribed {new Date(selected.newsletter.subscribedAt).toLocaleDateString()}
+                  {{ confirmed: '✅ Confirmed', pending: '⏳ Awaiting confirmation', unsubscribed: '❌ Unsubscribed' }[subState(selected.newsletter)]}
+                  {' · '}{selected.newsletter.sourceSite}
+                  {' · '}signed up {new Date(selected.newsletter.subscribedAt).toLocaleDateString()}
+                  {selected.newsletter.confirmedAt && selected.newsletter.active && <> · confirmed {new Date(selected.newsletter.confirmedAt).toLocaleDateString()}</>}
+                  {selected.newsletter.unsubscribedAt && !selected.newsletter.active && <> · left {new Date(selected.newsletter.unsubscribedAt).toLocaleDateString()}</>}
                 </p>
+              </div>
+            )}
+
+            {selected.outboundEmails && selected.outboundEmails.length > 0 && (
+              <div style={styles.section}>
+                <h4 style={styles.sectionTitle}>Emails sent ({selected.outboundEmails.length})</h4>
+                {selected.outboundEmails.map((e) => (
+                  <div key={e.id} style={styles.emailRow}>
+                    <span style={{ flex: 1, minWidth: 0 }}>{e.subject}</span>
+                    <span style={styles.emailStatus}>{e.status.toLowerCase()}</span>
+                    <span style={styles.msgDate}>{new Date(e.createdAt).toLocaleDateString()}</span>
+                  </div>
+                ))}
               </div>
             )}
 
@@ -185,6 +221,9 @@ const styles: Record<string, React.CSSProperties> = {
   cardEmail: { fontSize: '0.82rem', color: '#666', marginBottom: 6 },
   badges: { display: 'flex', gap: 4, flexWrap: 'wrap' },
   badgeGreen: { background: '#e8efe8', color: '#2d4a2d', borderRadius: 3, fontSize: '0.68rem', fontWeight: 600, padding: '1px 6px' },
+  badgeAmber: { background: '#fdf3e0', color: '#8a5a00', borderRadius: 3, fontSize: '0.68rem', fontWeight: 600, padding: '1px 6px' },
+  emailRow: { display: 'flex', gap: 10, alignItems: 'baseline', fontSize: '0.84rem', padding: '0.35rem 0', borderBottom: '1px solid #f5f5f5' },
+  emailStatus: { fontSize: '0.72rem', color: '#777', whiteSpace: 'nowrap' },
   badgeBlue: { background: '#e8f0f8', color: '#2850a0', borderRadius: 3, fontSize: '0.68rem', fontWeight: 600, padding: '1px 6px' },
   badgeGray: { background: '#eee', color: '#555', borderRadius: 3, fontSize: '0.68rem', fontWeight: 600, padding: '1px 6px' },
   detail: { flex: 2, background: 'white', border: '1px solid #e5e5e5', borderRadius: 6, padding: '1.25rem', minWidth: 0 },

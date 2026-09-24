@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { apiFetch, clearAccessToken } from '../api';
 
-export type Tab = 'dashboard' | 'people' | 'inbox';
+export type Tab = 'dashboard' | 'people' | 'inbox' | 'email';
 
 interface Props {
   activeTab: Tab;
@@ -14,6 +14,7 @@ const NAV_ITEMS: { id: Tab; label: string }[] = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'people', label: 'People' },
   { id: 'inbox', label: 'Inbox' },
+  { id: 'email', label: 'Email' },
 ];
 
 export default function AdminLayout({ activeTab, onTabChange, unreadCount = 0, children }: Props) {

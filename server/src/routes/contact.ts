@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import * as ContactService from '../services/ContactService';
 import { requireAdmin } from '../middleware/auth';
+import { verifyTurnstile } from '../lib/turnstile';
 
 const router = Router();
 
@@ -10,15 +11,21 @@ interface ContactBody {
   phone?: string;
   subject?: string;
   message?: string;
+  turnstileToken?: string;
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 router.post('/', async (req: Request<unknown, unknown, ContactBody>, res: Response) => {
-  const { name, email, phone, subject, message } = req.body;
+  const { name, email, phone, subject, message, turnstileToken } = req.body;
 
   if (!name?.trim() || !email || !EMAIL_PATTERN.test(email) || !subject?.trim() || !message?.trim()) {
     res.status(400).json({ success: false, error: 'All fields except phone are required' });
+    return;
+  }
+
+  if (!(await verifyTurnstile(turnstileToken, req.header('cf-connecting-ip')))) {
+    res.status(403).json({ success: false, error: 'Verification failed' });
     return;
   }
 
