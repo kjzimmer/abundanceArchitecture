@@ -6,6 +6,7 @@ import type { Tab } from './components/AdminLayout';
 import AdminPeople from './components/AdminPeople';
 import AdminContact from './components/AdminContact';
 import AdminAnalytics from './components/AdminAnalytics';
+import AdminEmail from './components/AdminEmail';
 
 export default function App() {
   const [authed, setAuthed] = useState(false);
@@ -39,6 +40,7 @@ export default function App() {
       {tab === 'dashboard' && <AdminAnalytics />}
       {tab === 'people' && <AdminPeople />}
       {tab === 'inbox' && <AdminContact onUnreadChange={setUnreadCount} />}
+      {tab === 'email' && <AdminEmail />}
     </AdminLayout>
   );
 }

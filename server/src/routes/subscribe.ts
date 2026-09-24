@@ -3,6 +3,7 @@
 
 import { Router, Request, Response } from 'express';
 import * as SubscriberService from '../services/SubscriberService';
+import { verifyTurnstile } from '../lib/turnstile';
 
 const router = Router();
 
@@ -10,13 +11,19 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface SubscribeBody {
   email?: string;
+  turnstileToken?: string;
 }
 
 router.post('/', async (req: Request<unknown, unknown, SubscribeBody>, res: Response) => {
-  const { email } = req.body;
+  const { email, turnstileToken } = req.body;
 
   if (!email || !EMAIL_PATTERN.test(email)) {
     res.status(400).json({ success: false, error: 'Invalid email' });
+    return;
+  }
+
+  if (!(await verifyTurnstile(turnstileToken, req.header('cf-connecting-ip')))) {
+    res.status(403).json({ success: false, error: 'Verification failed' });
     return;
   }
 

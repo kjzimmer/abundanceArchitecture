@@ -21,9 +21,10 @@ model Person {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  newsletter NewsletterSubscriber?
-  contacts   ContactMessage[]
-  sessions   RefreshToken[]
+  newsletter     NewsletterSubscriber?
+  contacts       ContactMessage[]
+  sessions       RefreshToken[]
+  outboundEmails OutboundEmail[]
 
   @@map("person")
 }
@@ -41,12 +42,16 @@ model RefreshToken {
 }
 
 model NewsletterSubscriber {
-  id           String   @id @default(cuid())
-  personId     String   @unique @map("person_id")
-  person       Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
-  active       Boolean  @default(true)
-  sourceSite   String   @map("source_site")
-  subscribedAt DateTime @default(now()) @map("subscribed_at")
+  id             String    @id @default(cuid())
+  personId       String    @unique @map("person_id")
+  person         Person    @relation(fields: [personId], references: [id], onDelete: Cascade)
+  active         Boolean   @default(true)
+  sourceSite     String    @map("source_site")
+  token          String    @unique // random hex — used in confirm + unsubscribe links
+  confirmedAt    DateTime? @map("confirmed_at") // null = awaiting double opt-in
+  unsubscribedAt DateTime? @map("unsubscribed_at")
+  subscribedAt   DateTime  @default(now()) @map("subscribed_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   @@map("newsletter_subscriber")
 }
@@ -65,6 +70,71 @@ model ContactMessage {
   createdAt  DateTime @default(now()) @map("created_at")
 
   @@map("contact_message")
+}
+
+enum EmailKind {
+  SUBSCRIBE_CONFIRM
+  CONTACT_ACK
+  ADMIN_NOTIFY
+  REPLY
+  NEWSLETTER
+  NEWSLETTER_TEST
+}
+
+enum EmailStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  DELAYED
+  BOUNCED
+  COMPLAINED
+  FAILED
+  SUPPRESSED
+}
+
+model OutboundEmail {
+  id                String      @id @default(cuid())
+  personId          String?     @map("person_id")
+  person            Person?     @relation(fields: [personId], references: [id], onDelete: SetNull)
+  toEmail           String      @map("to_email") // denormalized — readable if Person deleted
+  fromEmail         String      @map("from_email")
+  subject           String
+  kind              EmailKind
+  status            EmailStatus @default(QUEUED)
+  resendId          String?     @unique @map("resend_id")
+  error             String?
+  newsletterIssueId String?     @map("newsletter_issue_id") // PR C
+  conversationId    String?     @map("conversation_id") // PR B
+  sentAt            DateTime?   @map("sent_at")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  @@index([status, createdAt])
+  @@index([createdAt])
+  @@map("outbound_email")
+}
+
+// Raw Resend webhook log — audit trail, deduped on svix-id
+model EmailEvent {
+  id        String   @id @default(cuid())
+  svixId    String   @unique @map("svix_id")
+  type      String
+  resendId  String?  @map("resend_id")
+  payload   Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([resendId])
+  @@map("email_event")
+}
+
+model EmailSuppression {
+  id        String   @id @default(cuid())
+  email     String   @unique // lowercased
+  reason    String // bounce | complaint | manual
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("email_suppression")
 }
 
 model DailyAnalytics {

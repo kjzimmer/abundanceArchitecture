@@ -22,7 +22,18 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - Newsletter subscriber and contact message persistence (PostgreSQL via Prisma)
 - Admin panel at `/admin` — React SPA, DB-backed JWT auth
 - People CRM, contact inbox, Cloudflare Zone Analytics in admin panel
+- Admin left-nav layout (Module 6) — PR #9, badge fix PR #10
 - Rate limiting on subscribe, contact, and login endpoints
+- Email infrastructure (2026-09-24): Cloudflare Email Routing (catch-all → admin's inbox),
+  Resend sending domain verified, DMARC `p=none`. No app code uses it yet
+
+**In flight:**
+- Email + newsletter — spec `docs/wip/email-newsletter.md`, branch `feature/email-newsletter`
+  (PR A foundation → PR B inbound → PR C newsletter). PR A code complete + locally tested;
+  awaiting Turnstile/Railway/Resend-webhook setup and deploy (checklist in the wip spec)
+- SHARED_FEEDBACK logged 2026-09-24: email/newsletter module gap, `worker/` folder +
+  email decision gap, stale ARCHITECTURE.md, wrong SITE_DESIGN.md teaser tokens,
+  Prisma client generation location
 
 **Transition complete (all three PRs merged):**
 - PR1: Docs + minor fixes
@@ -30,11 +41,20 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - PR3: Auth hardening — 15-min access token (memory-only) + 7-day HttpOnly refresh cookie,
   refresh/logout/me routes, RefreshToken DB table with bcrypt-hashed storage, token rotation on refresh
 
-**Deferred:**
-- First-run admin setup via Resend (currently using `seed:admin` CLI script)
+**Known issues (open):**
+- **`trust proxy` not set** (found 2026-09-24): Express sees Railway's proxy IP as `req.ip` for every
+  visitor, so the form and login rate limits are shared site-wide, not applied per visitor (a bot can lock
+  the admin out of login). Fix: `app.set('trust proxy', N)`, with N set to the measured hop count
+  (Cloudflare → Railway edge). **Never `true`**: that trusts a spoofable X-Forwarded-For. Measure first
+  by logging `X-Forwarded-For` / `CF-Connecting-IP` for one production request. Also consider that
+  `*.up.railway.app` bypasses Cloudflare. Check Railway logs for `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`.
+  Planned as its own small PR after email PR A
 
-**Post-transition cleanup needed:**
-- Remove `docs/_transition/` folder (manual step after PR3 deploys successfully)
+**Deferred:**
+- First-run admin setup via Resend (currently using `seed:admin` CLI script) — unblocked
+  once email PR A ships
+
+**Post-transition cleanup:** done — `docs/_transition/` removed
 
 ---
 
