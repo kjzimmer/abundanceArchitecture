@@ -5,7 +5,7 @@
 import { Resend } from 'resend';
 import { EmailKind, EmailStatus, OutboundEmail } from '@prisma/client';
 import prisma from '../db';
-import { emailFrom, emailMode, adminNotifyEmail } from '../lib/email/config';
+import { emailFrom, emailNotifyFrom, emailMode, adminNotifyEmail } from '../lib/email/config';
 import { adminNotice, NoticeInput, RenderedEmail } from '../lib/email/templates';
 
 let resendClient: Resend | null = null;
@@ -23,6 +23,7 @@ export interface SendInput extends RenderedEmail {
   to: string;
   kind: EmailKind;
   personId?: string | null;
+  from?: string; // defaults to EMAIL_FROM
   replyTo?: string;
   headers?: Record<string, string>;
   newsletterIssueId?: string;
@@ -62,7 +63,7 @@ export async function sentRecently(email: string, kind: EmailKind, withinMs: num
  */
 export async function send(input: SendInput): Promise<OutboundEmail> {
   const to = input.to.toLowerCase().trim();
-  const from = emailFrom();
+  const from = input.from ?? emailFrom();
   const base = {
     toEmail: to,
     fromEmail: from,
@@ -74,7 +75,7 @@ export async function send(input: SendInput): Promise<OutboundEmail> {
   };
 
   if (await isSuppressed(to)) {
-    console.log(`[email] suppressed ${input.kind} → ${to}`);
+    console.log(`[email] suppressed ${input.kind} → ${maskEmail(to)}`);
     return prisma.outboundEmail.create({ data: { ...base, status: EmailStatus.SUPPRESSED } });
   }
 
@@ -127,6 +128,7 @@ export async function send(input: SendInput): Promise<OutboundEmail> {
       });
     }
 
+    console.log(`[email] sent ${input.kind} → ${maskEmail(to)} (${data.id})`);
     return prisma.outboundEmail.update({
       where: { id: row.id },
       data: { status: EmailStatus.SENT, resendId: data.id, sentAt: new Date() },
@@ -141,13 +143,27 @@ export async function send(input: SendInput): Promise<OutboundEmail> {
   }
 }
 
-/** Fire-and-forget admin notification. No-op if ADMIN_NOTIFY_EMAIL is unset. */
-export function notifyAdmin(notice: NoticeInput): void {
+/** Logs-safe form of an address: ka…@example.com */
+export function maskEmail(email: string): string {
+  const [local, domain] = email.split('@');
+  return domain ? `${local.slice(0, 2)}…@${domain}` : '…';
+}
+
+/**
+ * Fire-and-forget admin notification, sent from EMAIL_NOTIFY_FROM (separate from the
+ * subscriber-facing hello@ address). replyTo = the person the notice is about, so
+ * replying from the inbox reaches them. No-op if ADMIN_NOTIFY_EMAIL is unset.
+ */
+export function notifyAdmin(notice: NoticeInput, options: { replyTo?: string } = {}): void {
   const to = adminNotifyEmail();
   if (!to) return;
-  send({ ...adminNotice(notice), to, kind: EmailKind.ADMIN_NOTIFY }).catch((err) =>
-    console.error('[email] admin notification failed:', err),
-  );
+  send({
+    ...adminNotice(notice),
+    to,
+    kind: EmailKind.ADMIN_NOTIFY,
+    from: emailNotifyFrom(),
+    replyTo: options.replyTo,
+  }).catch((err) => console.error('[email] admin notification failed:', err));
 }
 
 // ─── Admin queries ────────────────────────────────────────────────────────────
@@ -183,5 +199,6 @@ export async function sendTest(): Promise<OutboundEmail | null> {
     }),
     to,
     kind: EmailKind.ADMIN_NOTIFY,
+    from: emailNotifyFrom(),
   });
 }

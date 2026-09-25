@@ -45,6 +45,19 @@ app.get('/api/public-config', (_req: Request, res: Response) => {
 app.use(['/confirm', '/unsubscribe'], linkLimiter, express.urlencoded({ extended: false }));
 app.use(subscriptionRouter);
 
+// TEMPORARY — measures the proxy chain so `trust proxy` can be set to the right hop count.
+// Echoes only the caller's own request metadata. Remove once trust proxy is configured.
+app.get('/api/debug/request-ip', (req: Request, res: Response) => {
+  res.json({
+    reqIp: req.ip,
+    remoteAddress: req.socket.remoteAddress ?? null,
+    xForwardedFor: req.header('x-forwarded-for') ?? null,
+    cfConnectingIp: req.header('cf-connecting-ip') ?? null,
+    xRealIp: req.header('x-real-ip') ?? null,
+    host: req.header('host') ?? null,
+  });
+});
+
 app.get(['/health', '/api/health'], (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });

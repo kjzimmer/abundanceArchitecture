@@ -122,7 +122,7 @@ export async function confirm(token: string): Promise<TokenResult> {
     type: 'Subscriber',
     title: `${sub.person.email} confirmed`,
     rows: [['Email', sub.person.email], ['Source', sub.sourceSite]],
-  });
+  }, { replyTo: sub.person.email });
   return 'ok';
 }
 
@@ -146,7 +146,7 @@ export async function unsubscribe(token: string): Promise<TokenResult> {
     type: 'Unsubscribe',
     title: `${sub.person.email} unsubscribed`,
     rows: [['Email', sub.person.email]],
-  });
+  }, { replyTo: sub.person.email });
   return 'ok';
 }
 

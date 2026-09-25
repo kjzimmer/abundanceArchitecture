@@ -252,6 +252,9 @@ PR C adds `marked`, `node-cron`.
 - History: issue list with sent / delivered / bounced / complained / unsubscribed / replies counts
 - Replies: conversations tagged with the issue, shown under that issue
 - **First issue:** "You're on the list — stay tuned" to grandfathered subscribers
+- **CAN-SPAM:** every newsletter footer must include a valid physical postal address (PO box or
+  mailbox service is fine) plus the unsubscribe link. **Karl to decide the address before the first issue**
+  (env `NEWSLETTER_POSTAL_ADDRESS`)
 
 ---
 
@@ -310,6 +313,13 @@ Next small PR (found during PR A production testing, 2026-09-24):
   `localStorage.removeItem('aa_subscribed')` (same origin) so the home-page form re-enables for resubscribing
 - **Cloudflare Browser Cache TTL:** Karl to set "Respect Existing Headers". The default 4h override kept
   the old `main.js` in browsers after deploy (subscribe 403s until the cache expired)
+- **Admin notices from `notify@`** (`EMAIL_NOTIFY_FROM`) with **Reply-To** set to the person the notice is
+  about (inquirer or subscriber; none for Deliverability). HTML layout kept (Karl, 2026-09-25). Context: the
+  first `[AA Inquiry]`/`[AA Unsubscribe]` notices went to EE spam ("similar to messages identified as spam"),
+  which is new-domain reputation, not an auth failure. Later notices and a Gmail-subscriber test landed fine.
+  Karl adds a Gmail "never spam" filter for the domain
+- **trust proxy measurement:** temporary `GET /api/debug/request-ip` ships first. Measure via the Cloudflare
+  domain and the `*.up.railway.app` domain, set the hop count, then remove the endpoint
 
 ## Status
 
