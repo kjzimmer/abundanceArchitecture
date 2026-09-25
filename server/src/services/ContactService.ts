@@ -48,7 +48,7 @@ export async function createMessage(input: ContactInput) {
       ['Subject', subject],
     ],
     body: message,
-  });
+  }, { replyTo: email });
 
   return msg;
 }

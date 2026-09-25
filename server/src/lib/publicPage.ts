@@ -13,9 +13,15 @@ interface PageInput {
     token: string;
     button: string;
   };
+  // Clears the home page's "already subscribed" flag (public/js/main.js) so the
+  // subscribe form re-enables in this browser after unsubscribing
+  clearSubscribedFlag?: boolean;
 }
 
-export function renderPublicPage({ title, heading, message, form }: PageInput): string {
+export function renderPublicPage({ title, heading, message, form, clearSubscribedFlag }: PageInput): string {
+  const clearScript = clearSubscribedFlag
+    ? `<script>try { localStorage.removeItem('aa_subscribed'); } catch (e) {}</script>`
+    : '';
   const formHtml = form
     ? `<form method="post" action="${escapeHtml(form.action)}">
         <input type="hidden" name="t" value="${escapeHtml(form.token)}">
@@ -61,6 +67,7 @@ export function renderPublicPage({ title, heading, message, form }: PageInput): 
   <p>${escapeHtml(message)}</p>
   ${formHtml}
 </main>
+${clearScript}
 </body>
 </html>`;
 }

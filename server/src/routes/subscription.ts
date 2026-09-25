@@ -66,7 +66,8 @@ router.get('/unsubscribe', async (req: Request, res: Response) => {
           message: 'You’ll stop receiving newsletter emails. You can resubscribe at any time.',
           form: { action: '/unsubscribe', token, button: 'Unsubscribe' } }
     : state === 'already'
-      ? { title: 'Unsubscribed', heading: 'You’re unsubscribed', message: 'You won’t receive further newsletter emails.' }
+      ? { title: 'Unsubscribed', heading: 'You’re unsubscribed', message: 'You won’t receive further newsletter emails.',
+          clearSubscribedFlag: true }
     : INVALID;
   res.status(state === 'invalid' ? 404 : 200).type('html').send(renderPublicPage(page));
 });
@@ -78,7 +79,8 @@ router.post('/unsubscribe', async (req: Request, res: Response) => {
       state === 'invalid'
         ? INVALID
         : { title: 'Unsubscribed', heading: 'You’re unsubscribed',
-            message: 'You won’t receive further newsletter emails. Thank you for your interest in Abundance Architecture.' };
+            message: 'You won’t receive further newsletter emails. Thank you for your interest in Abundance Architecture.',
+            clearSubscribedFlag: true };
     res.status(state === 'invalid' ? 404 : 200).type('html').send(renderPublicPage(page));
   } catch (err) {
     console.error('[unsubscribe] error', err);

@@ -12,6 +12,11 @@ export function emailFrom(): string {
   return process.env.EMAIL_FROM || 'Abundance Architecture <hello@abundancearchitecture.world>';
 }
 
+/** Sender for admin notices — kept separate from the subscriber-facing EMAIL_FROM */
+export function emailNotifyFrom(): string {
+  return process.env.EMAIL_NOTIFY_FROM || 'Abundance Architecture <notify@abundancearchitecture.world>';
+}
+
 /** Bare address from EMAIL_FROM, e.g. hello@abundancearchitecture.world */
 export function emailFromAddress(): string {
   const from = emailFrom();

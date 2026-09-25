@@ -19,7 +19,11 @@ export async function verifyTurnstile(token: unknown, remoteIp?: string): Promis
     }
     return true;
   }
-  if (typeof token !== 'string' || !token) return false;
+  if (typeof token !== 'string' || !token) {
+    // Usually a stale cached main.js (pre-Turnstile) or the widget failing to load in the browser
+    console.warn('[turnstile] missing token — rejected');
+    return false;
+  }
 
   const body = new URLSearchParams({ secret, response: token });
   if (remoteIp) body.set('remoteip', remoteIp);

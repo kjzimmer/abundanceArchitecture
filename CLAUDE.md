@@ -25,12 +25,16 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - Admin left-nav layout (Module 6) — PR #9, badge fix PR #10
 - Rate limiting on subscribe, contact, and login endpoints
 - Email infrastructure (2026-09-24): Cloudflare Email Routing (catch-all → admin's inbox),
-  Resend sending domain verified, DMARC `p=none`. No app code uses it yet
+  Resend sending domain verified, DMARC `p=none`
+- Email foundation (PR #11, 2026-09-24): Resend sending with OutboundEmail log, double opt-in
+  with /confirm and /unsubscribe pages, contact acknowledgements, `[AA …]` admin notices, Resend
+  delivery webhooks with suppression, Turnstile on both forms, admin Email page. Prod-tested
 
 **In flight:**
-- Email + newsletter — spec `docs/wip/email-newsletter.md`, branch `feature/email-newsletter`
-  (PR A foundation → PR B inbound → PR C newsletter). PR A code complete + locally tested;
-  awaiting Turnstile/Railway/Resend-webhook setup and deploy (checklist in the wip spec)
+- Email + newsletter: spec `docs/wip/email-newsletter.md` (PR A foundation ✅ → PR B inbound →
+  PR C newsletter). A few PR A prod checks remain (see Status in the spec)
+- Follow-up PR (branch `fix/email-followups`): trust proxy, Turnstile/send logging, clear
+  `aa_subscribed` on unsubscribe. Listed under Follow-ups in the spec
 - SHARED_FEEDBACK logged 2026-09-24: email/newsletter module gap, `worker/` folder +
   email decision gap, stale ARCHITECTURE.md, wrong SITE_DESIGN.md teaser tokens,
   Prisma client generation location
