@@ -331,8 +331,8 @@ Next small PR (found during PR A production testing, 2026-09-24):
   - [x] Prod: subscribe → confirmation email → confirm → `[AA Subscriber]` notice; admin shows subscriber
   - [x] Prod: unsubscribe via tokened link works; resubscribe works (after clearing `aa_subscribed`)
   - [x] Prod: contact → ack received; inquiry in admin Inbox; notice delivered per webhook logs
-  - [ ] Karl to confirm `[AA Inquiry]` notice arrived in EE (maybe grouped in Gmail or in Spam)
-  - [ ] Admin → Email → "Send test email" → shows `delivered`
+  - [x] `[AA Inquiry]` notice arrived in EE (first one in Spam; see notify@ follow-up)
+  - [x] Admin → Email → "Send test email" works (Karl, 2026-09-25)
   - [x] Admin → People: grandfathered subscribers show as confirmed; new signup shows pending (Karl, 2026-09-25)
 - [ ] Follow-up PR (see Follow-ups above)
 
