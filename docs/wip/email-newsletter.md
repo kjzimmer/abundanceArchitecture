@@ -333,7 +333,7 @@ Next small PR (found during PR A production testing, 2026-09-24):
   - [x] Prod: contact → ack received; inquiry in admin Inbox; notice delivered per webhook logs
   - [ ] Karl to confirm `[AA Inquiry]` notice arrived in EE (maybe grouped in Gmail or in Spam)
   - [ ] Admin → Email → "Send test email" → shows `delivered`
-  - [ ] Admin → People: grandfathered subscribers show as confirmed
+  - [x] Admin → People: grandfathered subscribers show as confirmed; new signup shows pending (Karl, 2026-09-25)
 - [ ] Follow-up PR (see Follow-ups above)
 
 ### Production testing notes (2026-09-24)
