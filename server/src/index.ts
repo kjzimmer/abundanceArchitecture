@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import subscribeRouter from './routes/subscribe';
 import contactRouter from './routes/contact';
 import peopleRouter from './routes/people';
@@ -11,6 +11,7 @@ import subscriptionRouter from './routes/subscription';
 import emailRouter from './routes/email';
 import { resendWebhookHandler } from './routes/webhooks';
 import { turnstileSiteKey } from './lib/turnstile';
+import { clientIp } from './lib/clientIp';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,9 +22,18 @@ app.post('/api/webhooks/resend', express.raw({ type: '*/*', limit: '1mb' }), res
 app.use(express.json());
 app.use(cookieParser());
 
-const formLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false });
-const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false });
-const linkLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false });
+// Keyed on the real visitor IP (see lib/clientIp.ts). `trust proxy` stays off on purpose:
+// X-Forwarded-For holds Cloudflare's IP, not the visitor's. ipKeyGenerator groups IPv6 by subnet.
+const limiterDefaults = {
+  windowMs: 15 * 60 * 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request) => ipKeyGenerator(clientIp(req)),
+  validate: { xForwardedForHeader: false }, // XFF is deliberately not used
+} as const;
+const formLimiter = rateLimit({ ...limiterDefaults, max: 10 });
+const loginLimiter = rateLimit({ ...limiterDefaults, max: 10 });
+const linkLimiter = rateLimit({ ...limiterDefaults, max: 30 });
 
 // Compiled output is server/dist/index.js — public/ is two levels up
 app.use(express.static(path.join(__dirname, '..', '..', 'public')));
@@ -44,19 +54,6 @@ app.get('/api/public-config', (_req: Request, res: Response) => {
 // Confirm / unsubscribe pages — HTML form posts (urlencoded), incl. RFC 8058 one-click
 app.use(['/confirm', '/unsubscribe'], linkLimiter, express.urlencoded({ extended: false }));
 app.use(subscriptionRouter);
-
-// TEMPORARY — measures the proxy chain so `trust proxy` can be set to the right hop count.
-// Echoes only the caller's own request metadata. Remove once trust proxy is configured.
-app.get('/api/debug/request-ip', (req: Request, res: Response) => {
-  res.json({
-    reqIp: req.ip,
-    remoteAddress: req.socket.remoteAddress ?? null,
-    xForwardedFor: req.header('x-forwarded-for') ?? null,
-    cfConnectingIp: req.header('cf-connecting-ip') ?? null,
-    xRealIp: req.header('x-real-ip') ?? null,
-    host: req.header('host') ?? null,
-  });
-});
 
 app.get(['/health', '/api/health'], (_req: Request, res: Response) => {
   res.json({ status: 'ok' });

@@ -4,6 +4,7 @@
 import { Router, Request, Response } from 'express';
 import * as SubscriberService from '../services/SubscriberService';
 import { verifyTurnstile } from '../lib/turnstile';
+import { clientIp } from '../lib/clientIp';
 
 const router = Router();
 
@@ -22,7 +23,7 @@ router.post('/', async (req: Request<unknown, unknown, SubscribeBody>, res: Resp
     return;
   }
 
-  if (!(await verifyTurnstile(turnstileToken, req.header('cf-connecting-ip')))) {
+  if (!(await verifyTurnstile(turnstileToken, clientIp(req)))) {
     res.status(403).json({ success: false, error: 'Verification failed' });
     return;
   }

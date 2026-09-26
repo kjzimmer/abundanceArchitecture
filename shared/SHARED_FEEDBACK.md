@@ -84,3 +84,21 @@ Add a gotcha for the placeholder-shadowing symptom (`PrismaClient: any`, missing
 **Workaround used:** Deleted the stale `server/node_modules/.prisma` locally. Reverted Prisma's
 automatic root package.json edits so the PR matches the existing (working) Railway behavior.
 
+## [2026-09-25] SHARED_TECH_STACK.md
+**Site:** abundance-architecture
+**Type:** Error
+**Section:** Rate Limiting
+**Issue:** With Cloudflare → Railway, express-rate-limit's default key (`req.ip`, with `trust proxy` off)
+is Railway's internal proxy address, so every visitor shares one bucket. A bot can then lock the admin out
+of login site-wide. The log shows `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`. The obvious fix,
+`trust proxy = N`, is also wrong here. Measured in AA prod: Railway's edge rewrites X-Forwarded-For to
+`<connecting ip>, <edge ip>`, and on the Cloudflare path the connecting IP is a Cloudflare server, so
+visitors behind the same Cloudflare location would still share a bucket. `X-Real-IP`, set by Railway's edge,
+is the true client via Cloudflare and via `*.up.railway.app`, and can't be spoofed (tested). FMW and HU
+likely have the same problem.
+**Suggested fix:** In Rate Limiting, specify
+`keyGenerator: req => ipKeyGenerator(clientIp(req))`, where `clientIp` reads `X-Real-IP` (validated with
+`net.isIP`) and falls back to `req.ip`. Also `validate: { xForwardedForHeader: false }`, and don't set `trust proxy`.
+Reference: `abundanceArchitecture/server/src/lib/clientIp.ts`.
+**Workaround used:** Implemented as above in AA.
+

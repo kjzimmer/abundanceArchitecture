@@ -301,11 +301,11 @@ subject prefix, so Gmail filters can label them automatically (filter: `subject:
 
 ## Follow-ups (outside this feature)
 
-Next small PR (found during PR A production testing, 2026-09-24):
+Found during PR A production testing (2026-09-24). Shipped in PR #12 and the rate-limit PR, except the
+Cloudflare setting (Karl):
 
-- **`trust proxy` / rate limiting:** see CLAUDE.md → Known issues. Affects the per-IP formLimiter and
-  linkLimiter used by these endpoints. Turnstile is the main bot defense in the meantime. Confirmed in
-  Railway logs: `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`
+- **Rate limiting per visitor:** measured, then keyed on Railway's `X-Real-IP` instead of `trust proxy`.
+  See `server/src/lib/clientIp.ts` and CLAUDE.md → Resolved
 - **Log missing Turnstile token:** `verifyTurnstile` returns false silently on an empty token. Add
   `[turnstile] missing token` so stale-script and blocked-widget cases show up in logs
 - **Log successful sends:** live mode only logs failures. Add one line per send (kind, masked recipient, resendId)
@@ -318,8 +318,10 @@ Next small PR (found during PR A production testing, 2026-09-24):
   first `[AA Inquiry]`/`[AA Unsubscribe]` notices went to EE spam ("similar to messages identified as spam"),
   which is new-domain reputation, not an auth failure. Later notices and a Gmail-subscriber test landed fine.
   Karl adds a Gmail "never spam" filter for the domain
-- **trust proxy measurement:** temporary `GET /api/debug/request-ip` ships first. Measure via the Cloudflare
-  domain and the `*.up.railway.app` domain, set the hop count, then remove the endpoint
+- **Proxy measurement (2026-09-25):** the temporary `GET /api/debug/request-ip` shipped in #12. Results:
+  via Cloudflare, XFF = `<cloudflare ip>, <railway edge>` and X-Real-IP = visitor. Direct to Railway,
+  XFF = `<visitor>, <railway edge>` and X-Real-IP = visitor. Spoofed XFF / X-Real-IP / CF-Connecting-IP were
+  overwritten or rejected (Cloudflare error 1000). Endpoint removed in the rate-limit PR
 
 ## Status
 
@@ -334,7 +336,7 @@ Next small PR (found during PR A production testing, 2026-09-24):
   - [x] `[AA Inquiry]` notice arrived in EE (first one in Spam; see notify@ follow-up)
   - [x] Admin → Email → "Send test email" works (Karl, 2026-09-25)
   - [x] Admin → People: grandfathered subscribers show as confirmed; new signup shows pending (Karl, 2026-09-25)
-- [ ] Follow-up PR (see Follow-ups above)
+- [x] Follow-up PRs: #12 (notify@, Reply-To, logging, resubscribe) + rate-limit client IP
 
 ### Production testing notes (2026-09-24)
 
