@@ -13,6 +13,9 @@ Give AbundanceArchitecture.world first-class email:
 3. Compose, send, and track a Markdown-authored newsletter, with replies grouped per issue
 
 Built as reusable modules so FreeMarketWatch.world and HealthUnveiled.world can adopt them.
+**Porting guide:** `docs/wip/email-porting-guide.md`. Site identity lives in `server/src/lib/brand.ts`.
+Planned layout (Karl, 2026-09-25): the AA family (AA, HU, FMW) in one Railway project with a **shared DB**
+and one Resend account. myGalleryWorks stays separate. See the porting guide → Shared database implications.
 
 ---
 

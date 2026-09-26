@@ -4,6 +4,7 @@ import { upsertPerson } from './PersonService';
 import * as EmailService from './EmailService';
 import { contactAck } from '../lib/email/templates';
 import { emailFromAddress } from '../lib/email/config';
+import { brand } from '../lib/brand';
 
 // At most one acknowledgement per address per hour, however many messages arrive
 const ACK_WINDOW_MS = 60 * 60 * 1000;
@@ -29,7 +30,7 @@ async function sendAck(email: string, personId: string) {
 }
 
 export async function createMessage(input: ContactInput) {
-  const { name, email, phone, subject, message, sourceSite = 'abundance-architecture' } = input;
+  const { name, email, phone, subject, message, sourceSite = brand.siteKey } = input;
 
   const person = await upsertPerson(email, name, phone);
 

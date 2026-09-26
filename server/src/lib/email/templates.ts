@@ -3,6 +3,7 @@
 
 import { renderLayout, escapeHtml, button, s } from './layout';
 import { publicBaseUrl } from './config';
+import { brand } from '../brand';
 
 export interface RenderedEmail {
   subject: string;
@@ -10,17 +11,18 @@ export interface RenderedEmail {
   text: string;
 }
 
-const SIGNOFF_TEXT = '— Abundance Architecture\nhttps://abundancearchitecture.world';
+const SIGNOFF_TEXT = `— ${brand.name}\nhttps://${brand.domain}`;
+const INTEREST_LINE = `Thank you for your interest in ${brand.name} — ${brand.tagline}.`;
 
 export function subscribeConfirm(confirmUrl: string): RenderedEmail {
   const siteUrl = publicBaseUrl();
-  const subject = 'Confirm your subscription to Abundance Architecture';
+  const subject = `Confirm your subscription to ${brand.name}`;
   const html = renderLayout({
     siteUrl,
     preheader: 'One click to confirm — then you are on the list.',
     bodyHtml: `
       <h1 style="${s.h1}">Please confirm your subscription</h1>
-      <p style="${s.p}">Thank you for your interest in Abundance Architecture — a long-term inquiry into the structural conditions required for human flourishing.</p>
+      <p style="${s.p}">${escapeHtml(INTEREST_LINE)}</p>
       <p style="${s.p}">To start receiving updates, confirm your email address:</p>
       ${button(confirmUrl, 'Confirm subscription')}
       <p style="${s.small}">If the button doesn't work, paste this link into your browser:<br><a href="${escapeHtml(confirmUrl)}" style="${s.link}word-break:break-all;">${escapeHtml(confirmUrl)}</a></p>`,
@@ -29,7 +31,7 @@ export function subscribeConfirm(confirmUrl: string): RenderedEmail {
   const text = [
     'Please confirm your subscription',
     '',
-    'Thank you for your interest in Abundance Architecture — a long-term inquiry into the structural conditions required for human flourishing.',
+    INTEREST_LINE,
     '',
     'To start receiving updates, confirm your email address:',
     confirmUrl,
@@ -45,7 +47,7 @@ export function subscribeConfirm(confirmUrl: string): RenderedEmail {
 // to deliver arbitrary content to arbitrary addresses.
 export function contactAck(): RenderedEmail {
   const siteUrl = publicBaseUrl();
-  const subject = 'We received your message — Abundance Architecture';
+  const subject = `We received your message — ${brand.name}`;
   const html = renderLayout({
     siteUrl,
     preheader: 'Thanks for reaching out — we will reply personally.',
@@ -53,7 +55,7 @@ export function contactAck(): RenderedEmail {
       <h1 style="${s.h1}">Thank you for reaching out</h1>
       <p style="${s.p}">Your message has arrived safely. Every message is read personally, and we'll reply as soon as we can.</p>
       <p style="${s.p}">If you need to add anything, simply reply to this email.</p>`,
-    footerHtml: `<p style="${s.small}">You're receiving this because this address was entered in the contact form at abundancearchitecture.world. If that wasn't you, no action is needed.</p>`,
+    footerHtml: `<p style="${s.small}">You're receiving this because this address was entered in the contact form at ${escapeHtml(brand.domain)}. If that wasn't you, no action is needed.</p>`,
   });
   const text = [
     'Thank you for reaching out',
@@ -68,7 +70,8 @@ export function contactAck(): RenderedEmail {
 }
 
 /**
- * Admin notification. Subject prefix `[AA {type}]` is stable so Gmail filters can label it.
+ * Admin notification. Subject prefix `[{brand.code} {type}]` (e.g. `[AA Inquiry]`) is stable so
+ * Gmail filters can label it.
  * Rows and body come from untrusted input and are escaped here.
  */
 export type NoticeType =
@@ -90,7 +93,7 @@ export function adminNotice({ type, title, rows = [], body, adminPath = '/admin'
   const siteUrl = publicBaseUrl();
   const adminUrl = `${siteUrl}${adminPath}`;
   // Strip newlines so user input can't break the subject line
-  const subject = `[AA ${type}] ${title}`.replace(/[\r\n]+/g, ' ').slice(0, 200);
+  const subject = `[${brand.code} ${type}] ${title}`.replace(/[\r\n]+/g, ' ').slice(0, 200);
 
   const rowsHtml = rows.length
     ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px;">

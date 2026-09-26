@@ -6,6 +6,7 @@
 import { Router, Request, Response } from 'express';
 import * as SubscriberService from '../services/SubscriberService';
 import { renderPublicPage } from '../lib/publicPage';
+import { brand } from '../lib/brand';
 
 const router = Router();
 
@@ -28,7 +29,7 @@ router.get('/confirm', async (req: Request, res: Response) => {
   const page =
     state === 'ok'
       ? { title: 'Confirm subscription', heading: 'Confirm your subscription',
-          message: 'One click and you’re on the list for updates from Abundance Architecture.',
+          message: `One click and you’re on the list for updates from ${brand.name}.`,
           form: { action: '/confirm', token, button: 'Confirm subscription' } }
     : state === 'already'
       ? { title: 'Already confirmed', heading: 'You’re already on the list', message: 'Your subscription is confirmed. Thank you.' }
@@ -44,7 +45,7 @@ router.post('/confirm', async (req: Request, res: Response) => {
     const page =
       state === 'ok' || state === 'already'
         ? { title: 'Subscription confirmed', heading: 'You’re on the list',
-            message: 'Thank you for confirming. We’ll be in touch as Abundance Architecture takes shape.' }
+            message: `Thank you for confirming. We’ll be in touch as ${brand.name} takes shape.` }
       : state === 'unsubscribed'
         ? { title: 'Unsubscribed', heading: 'This subscription was cancelled', message: 'You can subscribe again from the home page at any time.' }
       : INVALID;
@@ -62,7 +63,7 @@ router.get('/unsubscribe', async (req: Request, res: Response) => {
   const state = await SubscriberService.peekUnsubscribe(token);
   const page =
     state === 'ok'
-      ? { title: 'Unsubscribe', heading: 'Unsubscribe from Abundance Architecture?',
+      ? { title: 'Unsubscribe', heading: `Unsubscribe from ${brand.name}?`,
           message: 'You’ll stop receiving newsletter emails. You can resubscribe at any time.',
           form: { action: '/unsubscribe', token, button: 'Unsubscribe' } }
     : state === 'already'
@@ -79,7 +80,7 @@ router.post('/unsubscribe', async (req: Request, res: Response) => {
       state === 'invalid'
         ? INVALID
         : { title: 'Unsubscribed', heading: 'You’re unsubscribed',
-            message: 'You won’t receive further newsletter emails. Thank you for your interest in Abundance Architecture.',
+            message: `You won’t receive further newsletter emails. Thank you for your interest in ${brand.name}.`,
             clearSubscribedFlag: true };
     res.status(state === 'invalid' ? 404 : 200).type('html').send(renderPublicPage(page));
   } catch (err) {

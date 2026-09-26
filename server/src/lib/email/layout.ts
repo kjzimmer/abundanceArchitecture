@@ -1,20 +1,20 @@
 // src/lib/email/layout.ts
 // Shared HTML email shell. Table-based with inline styles, because email clients
-// ignore <style> blocks and modern CSS. Colors mirror public/index.html's :root tokens
-// (ink masthead over paper body, green accent). Web fonts are listed first; most
-// email clients fall back to Georgia / system sans.
+// ignore <style> blocks and modern CSS. Colors, fonts and names come from lib/brand.ts.
+
+import { brand } from '../brand';
 
 export const EMAIL_COLORS = {
-  ink: '#1a1917',       // masthead + primary text
-  paper: '#eeeae0',     // outer background
-  body: '#f7f5f0',      // content card — slightly lighter than paper for readability
-  accent: '#2d4a2d',    // buttons, links
-  muted: '#6b6764',
-  rule: '#dcd7cb',
+  ink: brand.colors.ink,
+  paper: brand.colors.paper,
+  body: brand.colors.card,
+  accent: brand.colors.accent,
+  muted: brand.colors.inkLight,
+  rule: brand.colors.rule,
 };
 
-const SERIF = "'EB Garamond', Georgia, 'Times New Roman', serif";
-const SANS = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+const SERIF = brand.fonts.serif;
+const SANS = brand.fonts.sans;
 
 export function escapeHtml(value: string): string {
   return value
@@ -61,7 +61,7 @@ export function renderLayout({ bodyHtml, preheader = '', footerHtml = '', siteUr
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
-<title>Abundance Architecture</title>
+<title>${escapeHtml(brand.name)}</title>
 </head>
 <body style="margin:0;padding:0;background:${c.paper};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(preheader)}</div>
@@ -69,7 +69,7 @@ export function renderLayout({ bodyHtml, preheader = '', footerHtml = '', siteUr
   <tr><td align="center" style="padding:24px 12px;">
     <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
       <tr><td style="background:${c.ink};padding:22px 32px;">
-        <a href="${escapeHtml(siteUrl)}" style="font-family:${SANS};font-size:12px;font-weight:500;letter-spacing:0.12em;color:${c.paper};text-decoration:none;text-transform:uppercase;">Abundance Architecture</a>
+        <a href="${escapeHtml(siteUrl)}" style="font-family:${SANS};font-size:12px;font-weight:500;letter-spacing:0.12em;color:${c.paper};text-decoration:none;text-transform:uppercase;">${escapeHtml(brand.name)}</a>
       </td></tr>
       <tr><td style="background:${c.body};padding:36px 32px 20px;">
         ${bodyHtml}
@@ -77,7 +77,7 @@ export function renderLayout({ bodyHtml, preheader = '', footerHtml = '', siteUr
       <tr><td style="background:${c.body};padding:0 32px 28px;">
         <div style="border-top:1px solid ${c.rule};padding-top:16px;">
           ${footerHtml}
-          <p style="${s.small}margin:0;"><a href="${escapeHtml(siteUrl)}" style="color:${c.muted};">abundancearchitecture.world</a></p>
+          <p style="${s.small}margin:0;"><a href="${escapeHtml(siteUrl)}" style="color:${c.muted};">${escapeHtml(brand.domain)}</a></p>
         </div>
       </td></tr>
     </table>
