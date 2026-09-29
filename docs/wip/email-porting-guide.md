@@ -96,14 +96,26 @@ Verify DNS from anywhere: `curl -s "https://dns.google/resolve?name=<name>&type=
 | `prisma/migrations/*_email_foundation` | Adapt: includes the grandfathering backfill for existing subscribers |
 | `public/js/main.js` | Turnstile injection + "check your inbox". Storage key must match `brand.subscribedStorageKey` |
 | `client/src/components/AdminEmail.tsx` + nav entry | Admin Email page |
+| `server/src/lib/email/newsletter.ts` | Markdown → inline-styled email, plain text, footer + per-recipient links |
+| `server/src/services/NewsletterService.ts` | Issues, recipients (mailability rules), preview/test/send, stats |
+| `server/src/jobs/newsletterQueue.ts` | Budgeted batch sender; started from `index.ts` after `listen` |
+| `server/src/routes/newsletter.ts` | Admin API |
+| `server/src/routes/subscription.ts` | Confirm / per-list unsubscribe / preferences pages |
+| `prisma/migrations/*_newsletter` | Adapt: seeds the site's default list (`brand.defaultList`) + backfills list subscriptions |
+| `client/src/components/AdminNewsletter.tsx` + nav entry | Editor with live preview, test, send, stats |
+| `client/src/api.ts` | `apiFetch` surfaces the server's `{ error }` message |
 
-Server dependency: `resend` (its `webhooks.verify()` covers Svix, so no `svix` package).
+Server dependencies: `resend` (its `webhooks.verify()` covers Svix, so no `svix` package), `marked@^15`
+(v16+ is ESM-only and breaks under CommonJS on Node < 20.19), `node-cron`.
+
+**Shared DB note:** the queue job must run in **one** service only, or two services will both drain the
+same QUEUED rows. When AA/HU/FMW share a DB, either run the queue in one service, or filter by `sourceSite`.
 
 ## Env Vars
 
 See `.env.example` (Email + Turnstile sections): `EMAIL_MODE=live`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`,
 `EMAIL_FROM`, `EMAIL_NOTIFY_FROM`, `ADMIN_NOTIFY_EMAIL`, `PUBLIC_BASE_URL`, `TURNSTILE_SITE_KEY`,
-`TURNSTILE_SECRET_KEY`. **Set them before the first deploy with this code**: without `EMAIL_MODE=live`
+`TURNSTILE_SECRET_KEY`, `NEWSLETTER_POSTAL_ADDRESS`, `EMAIL_DAILY_LIMIT`, `EMAIL_TRANSACTIONAL_RESERVE`. **Set them before the first deploy with this code**: without `EMAIL_MODE=live`
 the site runs in log mode and confirmations never send.
 
 ## Production Test Checklist

@@ -19,6 +19,13 @@ export const brand = {
   from: 'Abundance Architecture <hello@abundancearchitecture.world>',
   notifyFrom: 'Abundance Architecture <notify@abundancearchitecture.world>',
 
+  /** Newsletter list the home-page subscribe form joins. Created by migration; upserted at runtime too */
+  defaultList: {
+    key: 'aa',
+    name: 'Abundance Architecture',
+    description: 'Updates on the Abundance Architecture inquiry and book',
+  },
+
   /** localStorage key set by public/js/main.js after subscribing. Must match main.js */
   subscribedStorageKey: 'aa_subscribed',
 

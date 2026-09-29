@@ -102,3 +102,15 @@ likely have the same problem.
 Reference: `abundanceArchitecture/server/src/lib/clientIp.ts`.
 **Workaround used:** Implemented as above in AA.
 
+## [2026-09-29] docs/TECH_STACK.md
+**Site:** abundance-architecture
+**Type:** Gap
+**Section:** Version Pins
+**Issue:** New pin: `marked` `^15`. marked v16+ ships ESM only. The server compiles to CommonJS, and local
+Node 20.12 can't `require()` an ESM package (ERR_REQUIRE_ESM). Railway's Node 24 could, but local dev can't,
+so it's the same driver as the existing Prisma/Vite pins. Also new server deps: `node-cron` (the scheduled-jobs
+standard), used by the newsletter queue.
+**Suggested fix:** Add `marked | ^15 | v16+ ESM-only; server is CJS on Node < 20.19` to the pin table. Unpin
+together with Prisma/Vite once local Node ≥ 20.19 (or when the server moves to ESM).
+**Workaround used:** Pinned `marked@^15` in server/package.json.
+

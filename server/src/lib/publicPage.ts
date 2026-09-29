@@ -16,21 +16,30 @@ interface PageInput {
     token: string;
     button: string;
   };
+  // Trusted, already-escaped HTML rendered in place of `form` (e.g. the preferences form)
+  customHtml?: string;
   // Clears the home page's "already subscribed" flag (public/js/main.js) so the
   // subscribe form re-enables in this browser after unsubscribing
   clearSubscribedFlag?: boolean;
+  // Extra links under the content, e.g. "Manage preferences"
+  links?: { href: string; label: string }[];
 }
 
-export function renderPublicPage({ title, heading, message, form, clearSubscribedFlag }: PageInput): string {
+export function renderPublicPage({ title, heading, message, form, customHtml, clearSubscribedFlag, links = [] }: PageInput): string {
   const clearScript = clearSubscribedFlag
     ? `<script>try { localStorage.removeItem(${JSON.stringify(brand.subscribedStorageKey)}); } catch (e) {}</script>`
     : '';
-  const formHtml = form
+  const formHtml = customHtml
+    ? customHtml
+    : form
     ? `<form method="post" action="${escapeHtml(form.action)}">
         <input type="hidden" name="t" value="${escapeHtml(form.token)}">
         <button type="submit">${escapeHtml(form.button)}</button>
       </form>`
     : `<a class="home" href="/">Return to ${escapeHtml(brand.domain)}</a>`;
+  const linksHtml = links.length
+    ? `<p class="links">${links.map((l) => `<a href="${escapeHtml(l.href)}">${escapeHtml(l.label)}</a>`).join(' · ')}</p>`
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -60,6 +69,17 @@ export function renderPublicPage({ title, heading, message, form, clearSubscribe
            text-transform: uppercase; cursor: pointer; }
   button:hover { background: var(--accent-hover); }
   .home { font-family: var(--sans); font-size: 0.8rem; color: var(--accent); }
+  .links { margin-top: 2rem; font-family: var(--sans); font-size: 0.8rem; }
+  .links a { color: var(--accent); }
+  .lists { list-style: none; margin: 0 0 2rem; padding: 0; border-top: 1px solid rgba(26,25,23,0.12); }
+  .lists li { border-bottom: 1px solid rgba(26,25,23,0.12); }
+  .lists label { display: flex; gap: 0.9rem; align-items: flex-start; padding: 1rem 0; cursor: pointer; }
+  .lists input { margin-top: 0.45rem; width: 1.05rem; height: 1.05rem; accent-color: var(--accent); flex-shrink: 0; }
+  .lists strong { display: block; font-weight: 400; font-size: 1.1rem; }
+  .lists span { display: block; color: var(--ink-light); font-size: 0.92rem; }
+  .saved { font-family: var(--sans); font-size: 0.8rem; color: var(--accent); margin-bottom: 1.5rem; }
+  .secondary { background: transparent; color: var(--ink-light); border: 1px solid rgba(26,25,23,0.2); margin-left: 0.5rem; }
+  .secondary:hover { background: transparent; color: var(--ink); }
 </style>
 </head>
 <body>
@@ -68,6 +88,7 @@ export function renderPublicPage({ title, heading, message, form, clearSubscribe
   <h1>${escapeHtml(heading)}</h1>
   <p>${escapeHtml(message)}</p>
   ${formHtml}
+  ${linksHtml}
 </main>
 ${clearScript}
 </body>

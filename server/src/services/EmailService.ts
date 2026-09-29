@@ -2,11 +2,13 @@
 // Single entry point for all outbound email. Every send is recorded in OutboundEmail.
 // EMAIL_MODE: live (Resend) | log (console only, default) | redirect (Resend, all mail to EMAIL_REDIRECT_TO)
 
+import { createHash } from 'crypto';
 import { Resend } from 'resend';
 import { EmailKind, EmailStatus, OutboundEmail } from '@prisma/client';
 import prisma from '../db';
 import { emailFrom, emailNotifyFrom, emailMode, adminNotifyEmail } from '../lib/email/config';
 import { adminNotice, NoticeInput, RenderedEmail } from '../lib/email/templates';
+import { brand } from '../lib/brand';
 
 let resendClient: Resend | null = null;
 
@@ -69,6 +71,7 @@ export async function send(input: SendInput): Promise<OutboundEmail> {
     fromEmail: from,
     subject: input.subject,
     kind: input.kind,
+    sourceSite: brand.siteKey,
     personId: input.personId ?? null,
     newsletterIssueId: input.newsletterIssueId ?? null,
     conversationId: input.conversationId ?? null,
@@ -141,6 +144,106 @@ export async function send(input: SendInput): Promise<OutboundEmail> {
       data: { status: EmailStatus.FAILED, error: message },
     });
   }
+}
+
+// ─── Batch sending (newsletter queue) ─────────────────────────────────────────
+
+/** One already-created OutboundEmail row (status QUEUED) and its rendered content */
+export interface BatchItem extends RenderedEmail {
+  rowId: string;
+  to: string;
+  from?: string;
+  replyTo?: string;
+  headers?: Record<string, string>;
+}
+
+// Resend errors worth retrying on the next queue run; anything else fails the rows permanently
+const RETRYABLE: ReadonlySet<string> = new Set([
+  'rate_limit_exceeded', 'daily_quota_exceeded', 'monthly_quota_exceeded',
+  'concurrent_idempotent_requests', 'application_error', 'internal_server_error',
+]);
+
+export type BatchResult = 'sent' | 'retry' | 'failed';
+
+/** Sends up to 100 pre-queued rows in one Resend batch call and records the outcome on each row. */
+export async function sendBatch(items: BatchItem[]): Promise<BatchResult> {
+  if (items.length === 0) return 'sent';
+  if (items.length > 100) throw new Error('sendBatch: max 100 items per call');
+  const mode = emailMode();
+  const now = new Date();
+
+  if (mode === 'log') {
+    console.log(`[email] (log mode) batch of ${items.length}: "${items[0].subject}" → ${items.map((i) => maskEmail(i.to)).join(', ')}`);
+    await prisma.outboundEmail.updateMany({
+      where: { id: { in: items.map((i) => i.rowId) } },
+      data: { status: EmailStatus.SENT, sentAt: now },
+    });
+    return 'sent';
+  }
+
+  const redirectTo = process.env.EMAIL_REDIRECT_TO;
+  if (mode === 'redirect' && !redirectTo) {
+    await prisma.outboundEmail.updateMany({
+      where: { id: { in: items.map((i) => i.rowId) } },
+      data: { status: EmailStatus.FAILED, error: 'EMAIL_MODE=redirect but EMAIL_REDIRECT_TO is not set' },
+    });
+    return 'failed';
+  }
+
+  const payload = items.map((i) => ({
+    from: i.from ?? emailFrom(),
+    to: mode === 'redirect' ? redirectTo! : i.to,
+    subject: mode === 'redirect' ? `[→ ${i.to}] ${i.subject}` : i.subject,
+    html: i.html,
+    text: i.text,
+    replyTo: i.replyTo,
+    headers: i.headers,
+    tags: [{ name: 'kind', value: EmailKind.NEWSLETTER }],
+  }));
+
+  try {
+    // Same rows → same key, so a retried call after a timeout can't double-send
+    const idempotencyKey = `batch-${createHash('sha256').update(items.map((i) => i.rowId).join('.')).digest('hex')}`;
+    const { data, error } = await getResend().batch.send(payload, { idempotencyKey });
+
+    if (error || !data) {
+      const message = error ? `${error.name}: ${error.message}` : 'No response data';
+      const retry = !error || RETRYABLE.has(error.name);
+      console.error(`[email] batch ${retry ? 'deferred' : 'failed'} (${items.length}): ${message}`);
+      await prisma.outboundEmail.updateMany({
+        where: { id: { in: items.map((i) => i.rowId) } },
+        data: retry ? { error: message } : { status: EmailStatus.FAILED, error: message },
+      });
+      return retry ? 'retry' : 'failed';
+    }
+
+    // Resend returns ids in request order
+    await prisma.$transaction(
+      items.map((item, idx) =>
+        prisma.outboundEmail.update({
+          where: { id: item.rowId },
+          data: { status: EmailStatus.SENT, resendId: data.data[idx]?.id ?? null, sentAt: now, error: null },
+        }),
+      ),
+    );
+    console.log(`[email] batch sent ${items.length} × "${items[0].subject}"`);
+    return 'sent';
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`[email] batch threw (${items.length}): ${message}`);
+    await prisma.outboundEmail.updateMany({
+      where: { id: { in: items.map((i) => i.rowId) } },
+      data: { error: message },
+    });
+    return 'retry';
+  }
+}
+
+/** Emails accepted for sending in the last 24h — Resend's daily cap counts every send */
+export async function sentInLast24h(): Promise<number> {
+  return prisma.outboundEmail.count({
+    where: { sentAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+  });
 }
 
 /** Logs-safe form of an address: ka…@example.com */

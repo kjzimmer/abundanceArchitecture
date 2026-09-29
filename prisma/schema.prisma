@@ -21,10 +21,11 @@ model Person {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  newsletter     NewsletterSubscriber?
-  contacts       ContactMessage[]
-  sessions       RefreshToken[]
-  outboundEmails OutboundEmail[]
+  newsletter        NewsletterSubscriber?
+  listSubscriptions ListSubscription[]
+  contacts          ContactMessage[]
+  sessions          RefreshToken[]
+  outboundEmails    OutboundEmail[]
 
   @@map("person")
 }
@@ -41,19 +42,80 @@ model RefreshToken {
   @@map("refresh_token")
 }
 
+// Person-level email consent: verified address (double opt-in) + "receives newsletters at all".
+// Which newsletters they get is per list — see ListSubscription.
 model NewsletterSubscriber {
   id             String    @id @default(cuid())
   personId       String    @unique @map("person_id")
   person         Person    @relation(fields: [personId], references: [id], onDelete: Cascade)
-  active         Boolean   @default(true)
-  sourceSite     String    @map("source_site")
-  token          String    @unique // random hex — used in confirm + unsubscribe links
+  active         Boolean   @default(true) // false = unsubscribed from everything
+  sourceSite     String    @map("source_site") // site where they first signed up
+  token          String    @unique // random hex — used in confirm / unsubscribe / preferences links
   confirmedAt    DateTime? @map("confirmed_at") // null = awaiting double opt-in
   unsubscribedAt DateTime? @map("unsubscribed_at")
   subscribedAt   DateTime  @default(now()) @map("subscribed_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
   @@map("newsletter_subscriber")
+}
+
+// One per newsletter. Shared-DB ready: AA, HU, FMW (and e.g. a digest) each get a row.
+model NewsletterList {
+  id          String   @id @default(cuid())
+  key         String   @unique // 'aa' — used in unsubscribe links
+  name        String
+  description String?
+  siteKey     String   @map("site_key") // owning site (brand.siteKey)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  subscriptions ListSubscription[]
+  issues        NewsletterIssue[]
+
+  @@map("newsletter_list")
+}
+
+model ListSubscription {
+  id                  String         @id @default(cuid())
+  personId            String         @map("person_id")
+  person              Person         @relation(fields: [personId], references: [id], onDelete: Cascade)
+  listId              String         @map("list_id")
+  list                NewsletterList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  active              Boolean        @default(true)
+  confirmedAt         DateTime?      @map("confirmed_at") // null = awaiting the confirm click
+  subscribedAt        DateTime       @default(now()) @map("subscribed_at")
+  unsubscribedAt      DateTime?      @map("unsubscribed_at")
+  unsubscribedIssueId String?        @map("unsubscribed_issue_id") // issue whose link was used
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+
+  @@unique([personId, listId])
+  @@index([listId, active])
+  @@map("list_subscription")
+}
+
+enum IssueStatus {
+  DRAFT
+  SENDING
+  SENT
+}
+
+model NewsletterIssue {
+  id             String         @id @default(cuid())
+  listId         String         @map("list_id")
+  list           NewsletterList @relation(fields: [listId], references: [id])
+  subject        String
+  preheader      String?
+  markdown       String
+  status         IssueStatus    @default(DRAFT)
+  recipientCount Int            @default(0) @map("recipient_count")
+  sendStartedAt  DateTime?      @map("send_started_at")
+  sentAt         DateTime?      @map("sent_at") // queue fully drained
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  outboundEmails OutboundEmail[]
+
+  @@map("newsletter_issue")
 }
 
 model ContactMessage {
@@ -93,24 +155,27 @@ enum EmailStatus {
 }
 
 model OutboundEmail {
-  id                String      @id @default(cuid())
-  personId          String?     @map("person_id")
-  person            Person?     @relation(fields: [personId], references: [id], onDelete: SetNull)
-  toEmail           String      @map("to_email") // denormalized — readable if Person deleted
-  fromEmail         String      @map("from_email")
+  id                String           @id @default(cuid())
+  personId          String?          @map("person_id")
+  person            Person?          @relation(fields: [personId], references: [id], onDelete: SetNull)
+  toEmail           String           @map("to_email") // denormalized — readable if Person deleted
+  fromEmail         String           @map("from_email")
   subject           String
   kind              EmailKind
-  status            EmailStatus @default(QUEUED)
-  resendId          String?     @unique @map("resend_id")
+  status            EmailStatus      @default(QUEUED)
+  resendId          String?          @unique @map("resend_id")
   error             String?
-  newsletterIssueId String?     @map("newsletter_issue_id") // PR C
-  conversationId    String?     @map("conversation_id") // PR B
-  sentAt            DateTime?   @map("sent_at")
-  createdAt         DateTime    @default(now()) @map("created_at")
-  updatedAt         DateTime    @updatedAt @map("updated_at")
+  sourceSite        String           @map("source_site") // brand.siteKey of the sending site
+  newsletterIssueId String?          @map("newsletter_issue_id")
+  newsletterIssue   NewsletterIssue? @relation(fields: [newsletterIssueId], references: [id], onDelete: SetNull)
+  conversationId    String?          @map("conversation_id") // PR B
+  sentAt            DateTime?        @map("sent_at")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
 
   @@index([status, createdAt])
   @@index([createdAt])
+  @@index([newsletterIssueId, status])
   @@map("outbound_email")
 }
 

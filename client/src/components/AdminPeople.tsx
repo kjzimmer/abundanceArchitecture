@@ -37,6 +37,7 @@ interface Person {
   _count?: { contacts: number };
   contacts?: ContactMsg[];
   outboundEmails?: SentEmail[];
+  listSubscriptions?: { active: boolean; confirmedAt: string | null; list: { key: string; name: string } }[];
 }
 
 interface ContactMsg {
@@ -172,6 +173,16 @@ export default function AdminPeople() {
                   {selected.newsletter.confirmedAt && selected.newsletter.active && <> · confirmed {new Date(selected.newsletter.confirmedAt).toLocaleDateString()}</>}
                   {selected.newsletter.unsubscribedAt && !selected.newsletter.active && <> · left {new Date(selected.newsletter.unsubscribedAt).toLocaleDateString()}</>}
                 </p>
+                {selected.listSubscriptions && selected.listSubscriptions.length > 0 && (
+                  <div style={styles.badges}>
+                    {selected.listSubscriptions.map((ls) => (
+                      <span key={ls.list.key}
+                        style={!ls.active ? styles.badgeGray : ls.confirmedAt ? styles.badgeGreen : styles.badgeAmber}>
+                        {ls.list.name}{!ls.active ? ' (left)' : ls.confirmedAt ? '' : ' (pending)'}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
