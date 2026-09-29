@@ -28,16 +28,27 @@ editing anything else to rebrand, that's a gap: move it into `brand.ts` and upda
 Resend free plan = 3 domains, 100/day, 3,000/month. The AA family fits 3 domains; move to **Pro ($20/mo,
 10 domains, no daily cap)** when volume or a 4th domain requires it.
 
-### Shared database implications (open, decide before porting)
+### Identity model for the shared database (Karl, 2026-09-29)
 
-- `NewsletterSubscriber.personId` is `@unique`, so one subscription per person. With a shared DB, a person
-  subscribing to several sites needs **one row per (person, site)**. Also, confirm/unsubscribe tokens
-  should be per subscription (already true)
-- `OutboundEmail` should record which site sent it (a `sourceSite` column)
+One account per person across all AA-family sites. Membership tier decides site and content access, and
+the person chooses which newsletters they receive.
+
+| Concept | Scope | Table |
+|---|---|---|
+| Account | One per person, all sites | `Person` (existing hub) |
+| Verified email + email consent | Once per person (double opt-in), not per site | `NewsletterSubscriber` (one row per person: `confirmedAt`, `token`, `active` = receives any newsletter) |
+| Newsletter choices | Per person per list (AA, HU, FMW, digest…) | `NewsletterList` + `ListSubscription` (PR C) |
+| Membership tier / access | Per person | Future membership feature (not email) |
+
+- Unsubscribe links in an issue remove that **list** only. The manage-preferences page covers the rest, and
+  "stop all" sets `NewsletterSubscriber.active = false`
+- Consent per list: signing up on one site must not silently add other sites' lists (checkboxes, with the
+  current site pre-ticked)
+- `OutboundEmail.sourceSite` records which site sent each email (PR C)
 - `EmailSuppression` stays **global** (per address). A hard bounce is a property of the address, not the site
-- **Migrations:** several services running `prisma migrate deploy` with separate histories against one DB
-  will conflict. One service (or a shared schema package) must own the schema and migrations
-- Membership and tier design is a separate feature. The email tables should just not block it
+- **Open: migrations.** Several services running `prisma migrate deploy` with separate histories against
+  one DB will conflict. One service (or a shared schema package) must own the schema. Decide when the
+  second site joins the shared DB
 
 ---
 

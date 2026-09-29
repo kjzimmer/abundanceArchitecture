@@ -29,7 +29,9 @@ and one Resend account. myGalleryWorks stays separate. See the porting guide →
 | Subscribe | Double opt-in. Existing subscribers grandfathered as confirmed |
 | Newsletter authoring | Markdown + live preview. Visual editor possibly later |
 | Newsletter replies | Private, grouped by issue in admin. Public discussion deferred |
-| Delivery order | PR A (foundation) → PR B (inbound) → PR C (newsletter) |
+| Delivery order | PR A (foundation) → **PR C (newsletter)** → PR B (inbound + general email). Order changed by Karl 2026-09-29 |
+| Identity | One account per person across AA-family sites; newsletter choices per list (see porting guide) |
+| General email | PR B grows into basic email in admin: inbox, reply, **compose new threads** to anyone (Karl, 2026-09-29) |
 | Subscriber list | Owned in Postgres; Resend Audiences/Broadcasts not used |
 
 ---
@@ -237,6 +239,9 @@ PR C adds `marked`, `node-cron`.
 - Threading: outbound replies set `Reply-To: reply+c-<conversationId>@abundancearchitecture.world`;
   fallback match on `In-Reply-To` / `References`, then sender + subject
 - Admin Inbox becomes a conversation list → thread view → reply composer (sends `REPLY` via `EmailService`)
+- **Compose new:** start a thread to any address (or pick a Person) from admin. Creates a Conversation with an
+  outbound first Message, and replies thread back via `reply+c-<id>@`. This makes admin a basic email client
+  for `hello@`
 
 ---
 
