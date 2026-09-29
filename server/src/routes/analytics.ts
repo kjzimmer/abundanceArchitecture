@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../db';
 import { requireAdmin } from '../middleware/auth';
+import { brand } from '../lib/brand';
 
 const router = Router();
 router.use(requireAdmin);
@@ -84,7 +85,7 @@ async function fetchFromCloudflare(range: number) {
     await prisma.dailyAnalytics.upsert({
       where: { date: new Date(d.date) },
       update: { uniqueVisitors: d.uniqueVisitors, pageViews: d.pageViews, requests: d.requests, bandwidthBytes: BigInt(d.bytes) },
-      create: { date: new Date(d.date), site: 'abundance-architecture', uniqueVisitors: d.uniqueVisitors, pageViews: d.pageViews, requests: d.requests, bandwidthBytes: BigInt(d.bytes) },
+      create: { date: new Date(d.date), site: brand.siteKey, uniqueVisitors: d.uniqueVisitors, pageViews: d.pageViews, requests: d.requests, bandwidthBytes: BigInt(d.bytes) },
     }).catch(() => { /* non-fatal */ });
   }
 

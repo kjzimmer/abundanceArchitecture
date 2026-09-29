@@ -5,6 +5,7 @@ import { upsertPerson } from './PersonService';
 import * as EmailService from './EmailService';
 import { subscribeConfirm } from '../lib/email/templates';
 import { publicBaseUrl } from '../lib/email/config';
+import { brand } from '../lib/brand';
 
 // Don't resend a confirmation to the same address more than once per hour
 const CONFIRM_RESEND_WINDOW_MS = 60 * 60 * 1000;
@@ -48,7 +49,7 @@ async function sendConfirmation(email: string, personId: string, token: string, 
  */
 export async function subscribe(
   email: string,
-  sourceSite = 'abundance-architecture'
+  sourceSite: string = brand.siteKey
 ): Promise<SubscribeResult> {
   const person = await upsertPerson(email);
 

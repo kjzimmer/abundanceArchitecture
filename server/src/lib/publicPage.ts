@@ -1,8 +1,11 @@
 // src/lib/publicPage.ts
-// Minimal server-rendered pages (confirm / unsubscribe) using the teaser page's design tokens.
+// Minimal server-rendered pages (confirm / unsubscribe) styled from lib/brand.ts.
 // Standalone — public/index.html is frozen and not touched.
 
 import { escapeHtml } from './email/layout';
+import { brand } from './brand';
+
+const c = brand.colors;
 
 interface PageInput {
   title: string;
@@ -20,14 +23,14 @@ interface PageInput {
 
 export function renderPublicPage({ title, heading, message, form, clearSubscribedFlag }: PageInput): string {
   const clearScript = clearSubscribedFlag
-    ? `<script>try { localStorage.removeItem('aa_subscribed'); } catch (e) {}</script>`
+    ? `<script>try { localStorage.removeItem(${JSON.stringify(brand.subscribedStorageKey)}); } catch (e) {}</script>`
     : '';
   const formHtml = form
     ? `<form method="post" action="${escapeHtml(form.action)}">
         <input type="hidden" name="t" value="${escapeHtml(form.token)}">
         <button type="submit">${escapeHtml(form.button)}</button>
       </form>`
-    : `<a class="home" href="/">Return to abundancearchitecture.world</a>`;
+    : `<a class="home" href="/">Return to ${escapeHtml(brand.domain)}</a>`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -35,14 +38,13 @@ export function renderPublicPage({ title, heading, message, form, clearSubscribe
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>${escapeHtml(title)} — Abundance Architecture</title>
+<title>${escapeHtml(title)} — ${escapeHtml(brand.name)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="${escapeHtml(brand.fonts.googleFontsHref)}" rel="stylesheet">
 <style>
-  /* Tokens mirror public/index.html :root */
-  :root { --ink: #1a1917; --ink-light: #6b6764; --paper: #eeeae0; --accent: #2d4a2d;
-          --serif: 'EB Garamond', Georgia, serif; --sans: 'Inter', system-ui, sans-serif; }
+  :root { --ink: ${c.ink}; --ink-light: ${c.inkLight}; --paper: ${c.paper}; --accent: ${c.accent};
+          --accent-hover: ${c.accentHover}; --serif: ${brand.fonts.serif}; --sans: ${brand.fonts.sans}; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { font-size: 18px; }
   body { min-height: 100vh; background: var(--paper); color: var(--ink); font-family: var(--serif);
@@ -56,12 +58,12 @@ export function renderPublicPage({ title, heading, message, form, clearSubscribe
   button { background: var(--accent); color: #fff; border: none; border-radius: 2px; padding: 0.8rem 1.8rem;
            font-family: var(--sans); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em;
            text-transform: uppercase; cursor: pointer; }
-  button:hover { background: #1e3a1e; }
+  button:hover { background: var(--accent-hover); }
   .home { font-family: var(--sans); font-size: 0.8rem; color: var(--accent); }
 </style>
 </head>
 <body>
-<header class="masthead"><a href="/">Abundance Architecture</a></header>
+<header class="masthead"><a href="/">${escapeHtml(brand.name)}</a></header>
 <main>
   <h1>${escapeHtml(heading)}</h1>
   <p>${escapeHtml(message)}</p>
