@@ -53,7 +53,17 @@ export async function apiFetch<T = unknown>(path: string, options: RequestInit =
     throw new Error('Session expired');
   }
 
-  if (!res.ok) throw new Error(`API error ${res.status}`);
+  if (!res.ok) {
+    // Surface the server's { error } message when there is one
+    let message = `API error ${res.status}`;
+    try {
+      const data = await res.json() as { error?: unknown };
+      if (typeof data.error === 'string') message = data.error;
+    } catch {
+      // non-JSON error body — keep the status message
+    }
+    throw new Error(message);
+  }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }

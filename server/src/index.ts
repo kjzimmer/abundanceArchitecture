@@ -9,6 +9,8 @@ import analyticsRouter from './routes/analytics';
 import authRouter from './routes/auth';
 import subscriptionRouter from './routes/subscription';
 import emailRouter from './routes/email';
+import newsletterRouter from './routes/newsletter';
+import { startNewsletterQueue } from './jobs/newsletterQueue';
 import { resendWebhookHandler } from './routes/webhooks';
 import { turnstileSiteKey } from './lib/turnstile';
 import { clientIp } from './lib/clientIp';
@@ -45,14 +47,16 @@ app.use('/api/contact', formLimiter, contactRouter);
 app.use('/api/people', peopleRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/email', emailRouter);
+app.use('/api/newsletter', newsletterRouter);
 
 // Public config for public/js/main.js (site key is public by design)
 app.get('/api/public-config', (_req: Request, res: Response) => {
   res.json({ turnstileSiteKey: turnstileSiteKey() });
 });
 
-// Confirm / unsubscribe pages — HTML form posts (urlencoded), incl. RFC 8058 one-click
-app.use(['/confirm', '/unsubscribe'], linkLimiter, express.urlencoded({ extended: false }));
+// Confirm / unsubscribe / preferences pages — HTML form posts (urlencoded), incl. RFC 8058 one-click.
+// extended: true so repeated checkbox fields (lists=a&lists=b) parse as an array
+app.use(['/confirm', '/unsubscribe', '/preferences'], linkLimiter, express.urlencoded({ extended: true }));
 app.use(subscriptionRouter);
 
 app.get(['/health', '/api/health'], (_req: Request, res: Response) => {
@@ -65,4 +69,5 @@ app.get(['/admin', '/admin/*path'], (_req: Request, res: Response) => {
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
+  startNewsletterQueue();
 });

@@ -31,13 +31,13 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   delivery webhooks with suppression, Turnstile on both forms, admin Email page. Prod-tested
 
 **In flight:**
-- Email + newsletter: spec `docs/wip/email-newsletter.md` (PR A foundation ✅ → PR B inbound →
-  PR C newsletter). A few PR A prod checks remain (see Status in the spec)
-- Follow-up PR (branch `fix/email-followups`): trust proxy, Turnstile/send logging, clear
-  `aa_subscribed` on unsubscribe. Listed under Follow-ups in the spec
-- SHARED_FEEDBACK logged 2026-09-24: email/newsletter module gap, `worker/` folder +
+- Email + newsletter: spec `docs/wip/email-newsletter.md` (PR A foundation ✅ → PR C newsletter (in review) →
+  PR B inbound + compose). Porting guide: `docs/wip/email-porting-guide.md`
+- Email follow-ups shipped: #12 (notify@ sender, Reply-To, logging, resubscribe), #13 (rate limit),
+  #14 (`server/src/lib/brand.ts` = all site identity, for porting to HU/FMW)
+- SHARED_FEEDBACK logged 2026-09-24/29: email/newsletter module gap, `worker/` folder +
   email decision gap, stale ARCHITECTURE.md, wrong SITE_DESIGN.md teaser tokens,
-  Prisma client generation location
+  Prisma client generation location, X-Real-IP rate limiting, `marked@^15` pin
 
 **Transition complete (all three PRs merged):**
 - PR1: Docs + minor fixes

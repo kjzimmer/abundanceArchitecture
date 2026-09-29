@@ -245,24 +245,66 @@ PR C adds `marked`, `node-cron`.
 
 ---
 
-## PR C — Newsletter (outline; refine at start of PR C)
+## PR C — Newsletter (designed 2026-09-29)
 
-- `NewsletterIssue`: slug, subject, preheader, markdown, status `DRAFT | QUEUED | SENDING | SENT`, timestamps
-- Editor: Markdown textarea + live preview rendered with the real email template
-  (`marked` → sanitized HTML → layout). Plain-text part generated
-- **Send test to me** (`NEWSLETTER_TEST`)
-- Send: one `OutboundEmail` (QUEUED) per mailable subscriber; per-recipient unsubscribe link;
-  headers `List-Unsubscribe` + `List-Unsubscribe-Post: List-Unsubscribe=One-Click`;
-  `Reply-To: reply+n-<issueId>@...`
-- Queue: `node-cron` job drains QUEUED rows via Resend batch API, capped by
-  `EMAIL_DAILY_LIMIT` (default 100) minus sends already made today, minus
-  `EMAIL_TRANSACTIONAL_RESERVE` (default 20)
-- History: issue list with sent / delivered / bounced / complained / unsubscribed / replies counts
-- Replies: conversations tagged with the issue, shown under that issue
+### Data model
+
+```prisma
+model NewsletterList {            // one per newsletter: 'aa' now; HU/FMW/digest later
+  key, name, description?, siteKey
+  subscriptions ListSubscription[], issues NewsletterIssue[]
+}
+model ListSubscription {          // a person's choice for one list
+  personId, listId  @@unique([personId, listId])
+  active, confirmedAt?            // confirmedAt null = awaiting the confirm click
+  subscribedAt, unsubscribedAt?, unsubscribedIssueId?   // which issue's link they used
+}
+enum IssueStatus { DRAFT SENDING SENT }
+model NewsletterIssue {
+  listId, subject, preheader?, markdown, status, recipientCount,
+  sendStartedAt?, sentAt?         // sentAt = queue fully drained
+}
+OutboundEmail += sourceSite (from brand.siteKey), relation to NewsletterIssue
+```
+
+**Migration:** creates the `aa` list and gives every existing subscriber a ListSubscription mirroring
+their current state (grandfathered confirmed subscribers stay confirmed). Backfills `OutboundEmail.source_site`.
+
+### Consent rules
+
+- **Mailable for list L** = `NewsletterSubscriber.active && confirmedAt` (verified email, not stopped-all)
+  AND `ListSubscription(L).active && confirmedAt` AND address not suppressed
+- Home-page subscribe → upserts the site's default list (`brand.defaultListKey`). New or reactivated list
+  rows start **unconfirmed**. One confirmation email covers the email address and pending lists, so a bot
+  can never (re)add someone without the owner's click
+- `/confirm` confirms the address and all pending list rows
+- Issue footer links: **Unsubscribe from this list** (`/unsubscribe?t=&l=&i=`, also the RFC 8058 one-click
+  target) and **Manage preferences** (`/preferences?t=`). Plain `/unsubscribe?t=` without `l` = stop all
+- `/preferences?t=` lists every NewsletterList with checkboxes plus "unsubscribe from everything".
+  Holding the token proves ownership, so lists ticked there are confirmed immediately
+
+### Authoring and sending
+
+- Markdown (`marked` v15; v16+ is ESM-only and won't load under CJS on local Node 20.12), rendered into the
+  brand email layout with inline styles. Plain-text part derived from the markdown
+- Admin → **Newsletter**: issue list with stats → editor (list, subject, preheader, markdown | live preview
+  iframe) → **Save**, **Send test** (to `ADMIN_NOTIFY_EMAIL`, kind `NEWSLETTER_TEST`), **Send to N subscribers**
+- Send: validates, then creates one QUEUED `OutboundEmail` per mailable person, status `SENDING`
+- **Queue** (`server/src/jobs/newsletterQueue.ts`, `node-cron` every minute + an immediate kick): re-checks
+  mailability at send time, batches up to 100 through Resend's batch API. Budget = `EMAIL_DAILY_LIMIT`
+  (100) − `EMAIL_TRANSACTIONAL_RESERVE` (20) − sends in the last 24h, so acknowledgements are never starved.
+  Leftovers go on the next run. When drained: `SENT` + `[AA Newsletter]` notice with counts
+- Per-recipient headers: `List-Unsubscribe`, `List-Unsubscribe-Post: List-Unsubscribe=One-Click`,
+  `Reply-To: reply+n-<issueId>@<domain>`. Until PR B, replies reach Karl through the catch-all
+- **CAN-SPAM:** footer includes `NEWSLETTER_POSTAL_ADDRESS`. **Live sends are blocked until it's set**
+  (tests are allowed). **Karl to choose the address** (PO box / mailbox service is fine)
+- History: recipients, sent, delivered, bounced, complained, unsubscribed via this issue
 - **First issue:** "You're on the list — stay tuned" to grandfathered subscribers
-- **CAN-SPAM:** every newsletter footer must include a valid physical postal address (PO box or
-  mailbox service is fine) plus the unsubscribe link. **Karl to decide the address before the first issue**
-  (env `NEWSLETTER_POSTAL_ADDRESS`)
+
+### Deferred
+
+- Public web archive / "view in browser", scheduled sends, per-list sign-up checkboxes on other sites' forms,
+  replies grouped under issues (needs PR B), visual editor
 
 ---
 
@@ -344,7 +386,13 @@ Cloudflare setting (Karl):
   - [x] `[AA Inquiry]` notice arrived in EE (first one in Spam; see notify@ follow-up)
   - [x] Admin → Email → "Send test email" works (Karl, 2026-09-25)
   - [x] Admin → People: grandfathered subscribers show as confirmed; new signup shows pending (Karl, 2026-09-25)
-- [x] Follow-up PRs: #12 (notify@, Reply-To, logging, resubscribe) + rate-limit client IP
+- [x] Follow-up PRs: #12 (notify@, Reply-To, logging, resubscribe) + #13 (rate-limit client IP) + #14 (brand.ts)
+- [ ] PR C — Newsletter: code complete, locally tested 2026-09-29 (log mode full flow + one real Resend
+      batch in redirect mode). Before the first issue:
+  - [ ] Karl: choose postal address → Railway `NEWSLETTER_POSTAL_ADDRESS`
+  - [ ] Prod: send test issue to self, check layout + `List-Unsubscribe` in Gmail "Show original"
+  - [ ] Prod: send first issue ("You're on the list") to grandfathered subscribers
+- [ ] PR B — Inbound + conversations + compose new
 
 ### Production testing notes (2026-09-24)
 
@@ -356,5 +404,4 @@ Cloudflare setting (Karl):
 - Replies to acknowledgements currently go to `hello@` → EE via catch-all, not linked in the app.
   PR B links them via `reply+c-<id>@` Reply-To and In-Reply-To. Pre-PR-B sends can be matched using
   `message_id` saved in `email_event.payload`
-- [ ] PR B — Inbound + conversations
-- [ ] PR C — Newsletter + first issue
+- [ ] PR B — Inbound + conversations + compose new
