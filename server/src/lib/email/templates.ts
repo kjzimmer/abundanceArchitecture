@@ -114,6 +114,8 @@ export type NoticeType =
   | 'Unsubscribe'
   | 'Deliverability'
   | 'Newsletter'
+  | 'Email'
+  | 'Newsletter Reply'
   | 'Test';
 
 export interface NoticeInput {

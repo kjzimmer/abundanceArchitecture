@@ -423,8 +423,8 @@ Cloudflare setting (Karl):
   - [ ] Karl: enter postal address in Admin → Settings → Newsletter
   - [ ] Prod: send test issue to self, check layout + `List-Unsubscribe` in Gmail "Show original"
   - [ ] Prod: send first issue ("You're on the list") to grandfathered subscribers
-- [ ] PR B1 — Conversations inbox (reply, compose, search, statuses): code complete + locally tested 2026-09-30
-- [ ] PR B2 — Inbound Worker (receive hello@ + replies into threads)
+- [x] PR B1 — Conversations inbox: merged #18 (2026-09-30)
+- [ ] PR B2 — Inbound Worker: code complete + locally tested 2026-09-30 (all threading cases). Setup: secret in Railway + Worker, wrangler deploy, verify +aa-raw destination, catch-all → Worker
 
 ### Production testing notes (2026-09-24)
 

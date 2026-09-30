@@ -1,0 +1,18 @@
+# Cloudflare Email Worker for abundancearchitecture.world.
+# Deploy: cd worker && npx wrangler deploy
+# Secret:  npx wrangler secret put INBOUND_WEBHOOK_SECRET   (same value as the app's Railway env var)
+# Then Cloudflare → Email → Email Routing → Routing rules → Catch-all → "Send to a Worker" → aa-email-worker
+
+name = "aa-email-worker"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+workers_dev = false
+
+[vars]
+# Where parsed mail is POSTed (HMAC-signed with INBOUND_WEBHOOK_SECRET)
+APP_INBOUND_URL = "https://abundancearchitecture.world/api/inbound-email"
+# Every message is forwarded here first, unmodified, as a backup (must be a verified destination address)
+FORWARD_TO = "karl.zimmer+aa-raw@enterpriseedge.com"
+# Site domain; local parts below (and reply+…) are posted to the app, anything else is forward-only
+DOMAIN = "abundancearchitecture.world"
+APP_LOCAL_PARTS = "hello"

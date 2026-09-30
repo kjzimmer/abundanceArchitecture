@@ -14,6 +14,7 @@ import settingsRouter from './routes/settings';
 import inboxRouter from './routes/inbox';
 import { startNewsletterQueue } from './jobs/newsletterQueue';
 import { resendWebhookHandler } from './routes/webhooks';
+import { inboundEmailHandler } from './routes/inbound';
 import { turnstileSiteKey } from './lib/turnstile';
 import { clientIp } from './lib/clientIp';
 
@@ -22,6 +23,7 @@ const port = process.env.PORT || 3000;
 
 // Must precede express.json() — signature verification needs the raw body
 app.post('/api/webhooks/resend', express.raw({ type: '*/*', limit: '1mb' }), resendWebhookHandler);
+app.post('/api/inbound-email', express.raw({ type: '*/*', limit: '2mb' }), inboundEmailHandler);
 
 app.use(express.json());
 app.use(cookieParser());

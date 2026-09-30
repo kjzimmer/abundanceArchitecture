@@ -151,3 +151,20 @@ the site runs in log mode and confirmations never send.
 
 Settings: `inbox.signature` (Settings → Inbox). Replies use `Reply-To: reply+c-<id>@<domain>`, so the catch-all
 must stay pointed at the Worker (B2) for replies to thread.
+
+## Inbound email (PR B2)
+
+| Path | Notes |
+|------|-------|
+| `worker/` | Cloudflare Email Worker (own package; **not** built by Railway). Site values live in `wrangler.toml [vars]`: `APP_INBOUND_URL`, `FORWARD_TO`, `DOMAIN`, `APP_LOCAL_PARTS`. `wrangler` is pinned to **4.86.0**, the last release that supports Node 20 |
+| `server/src/routes/inbound.ts` | `POST /api/inbound-email`, HMAC-SHA256 over `${timestamp}.${body}`, ±5 min |
+| `server/src/services/InboundService.ts` | Threading (reply+c → In-Reply-To/References → subject match → new), newsletter replies, auto-reply handling |
+
+**Runbook (per domain):**
+1. Generate a secret → Railway `INBOUND_WEBHOOK_SECRET` → deploy the app (the endpoint returns 503 until it's set)
+2. `cd worker && npx wrangler login && npx wrangler secret put INBOUND_WEBHOOK_SECRET && npx wrangler deploy`
+3. Cloudflare → Email Routing → **Destination addresses**: add + verify `FORWARD_TO` (e.g. `you+aa-raw@…`)
+4. **Routing rules**: Catch-all → *Send to a Worker* → the worker. Any specific-address rule (e.g. `hello@`) must
+   also point at the Worker, or it bypasses it
+5. Test: email `hello@` from an outside account → conversation in admin, `[CODE Email]` notice, raw copy at `FORWARD_TO`.
+   Debug with `npx wrangler tail`
