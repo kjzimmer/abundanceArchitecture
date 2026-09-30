@@ -28,6 +28,7 @@ interface Message {
   toEmail: string;
   subject: string;
   text: string;
+  quotedText: string | null;
   createdAt: string;
   meta: { phone?: string } | null;
   attachments: { filename: string; contentType: string; size: number }[] | null;
@@ -275,6 +276,7 @@ function Thread({ id, onChanged, showSidebar }: { id: string; onChanged: () => v
             </div>
             {m.meta?.phone && <div style={styles.msgExtra}>📞 {m.meta.phone}</div>}
             <div style={styles.msgBody}>{m.text}</div>
+            {m.quotedText && <QuotedText text={m.quotedText} />}
             {m.attachments && m.attachments.length > 0 && (
               <div style={styles.msgExtra}>📎 {m.attachments.map((a) => a.filename).join(', ')} <em>(see the original in your email inbox)</em></div>
             )}
@@ -301,6 +303,19 @@ function Thread({ id, onChanged, showSidebar }: { id: string; onChanged: () => v
       </div>
 
       {showSidebar && detail.person && <PersonSidebar person={detail.person} />}
+    </div>
+  );
+}
+
+// Earlier messages the sender's email client quoted below their reply — hidden by default
+function QuotedText({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ marginTop: 8 }}>
+      <button onClick={() => setOpen(!open)} style={styles.quoteToggle} title={open ? 'Hide quoted text' : 'Show quoted text'}>
+        {open ? 'Hide quoted text' : '··· Show quoted text'}
+      </button>
+      {open && <div style={styles.quoted}>{text}</div>}
     </div>
   );
 }
@@ -437,6 +452,8 @@ const styles: Record<string, React.CSSProperties> = {
   msgHead: { display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: '0.78rem', color: '#444', marginBottom: 6, flexWrap: 'wrap' },
   msgTime: { color: '#999' },
   msgBody: { fontSize: '0.88rem', color: '#222', lineHeight: 1.55, whiteSpace: 'pre-wrap', wordBreak: 'break-word' },
+  quoteToggle: { background: 'transparent', border: '1px solid #e0e0e0', borderRadius: 10, padding: '1px 8px', fontSize: '0.72rem', color: '#888', cursor: 'pointer' },
+  quoted: { marginTop: 6, paddingLeft: 10, borderLeft: '2px solid #e0e0e0', fontSize: '0.8rem', color: '#888', whiteSpace: 'pre-wrap', wordBreak: 'break-word' },
   msgExtra: { fontSize: '0.74rem', color: '#888', marginTop: 6 },
   replyBox: { borderTop: '1px solid #f0f0f0', padding: '0.75rem 1.1rem', display: 'flex', flexDirection: 'column', gap: 8 },
   replyInput: { border: '1px solid #ddd', borderRadius: 4, padding: '0.6rem 0.7rem', fontSize: '0.88rem', fontFamily: 'inherit', lineHeight: 1.5, resize: 'vertical' },

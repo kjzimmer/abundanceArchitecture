@@ -186,7 +186,8 @@ model Message {
   fromName        String?          @map("from_name")
   toEmail         String           @map("to_email")
   subject         String
-  text            String
+  text            String // for INBOUND: only the new part of the message (quoted history split off)
+  quotedText      String?          @map("quoted_text") // earlier messages the sender's client quoted below
   html            String?
   messageIdHeader String?          @unique @map("message_id_header") // RFC 5322 Message-ID, for threading
   inReplyTo       String?          @map("in_reply_to")
