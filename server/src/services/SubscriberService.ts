@@ -10,7 +10,7 @@ import { EmailKind } from '@prisma/client';
 import prisma from '../db';
 import { upsertPerson } from './PersonService';
 import * as EmailService from './EmailService';
-import { subscribeConfirm, unsubscribeConfirm } from '../lib/email/templates';
+import { subscribeConfirm, subscribeInvite, unsubscribeConfirm } from '../lib/email/templates';
 import { publicBaseUrl } from '../lib/email/config';
 import { brand } from '../lib/brand';
 
@@ -66,6 +66,63 @@ async function sendConfirmation(email: string, personId: string, token: string, 
     kind: EmailKind.SUBSCRIBE_CONFIRM,
     personId,
   });
+}
+
+// ─── Admin invitation ─────────────────────────────────────────────────────────
+
+export type InviteResult =
+  | 'sent'          // invitation emailed; they're pending until they click
+  | 'resent'        // was already pending; invitation sent again
+  | 'throttled'     // a confirmation/invite went out within the last hour
+  | 'already'       // already a confirmed subscriber of the default list
+  | 'unsubscribed'  // they opted out before — respect it; they can resubscribe themselves
+  | 'suppressed'    // address bounced or complained
+  | 'not_found';
+
+/**
+ * Admin-initiated invitation (Inbox sidebar / People). Double opt-in: creates pending rows and
+ * sends an invitation-worded confirmation. Never re-invites someone who unsubscribed.
+ */
+export async function invite(personId: string): Promise<InviteResult> {
+  const person = await prisma.person.findUnique({
+    where: { id: personId },
+    include: { newsletter: true },
+  });
+  if (!person) return 'not_found';
+  if (await EmailService.isSuppressed(person.email)) return 'suppressed';
+
+  const list = await ensureDefaultList();
+  const listSub = await prisma.listSubscription.findUnique({
+    where: { personId_listId: { personId: person.id, listId: list.id } },
+  });
+  const sub = person.newsletter;
+
+  if ((sub && !sub.active && sub.unsubscribedAt) || (listSub && !listSub.active && listSub.unsubscribedAt)) {
+    return 'unsubscribed';
+  }
+  if (sub?.active && sub.confirmedAt && listSub?.active && listSub.confirmedAt) return 'already';
+
+  const wasPending = !!(sub || listSub);
+  if (await EmailService.sentRecently(person.email, EmailKind.SUBSCRIBE_CONFIRM, CONFIRM_RESEND_WINDOW_MS)) {
+    return 'throttled';
+  }
+
+  const token = sub?.token ?? newToken();
+  if (!sub) {
+    await prisma.newsletterSubscriber.create({ data: { personId: person.id, sourceSite: brand.siteKey, token } });
+  }
+  if (!listSub) {
+    await prisma.listSubscription.create({ data: { personId: person.id, listId: list.id } });
+  }
+
+  await EmailService.send({
+    ...subscribeInvite(confirmUrl(token), person.name),
+    to: person.email,
+    kind: EmailKind.SUBSCRIBE_CONFIRM,
+    personId: person.id,
+  });
+  console.log(`[subscribe] invited ${EmailService.maskEmail(person.email)}${wasPending ? ' (resent)' : ''}`);
+  return wasPending ? 'resent' : 'sent';
 }
 
 /**

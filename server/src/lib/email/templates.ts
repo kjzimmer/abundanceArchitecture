@@ -43,6 +43,39 @@ export function subscribeConfirm(confirmUrl: string): RenderedEmail {
   return { subject, html, text };
 }
 
+/**
+ * Admin-initiated invitation for someone we've corresponded with. Same double opt-in as
+ * subscribeConfirm — nothing changes unless they click — with wording that fits an invite.
+ */
+export function subscribeInvite(confirmUrl: string, name: string | null): RenderedEmail {
+  const siteUrl = publicBaseUrl();
+  const greeting = name ? `Hi ${name.split(/\s+/)[0]},` : 'Hello,';
+  const subject = `An invitation to follow ${brand.name}`;
+  const intro = `Since we've been in touch, I wanted to invite you to receive occasional updates from ${brand.name} — ${brand.tagline}.`;
+  const html = renderLayout({
+    siteUrl,
+    preheader: 'Occasional updates — one click to join, and you can leave anytime.',
+    bodyHtml: `
+      <p style="${s.p}">${escapeHtml(greeting)}</p>
+      <p style="${s.p}">${escapeHtml(intro)}</p>
+      <p style="${s.p}">If you'd like to join, just confirm below. If not, no action is needed — you won't be added.</p>
+      ${button(confirmUrl, 'Yes, keep me updated')}
+      <p style="${s.small}">If the button doesn't work, paste this link into your browser:<br><a href="${escapeHtml(confirmUrl)}" style="${s.link}word-break:break-all;">${escapeHtml(confirmUrl)}</a></p>`,
+    footerHtml: `<p style="${s.small}">You're receiving this one-time invitation because we've corresponded. You won't be subscribed unless you confirm.</p>`,
+  });
+  const text = [
+    greeting,
+    '',
+    intro,
+    '',
+    "If you'd like to join, confirm here (if not, no action is needed — you won't be added):",
+    confirmUrl,
+    '',
+    SIGNOFF_TEXT,
+  ].join('\n');
+  return { subject, html, text };
+}
+
 // Deliberately echoes nothing the sender typed — the contact form must not be usable
 // to deliver arbitrary content to arbitrary addresses.
 export function contactAck(): RenderedEmail {

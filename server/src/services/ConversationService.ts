@@ -138,8 +138,8 @@ export async function getConversation(id: string, markRead = true) {
       person: {
         omit: { passwordHash: true, totpSecret: true },
         include: {
-          newsletter: { select: { active: true, confirmedAt: true } },
-          listSubscriptions: { select: { active: true, confirmedAt: true, list: { select: { name: true } } } },
+          newsletter: { select: { active: true, confirmedAt: true, unsubscribedAt: true } },
+          listSubscriptions: { select: { active: true, confirmedAt: true, unsubscribedAt: true, list: { select: { name: true } } } },
           conversations: {
             where: { id: { not: id } },
             orderBy: { lastMessageAt: 'desc' },
