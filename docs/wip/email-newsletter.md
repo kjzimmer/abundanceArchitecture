@@ -480,3 +480,9 @@ invitation-worded double opt-in (`subscribeInvite`: "Since we've been in touch�
 changes unless they click), creating pending subscriber + default-list rows. Rules: confirmed → no button;
 pending → "Resend" (shares the 1/hour confirmation throttle); **previously unsubscribed → never re-invited**
 (note shown instead); suppressed → blocked.
+
+### Compose recipient lookup (Karl, 2026-09-30)
+
+The Compose "To" field autocompletes from People (`GET /api/people/lookup?q=`, 2+ chars, top 8). Matches on name
+or email, case-insensitive; matches at the start of a name word or the email rank first, then most recently
+active. Picking a match fills in the email and name. Free-typed addresses still work.

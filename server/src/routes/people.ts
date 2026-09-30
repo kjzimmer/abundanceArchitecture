@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import prisma from '../db';
 import { requireAdmin } from '../middleware/auth';
 import * as SubscriberService from '../services/SubscriberService';
+import * as PersonService from '../services/PersonService';
 
 const router = Router();
 
@@ -20,6 +21,12 @@ router.get('/', async (_req, res: Response) => {
     },
   });
   res.json(people);
+});
+
+// Type-ahead for Compose "To" — must be registered before '/:id'
+router.get('/lookup', async (req: Request, res: Response) => {
+  const q = typeof req.query.q === 'string' ? req.query.q.slice(0, 100) : '';
+  res.json(await PersonService.lookupPeople(q));
 });
 
 router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { apiFetch } from '../api';
 import NewsletterInvite from './NewsletterInvite';
+import RecipientInput from './RecipientInput';
 
 type Status = 'OPEN' | 'WAITING' | 'CLOSED';
 type Filter = 'open' | 'waiting' | 'closed' | 'all';
@@ -404,7 +405,8 @@ function Compose({ onCancel, onSent }: { onCancel: () => void; onSent: (id: stri
     <div style={{ ...styles.thread, padding: '1rem 1.1rem', gap: 10 }}>
       <h3 style={styles.threadSubject}>New email</h3>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <input value={to} onChange={(e) => setTo(e.target.value)} placeholder="To (email)" style={styles.input} autoFocus />
+        <RecipientInput value={to} onChange={setTo} style={styles.input} autoFocus
+          onPick={(m) => { setTo(m.email); if (m.name) setName(m.name); }} />
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name (optional)" style={styles.input} />
       </div>
       <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" style={styles.input} />
