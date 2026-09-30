@@ -35,10 +35,10 @@ export const SETTINGS = [
     key: 'inbox.signature',
     group: 'Inbox',
     label: 'Email signature',
-    help: 'Added below every reply and new email sent from the Inbox.',
+    help: 'Added below every reply and new email sent from the Inbox. Links: paste a URL, or use [link text](https://…) to show linked text.',
     type: 'multiline',
-    default: '— Abundance Architecture\nhttps://abundancearchitecture.world',
-    placeholder: 'Karl Zimmer\nAbundance Architecture\nhttps://abundancearchitecture.world',
+    default: '— [Abundance Architecture](https://abundancearchitecture.world)',
+    placeholder: 'Karl Zimmer\n[Abundance Architecture](https://abundancearchitecture.world)',
     maxLength: 500,
   },
 ] as const satisfies readonly SettingDefinition[];
