@@ -405,3 +405,11 @@ Cloudflare setting (Karl):
   PR B links them via `reply+c-<id>@` Reply-To and In-Reply-To. Pre-PR-B sends can be matched using
   `message_id` saved in `email_event.payload`
 - [ ] PR B — Inbound + conversations + compose new
+
+### Unsubscribe confirmation (Karl, 2026-09-30)
+
+After any unsubscribe (list link, one-click, stop-all, or unticking on /preferences) the subscriber gets a
+one-time `UNSUBSCRIBE_CONFIRM` email at their own address with a "Review my subscriptions" button
+(→ /preferences). Purpose: if a forwarded newsletter's link was used by someone else, the owner finds out and
+can undo it. Rules: transactional only (CAN-SPAM allows a single opt-out confirmation), max 1 per address per
+10 min, never sent for complaint/bounce deactivations, and suppressed addresses are skipped by EmailService.

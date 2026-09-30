@@ -141,6 +141,7 @@ enum EmailKind {
   REPLY
   NEWSLETTER
   NEWSLETTER_TEST
+  UNSUBSCRIBE_CONFIRM
 }
 
 enum EmailStatus {

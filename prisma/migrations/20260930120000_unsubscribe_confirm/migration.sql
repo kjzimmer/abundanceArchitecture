@@ -1,0 +1,3 @@
+-- AlterEnum
+ALTER TYPE "EmailKind" ADD VALUE 'UNSUBSCRIBE_CONFIRM';
+

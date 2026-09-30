@@ -70,6 +70,40 @@ export function contactAck(): RenderedEmail {
 }
 
 /**
+ * One-time confirmation after an unsubscribe. Goes to the subscriber's own address, so if a
+ * forwarded email's link was used by someone else, the owner can undo it. Strictly transactional.
+ * listNames empty = unsubscribed from everything.
+ */
+export function unsubscribeConfirm(listNames: string[], preferencesUrl: string): RenderedEmail {
+  const siteUrl = publicBaseUrl();
+  const what = listNames.length ? listNames.join(', ') : `all ${brand.name} newsletters`;
+  const subject = `You've been unsubscribed — ${brand.name}`;
+  const html = renderLayout({
+    siteUrl,
+    preheader: `You won't receive ${what} emails. Changed your mind? Resubscribe in one click.`,
+    bodyHtml: `
+      <h1 style="${s.h1}">You’ve been unsubscribed</h1>
+      <p style="${s.p}">You won’t receive any more emails from <strong>${escapeHtml(what)}</strong>.</p>
+      <p style="${s.p}">If this wasn’t you (for example, if you forwarded one of our emails and someone else used its link), or you’ve simply changed your mind, you can resubscribe here:</p>
+      ${button(preferencesUrl, 'Review my subscriptions')}`,
+    footerHtml: `<p style="${s.small}">This is a one-time confirmation of your request. No further newsletters will be sent unless you resubscribe.</p>`,
+  });
+  const text = [
+    'You’ve been unsubscribed',
+    '',
+    `You won’t receive any more emails from ${what}.`,
+    '',
+    'If this wasn’t you (for example, if you forwarded one of our emails and someone else used its link), or you’ve simply changed your mind, you can resubscribe here:',
+    preferencesUrl,
+    '',
+    'This is a one-time confirmation of your request. No further newsletters will be sent unless you resubscribe.',
+    '',
+    SIGNOFF_TEXT,
+  ].join('\n');
+  return { subject, html, text };
+}
+
+/**
  * Admin notification. Subject prefix `[{brand.code} {type}]` (e.g. `[AA Inquiry]`) is stable so
  * Gmail filters can label it.
  * Rows and body come from untrusted input and are escaped here.

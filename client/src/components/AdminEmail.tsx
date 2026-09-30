@@ -33,6 +33,7 @@ const KIND_LABELS: Record<string, string> = {
   REPLY: 'Reply',
   NEWSLETTER: 'Newsletter',
   NEWSLETTER_TEST: 'Newsletter test',
+  UNSUBSCRIBE_CONFIRM: 'Unsubscribe confirm',
 };
 
 const STATUS_COLORS: Record<EmailStatus, { bg: string; fg: string }> = {
