@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { apiFetch } from '../api';
+import NewsletterInvite from './NewsletterInvite';
 
 type Status = 'OPEN' | 'WAITING' | 'CLOSED';
 type Filter = 'open' | 'waiting' | 'closed' | 'all';
@@ -50,8 +51,8 @@ interface Detail {
     notes: string | null;
     tags: string[];
     createdAt: string;
-    newsletter: { active: boolean; confirmedAt: string | null } | null;
-    listSubscriptions: { active: boolean; confirmedAt: string | null; list: { name: string } }[];
+    newsletter: { active: boolean; confirmedAt: string | null; unsubscribedAt: string | null } | null;
+    listSubscriptions: { active: boolean; confirmedAt: string | null; unsubscribedAt: string | null; list: { name: string } }[];
     conversations: { id: string; subject: string; status: Status; lastMessageAt: string }[];
   } | null;
 }
@@ -220,6 +221,9 @@ function Thread({ id, onChanged, showSidebar }: { id: string; onChanged: () => v
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // Refresh after sidebar actions (e.g. newsletter invite) without touching list state
+  const reload = () => apiFetch<Detail>(`/api/inbox/conversations/${id}`).then(setDetail);
+
   useEffect(() => { bottomRef.current?.scrollIntoView({ block: 'end' }); }, [detail?.messages.length]);
 
   async function send(close: boolean) {
@@ -302,7 +306,7 @@ function Thread({ id, onChanged, showSidebar }: { id: string; onChanged: () => v
         </div>
       </div>
 
-      {showSidebar && detail.person && <PersonSidebar person={detail.person} />}
+      {showSidebar && detail.person && <PersonSidebar person={detail.person} onChanged={reload} />}
     </div>
   );
 }
@@ -321,7 +325,7 @@ function QuotedText({ text }: { text: string }) {
 }
 
 // Rendered into the third grid column (#inbox-sidebar) with a portal, so it can live with the thread's data
-function PersonSidebar({ person }: { person: NonNullable<Detail['person']> }) {
+function PersonSidebar({ person, onChanged }: { person: NonNullable<Detail['person']>; onChanged: () => void }) {
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   useEffect(() => { setSlot(document.getElementById('inbox-sidebar')); }, []);
   if (!slot) return null;
@@ -345,6 +349,8 @@ function PersonSidebar({ person }: { person: NonNullable<Detail['person']> }) {
       {person.listSubscriptions.filter((l) => l.active).map((l) => (
         <div key={l.list.name} style={styles.sideMuted}>· {l.list.name}{l.confirmedAt ? '' : ' (pending)'}</div>
       ))}
+      <NewsletterInvite personId={person.id} newsletter={person.newsletter}
+        lists={person.listSubscriptions} onInvited={onChanged} />
     </div>
     {person.notes && (
       <div style={styles.sideCard}>

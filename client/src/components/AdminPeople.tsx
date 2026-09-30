@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { apiFetch } from '../api';
+import NewsletterInvite from './NewsletterInvite';
 
 interface Newsletter {
   active: boolean;
@@ -37,7 +38,7 @@ interface Person {
   _count?: { conversations: number };
   conversations?: ConversationSummary[];
   outboundEmails?: SentEmail[];
-  listSubscriptions?: { active: boolean; confirmedAt: string | null; list: { key: string; name: string } }[];
+  listSubscriptions?: { active: boolean; confirmedAt: string | null; unsubscribedAt?: string | null; list: { key: string; name: string } }[];
 }
 
 interface ConversationSummary {
@@ -187,6 +188,15 @@ export default function AdminPeople() {
               </div>
             )}
 
+            {!selected.newsletter && (
+              <div style={styles.section}>
+                <h4 style={styles.sectionTitle}>Newsletter</h4>
+                <p style={{ fontSize: '0.85rem', color: '#555' }}>Not subscribed</p>
+                <NewsletterInvite personId={selected.id} newsletter={null} lists={selected.listSubscriptions ?? []}
+                  onInvited={() => selectPerson(selected)} />
+              </div>
+            )}
+
             {selected.newsletter && (
               <div style={styles.section}>
                 <h4 style={styles.sectionTitle}>Newsletter</h4>
@@ -207,6 +217,8 @@ export default function AdminPeople() {
                     ))}
                   </div>
                 )}
+                <NewsletterInvite personId={selected.id} newsletter={selected.newsletter}
+                  lists={selected.listSubscriptions ?? []} onInvited={() => selectPerson(selected)} />
               </div>
             )}
 

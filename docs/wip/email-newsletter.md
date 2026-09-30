@@ -472,3 +472,11 @@ quoted history (`Message.quotedText`, behind "Show quoted text"). Markers: Gmail
 "wrote" lines, and a trailing `>` block. Conservative: no marker → nothing cut, and a message with nothing new
 keeps its full text. Our replies quote only the latest inbound message, so history never compounds.
 Messages received before this change keep their full text.
+
+### Invite to newsletter (Karl, 2026-09-30)
+
+"Invite to newsletter" in the Inbox person sidebar and on People (`POST /api/people/:id/invite`). It sends an
+invitation-worded double opt-in (`subscribeInvite`: "Since we've been in touch…", one confirm button, nothing
+changes unless they click), creating pending subscriber + default-list rows. Rules: confirmed → no button;
+pending → "Resend" (shares the 1/hour confirmation throttle); **previously unsubscribed → never re-invited**
+(note shown instead); suppressed → blocked.

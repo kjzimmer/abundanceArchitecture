@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../db';
 import { requireAdmin } from '../middleware/auth';
+import * as SubscriberService from '../services/SubscriberService';
 
 const router = Router();
 
@@ -35,7 +36,7 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
         select: { id: true, subject: true, status: true, channel: true, lastMessageAt: true },
       },
       listSubscriptions: {
-        select: { active: true, confirmedAt: true, list: { select: { key: true, name: true } } },
+        select: { active: true, confirmedAt: true, unsubscribedAt: true, list: { select: { key: true, name: true } } },
       },
       outboundEmails: {
         orderBy: { createdAt: 'desc' },
@@ -66,6 +67,29 @@ router.patch('/:id', async (req: Request<{ id: string }>, res: Response) => {
     res.json(person);
   } catch {
     res.status(404).json({ error: 'Not found' });
+  }
+});
+
+const INVITE_MESSAGES: Record<SubscriberService.InviteResult, string> = {
+  sent: 'Invitation sent. They’ll show as pending until they confirm.',
+  resent: 'Invitation sent again.',
+  throttled: 'An invitation or confirmation went out within the last hour. Try again later.',
+  already: 'Already a confirmed subscriber.',
+  unsubscribed: 'They unsubscribed before, so no invitation was sent. They can resubscribe from the website.',
+  suppressed: 'This address bounced or reported spam, so it can’t be emailed.',
+  not_found: 'Person not found.',
+};
+
+// Admin-initiated newsletter invitation (double opt-in)
+router.post('/:id/invite', async (req: Request<{ id: string }>, res: Response) => {
+  try {
+    const result = await SubscriberService.invite(req.params.id);
+    const ok = result === 'sent' || result === 'resent';
+    res.status(result === 'not_found' ? 404 : ok || result === 'already' ? 200 : 409)
+      .json({ result, message: INVITE_MESSAGES[result] });
+  } catch (err) {
+    console.error('[people] invite failed:', err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
