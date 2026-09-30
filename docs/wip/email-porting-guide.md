@@ -115,7 +115,8 @@ same QUEUED rows. When AA/HU/FMW share a DB, either run the queue in one service
 
 See `.env.example` (Email + Turnstile sections): `EMAIL_MODE=live`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`,
 `EMAIL_FROM`, `EMAIL_NOTIFY_FROM`, `ADMIN_NOTIFY_EMAIL`, `PUBLIC_BASE_URL`, `TURNSTILE_SITE_KEY`,
-`TURNSTILE_SECRET_KEY`, `NEWSLETTER_POSTAL_ADDRESS`, `EMAIL_DAILY_LIMIT`, `EMAIL_TRANSACTIONAL_RESERVE`. **Set them before the first deploy with this code**: without `EMAIL_MODE=live`
+`TURNSTILE_SECRET_KEY`, `EMAIL_DAILY_LIMIT`, `EMAIL_TRANSACTIONAL_RESERVE`. The newsletter postal address is an **admin
+setting** (Settings → Newsletter), not an env var. Copy `lib/settings.ts`, `SettingsService`, the settings route and `AdminSettings.tsx`. **Set them before the first deploy with this code**: without `EMAIL_MODE=live`
 the site runs in log mode and confirmations never send.
 
 ## Production Test Checklist

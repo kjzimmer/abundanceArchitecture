@@ -6,7 +6,8 @@ import { requireAdmin } from '../middleware/auth';
 import * as NewsletterService from '../services/NewsletterService';
 import { NewsletterError, IssueInput } from '../services/NewsletterService';
 import { kickQueue } from '../jobs/newsletterQueue';
-import { newsletterPostalAddress, emailMode, dailyLimit, transactionalReserve } from '../lib/email/config';
+import { emailMode, dailyLimit, transactionalReserve } from '../lib/email/config';
+import { getSetting } from '../services/SettingsService';
 
 const router = Router();
 router.use(requireAdmin);
@@ -37,14 +38,14 @@ function body(req: Request<unknown>): IssueInput {
   };
 }
 
-router.get('/config', (_req, res) => {
+router.get('/config', wrap(async (_req, res) => {
   res.json({
     mode: emailMode(),
-    postalAddressSet: !!newsletterPostalAddress(),
+    postalAddressSet: !!(await getSetting('newsletter.postalAddress')),
     dailyLimit: dailyLimit(),
     transactionalReserve: transactionalReserve(),
   });
-});
+}));
 
 router.get('/lists', wrap(async (_req, res) => {
   res.json(await NewsletterService.listLists());

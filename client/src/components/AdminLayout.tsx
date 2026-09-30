@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { apiFetch, clearAccessToken } from '../api';
 
-export type Tab = 'dashboard' | 'people' | 'inbox' | 'newsletter' | 'email';
+export type Tab = 'analytics' | 'people' | 'inbox' | 'newsletter' | 'settings';
 
 interface Props {
   activeTab: Tab;
@@ -11,11 +11,11 @@ interface Props {
 }
 
 const NAV_ITEMS: { id: Tab; label: string }[] = [
-  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'analytics', label: 'Analytics' },
   { id: 'people', label: 'People' },
   { id: 'inbox', label: 'Inbox' },
   { id: 'newsletter', label: 'Newsletter' },
-  { id: 'email', label: 'Email' },
+  { id: 'settings', label: 'Settings' },
 ];
 
 export default function AdminLayout({ activeTab, onTabChange, unreadCount = 0, children }: Props) {

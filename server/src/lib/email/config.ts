@@ -41,12 +41,6 @@ export function transactionalReserve(): number {
   return Number.isFinite(v) && v >= 0 && process.env.EMAIL_TRANSACTIONAL_RESERVE !== undefined ? v : 20;
 }
 
-/** CAN-SPAM physical address for newsletter footers. Live newsletter sends are blocked without it */
-export function newsletterPostalAddress(): string | null {
-  // Accept a literal "\n" as a line break — env var editors rarely allow real newlines
-  return process.env.NEWSLETTER_POSTAL_ADDRESS?.replace(/\\n/g, '\n').trim() || null;
-}
-
 export function adminNotifyEmail(): string | null {
   return process.env.ADMIN_NOTIFY_EMAIL?.trim() || null;
 }

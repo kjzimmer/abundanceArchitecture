@@ -389,7 +389,7 @@ Cloudflare setting (Karl):
 - [x] Follow-up PRs: #12 (notify@, Reply-To, logging, resubscribe) + #13 (rate-limit client IP) + #14 (brand.ts)
 - [ ] PR C — Newsletter: code complete, locally tested 2026-09-29 (log mode full flow + one real Resend
       batch in redirect mode). Before the first issue:
-  - [ ] Karl: choose postal address → Railway `NEWSLETTER_POSTAL_ADDRESS`
+  - [ ] Karl: enter postal address in Admin → Settings → Newsletter
   - [ ] Prod: send test issue to self, check layout + `List-Unsubscribe` in Gmail "Show original"
   - [ ] Prod: send first issue ("You're on the list") to grandfathered subscribers
 - [ ] PR B — Inbound + conversations + compose new
@@ -413,3 +413,22 @@ one-time `UNSUBSCRIBE_CONFIRM` email at their own address with a "Review my subs
 (→ /preferences). Purpose: if a forwarded newsletter's link was used by someone else, the owner finds out and
 can undo it. Rules: transactional only (CAN-SPAM allows a single opt-out confirmation), max 1 per address per
 10 min, never sent for complaint/bounce deactivations, and suppressed addresses are skipped by EmailService.
+
+### Admin Settings + nav (Karl, 2026-09-30)
+
+- **Settings** page (`Setting` table, registry in `server/src/lib/settings.ts`). First setting:
+  `newsletter.postalAddress`, which replaces the `NEWSLETTER_POSTAL_ADDRESS` env var (still honored as a fallback).
+  The queue pauses (it doesn't send non-compliant footers) if the address is cleared mid-send
+- Nav: **Analytics** (renamed from Dashboard) · People · Inbox · Newsletter · **Settings**. The old Email page is
+  now Settings → Email delivery. PR B turns Inbox into help-desk-style conversations
+- People: client-side search (name, email, phone, notes, tags). Conversation search comes with PR B
+  (Postgres full-text)
+- Security fix: people API no longer returns `passwordHash` / `totpSecret`
+
+### PR B design direction (Karl, 2026-09-30)
+
+Shared-inbox / help-desk pattern (Help Scout, Front, Zendesk): three panes (conversation list | thread | person
+sidebar from People). Statuses **Open** (needs you) · **Waiting** (you replied) · **Closed**. The list defaults to
+Open, sorted by latest activity. Inbound → Open; your reply → Waiting (or "Send & close"); their reply reopens.
+Everything is a conversation: contact form, hello@, newsletter replies, and **Compose** new threads. Full-text
+search over subject, bodies and participants.

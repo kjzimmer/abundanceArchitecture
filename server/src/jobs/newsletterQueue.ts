@@ -9,6 +9,7 @@ import prisma from '../db';
 import * as EmailService from '../services/EmailService';
 import { issueStats } from '../services/NewsletterService';
 import { unsubscribeUrl, preferencesUrl } from '../services/SubscriberService';
+import { getSetting } from '../services/SettingsService';
 import { renderIssue, personalize } from '../lib/email/newsletter';
 import { dailyLimit, transactionalReserve, emailMode } from '../lib/email/config';
 import type { RenderedEmail } from '../lib/email/templates';
@@ -69,12 +70,20 @@ async function sendNextBatch(): Promise<'sent' | 'empty' | 'stop'> {
       select: { email: true },
     })).map((s) => s.email),
   );
+  const postalAddress = await getSetting('newsletter.postalAddress');
+  if (!postalAddress && emailMode() === 'live') {
+    // Cleared after the send started — pause rather than send a non-compliant footer
+    console.warn('[newsletter] postal address not set — queue paused (Admin → Settings)');
+    return 'stop';
+  }
+
   const skip: string[] = [];
   const template: RenderedEmail = renderIssue({
     subject: issue.subject,
     preheader: issue.preheader,
     markdown: issue.markdown,
     listName: issue.list.name,
+    postalAddress,
   });
   const replyTo = `reply+n-${issue.id}@${brand.domain}`;
 
