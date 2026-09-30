@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { apiFetch, clearAccessToken } from '../api';
 
-export type Tab = 'analytics' | 'people' | 'inbox' | 'newsletter' | 'settings';
+export type Tab = 'analytics' | 'people' | 'inbox' | 'newsletter' | 'documents' | 'settings';
 
 interface Props {
   activeTab: Tab;
@@ -15,6 +15,7 @@ const NAV_ITEMS: { id: Tab; label: string }[] = [
   { id: 'people', label: 'People' },
   { id: 'inbox', label: 'Inbox' },
   { id: 'newsletter', label: 'Newsletter' },
+  { id: 'documents', label: 'Documents' },
   { id: 'settings', label: 'Settings' },
 ];
 

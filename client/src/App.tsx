@@ -8,6 +8,7 @@ import AdminInbox from './components/AdminInbox';
 import AdminAnalytics from './components/AdminAnalytics';
 import AdminSettings from './components/AdminSettings';
 import AdminNewsletter from './components/AdminNewsletter';
+import AdminDocs from './components/AdminDocs';
 
 interface InboxSummary { open: number; waiting: number; closed: number; unread: number }
 
@@ -47,6 +48,7 @@ export default function App() {
       {tab === 'people' && <AdminPeople />}
       {tab === 'inbox' && <AdminInbox onSummaryChange={onInboxSummary} />}
       {tab === 'newsletter' && <AdminNewsletter />}
+      {tab === 'documents' && <AdminDocs />}
       {tab === 'settings' && <AdminSettings />}
     </AdminLayout>
   );

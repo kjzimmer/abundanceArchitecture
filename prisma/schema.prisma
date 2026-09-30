@@ -288,6 +288,59 @@ model Setting {
   @@map("setting")
 }
 
+// ─── Shared docs (docs/wip/shared-docs.md) ────────────────────────────────────
+// Secret-link document shares for collaborators: view + download only.
+
+model Share {
+  id           String    @id @default(cuid())
+  sourceSite   String    @map("source_site")
+  name         String
+  token        String    @unique // 64 hex — the secret in /s/<token>
+  active       Boolean   @default(true) // false = revoked
+  lastAccessAt DateTime? @map("last_access_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  folders SharedFolder[]
+  files   SharedFile[]
+
+  @@map("share")
+}
+
+model SharedFolder {
+  id        String         @id @default(cuid())
+  shareId   String         @map("share_id")
+  share     Share          @relation(fields: [shareId], references: [id], onDelete: Cascade)
+  parentId  String?        @map("parent_id") // null = share root
+  parent    SharedFolder?  @relation("FolderTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  SharedFolder[] @relation("FolderTree")
+  name      String
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+
+  files SharedFile[]
+
+  @@index([shareId, parentId])
+  @@map("shared_folder")
+}
+
+model SharedFile {
+  id          String        @id @default(cuid())
+  shareId     String        @map("share_id")
+  share       Share         @relation(fields: [shareId], references: [id], onDelete: Cascade)
+  folderId    String?       @map("folder_id") // null = share root
+  folder      SharedFolder? @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  name        String
+  contentType String        @map("content_type")
+  size        Int
+  storageKey  String        @unique @map("storage_key")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@index([shareId, folderId])
+  @@map("shared_file")
+}
+
 model DailyAnalytics {
   id             String   @id @default(cuid())
   date           DateTime @unique

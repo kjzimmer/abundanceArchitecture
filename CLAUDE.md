@@ -25,6 +25,7 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - Admin left-nav layout (Module 6) — PR #9, badge fix PR #10. Nav: Analytics · People · Inbox · Newsletter · Settings
 - Admin Settings (2026-09-30): `Setting` table + registry `server/src/lib/settings.ts` (non-secrets only). People search
 - Inbox = help-desk conversations (PR B1): contact form, replies, compose, search; Open/Waiting/Closed
+- Shared docs (in progress): secret-link read-only document shares, admin → Documents, Cloudflare R2 storage. Spec `docs/wip/shared-docs.md`
 - Rate limiting on subscribe, contact, and login endpoints
 - Email infrastructure (2026-09-24): Cloudflare Email Routing (catch-all → admin's inbox),
   Resend sending domain verified, DMARC `p=none`
