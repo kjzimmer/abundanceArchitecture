@@ -13,6 +13,7 @@ import prisma from '../db';
 import * as EmailService from './EmailService';
 import { upsertPerson } from './PersonService';
 import { brand } from '../lib/brand';
+import { splitQuotedReply } from '../lib/email/quotes';
 
 export interface InboundPayload {
   recipient: string;
@@ -119,7 +120,9 @@ export async function handleInbound(p: InboundPayload): Promise<InboundResult> {
 
   const automated = isAutomated(p);
   const newsletter = p.recipient.split('@')[0].match(/^reply\+n-([a-z0-9]+)$/i);
-  const text = p.text.trim() || (p.html ? htmlToText(p.html) : '');
+  const fullText = p.text.trim() || (p.html ? htmlToText(p.html) : '');
+  // Keep only what the sender newly wrote; the quoted history is stored separately
+  const { visible: text, quoted: quotedText } = splitQuotedReply(fullText);
   const subject = p.subject.trim() || '(no subject)';
 
   let conversationId: string | null = null;
@@ -170,6 +173,7 @@ export async function handleInbound(p: InboundPayload): Promise<InboundResult> {
       toEmail: p.recipient,
       subject,
       text,
+      quotedText,
       html: p.html,
       messageIdHeader,
       inReplyTo: p.inReplyTo,

@@ -424,7 +424,7 @@ Cloudflare setting (Karl):
   - [ ] Prod: send test issue to self, check layout + `List-Unsubscribe` in Gmail "Show original"
   - [ ] Prod: send first issue ("You're on the list") to grandfathered subscribers
 - [x] PR B1 — Conversations inbox: merged #18 (2026-09-30)
-- [ ] PR B2 — Inbound Worker: code complete + locally tested 2026-09-30 (all threading cases). Setup: secret in Railway + Worker, wrangler deploy, verify +aa-raw destination, catch-all → Worker
+- [x] PR B2 — Inbound Worker: merged #19, Worker deployed, catch-all → Worker, prod round trip verified by Karl (2026-09-30)
 
 ### Production testing notes (2026-09-24)
 
@@ -463,3 +463,12 @@ sidebar from People). Statuses **Open** (needs you) · **Waiting** (you replied)
 Open, sorted by latest activity. Inbound → Open; your reply → Waiting (or "Send & close"); their reply reopens.
 Everything is a conversation: contact form, hello@, newsletter replies, and **Compose** new threads. Full-text
 search over subject, bodies and participants.
+
+### Quoted-history stripping (Karl, 2026-09-30)
+
+Inbound replies are split into the new text (`Message.text`, shown in the thread and the notices) and the
+quoted history (`Message.quotedText`, behind "Show quoted text"). Markers: Gmail/Apple "On … wrote:"
+(including wrapped), Outlook "-----Original Message-----" and "From:/Sent:" blocks, common non-English
+"wrote" lines, and a trailing `>` block. Conservative: no marker → nothing cut, and a message with nothing new
+keeps its full text. Our replies quote only the latest inbound message, so history never compounds.
+Messages received before this change keep their full text.
