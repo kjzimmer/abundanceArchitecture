@@ -10,12 +10,14 @@ import { EmailKind } from '@prisma/client';
 import prisma from '../db';
 import { upsertPerson } from './PersonService';
 import * as EmailService from './EmailService';
-import { subscribeConfirm } from '../lib/email/templates';
+import { subscribeConfirm, unsubscribeConfirm } from '../lib/email/templates';
 import { publicBaseUrl } from '../lib/email/config';
 import { brand } from '../lib/brand';
 
 // Don't resend a confirmation to the same address more than once per hour
 const CONFIRM_RESEND_WINDOW_MS = 60 * 60 * 1000;
+// Several unsubscribe actions in quick succession (e.g. on the preferences page) → one email
+const UNSUB_CONFIRM_WINDOW_MS = 10 * 60 * 1000;
 
 export interface SubscribeResult {
   isNew: boolean;
@@ -64,6 +66,23 @@ async function sendConfirmation(email: string, personId: string, token: string, 
     kind: EmailKind.SUBSCRIBE_CONFIRM,
     personId,
   });
+}
+
+/**
+ * Tells the subscriber (at their own address) that they were unsubscribed, with a way back in.
+ * Covers the forwarded-link case. Not used for complaint/bounce deactivations, and
+ * EmailService skips suppressed addresses anyway. Background, throttled.
+ */
+function sendUnsubscribeConfirmation(email: string, personId: string, token: string, listNames: string[]) {
+  (async () => {
+    if (await EmailService.sentRecently(email, EmailKind.UNSUBSCRIBE_CONFIRM, UNSUB_CONFIRM_WINDOW_MS)) return;
+    await EmailService.send({
+      ...unsubscribeConfirm(listNames, preferencesUrl(token)),
+      to: email,
+      kind: EmailKind.UNSUBSCRIBE_CONFIRM,
+      personId,
+    });
+  })().catch((err) => console.error('[subscribe] unsubscribe confirmation failed:', err));
 }
 
 /**
@@ -232,6 +251,7 @@ export async function unsubscribe(token: string, listKey?: string, issueId?: str
       data: { active: false, unsubscribedAt: now, unsubscribedIssueId: issueId && /^[a-z0-9]{10,40}$/.test(issueId) ? issueId : null },
     });
     console.log(`[subscribe] left list ${ls.list.key}: ${EmailService.maskEmail(sub.person.email)}`);
+    sendUnsubscribeConfirmation(sub.person.email, sub.personId, sub.token, [ls.list.name]);
     EmailService.notifyAdmin({
       type: 'Unsubscribe',
       title: `${sub.person.email} left ${ls.list.name}`,
@@ -249,6 +269,7 @@ export async function unsubscribe(token: string, listKey?: string, issueId?: str
     }),
   ]);
   console.log(`[subscribe] unsubscribed from everything: ${EmailService.maskEmail(sub.person.email)}`);
+  sendUnsubscribeConfirmation(sub.person.email, sub.personId, sub.token, []);
   EmailService.notifyAdmin({
     type: 'Unsubscribe',
     title: `${sub.person.email} unsubscribed from everything`,
@@ -319,6 +340,11 @@ export async function savePreferences(token: string, selectedKeys: string[]): Pr
         : { active: false, unsubscribedAt: sub.active ? now : sub.unsubscribedAt },
     });
   });
+
+  if (left.length) {
+    const stillOn = lists.some((l) => selected.has(l.key));
+    sendUnsubscribeConfirmation(sub.person.email, sub.personId, sub.token, stillOn ? left : []);
+  }
 
   if (joined.length || left.length) {
     EmailService.notifyAdmin({
