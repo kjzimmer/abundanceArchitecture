@@ -34,18 +34,18 @@ interface Person {
   isAdmin: boolean;
   createdAt: string;
   newsletter: Newsletter | null;
-  _count?: { contacts: number };
-  contacts?: ContactMsg[];
+  _count?: { conversations: number };
+  conversations?: ConversationSummary[];
   outboundEmails?: SentEmail[];
   listSubscriptions?: { active: boolean; confirmedAt: string | null; list: { key: string; name: string } }[];
 }
 
-interface ContactMsg {
+interface ConversationSummary {
   id: string;
   subject: string;
-  message: string;
-  createdAt: string;
-  read: boolean;
+  status: 'OPEN' | 'WAITING' | 'CLOSED';
+  channel: string;
+  lastMessageAt: string;
 }
 
 export default function AdminPeople() {
@@ -138,7 +138,7 @@ export default function AdminPeople() {
               <div style={styles.badges}>
                 {p.newsletter && subState(p.newsletter) === 'confirmed' && <span style={styles.badgeGreen}>subscriber</span>}
                 {p.newsletter && subState(p.newsletter) === 'pending' && <span style={styles.badgeAmber}>pending</span>}
-                {(p._count?.contacts ?? 0) > 0 && <span style={styles.badgeBlue}>{p._count!.contacts} msg</span>}
+                {(p._count?.conversations ?? 0) > 0 && <span style={styles.badgeBlue}>{p._count!.conversations} conv</span>}
                 {p.isAdmin && <span style={styles.badgeGray}>admin</span>}
               </div>
             </div>
@@ -223,14 +223,15 @@ export default function AdminPeople() {
               </div>
             )}
 
-            {selected.contacts && selected.contacts.length > 0 && (
+            {selected.conversations && selected.conversations.length > 0 && (
               <div style={styles.section}>
-                <h4 style={styles.sectionTitle}>Messages ({selected.contacts.length})</h4>
-                {selected.contacts.map((c) => (
+                <h4 style={styles.sectionTitle}>Conversations ({selected.conversations.length})</h4>
+                {selected.conversations.map((c) => (
                   <div key={c.id} style={styles.msgItem}>
                     <div style={styles.msgSubject}>{c.subject}</div>
-                    <div style={styles.msgBody}>{c.message}</div>
-                    <div style={styles.msgDate}>{new Date(c.createdAt).toLocaleDateString()}</div>
+                    <div style={styles.msgDate}>
+                      {c.status.toLowerCase()} · last activity {new Date(c.lastMessageAt).toLocaleDateString()} · open it in Inbox
+                    </div>
                   </div>
                 ))}
               </div>

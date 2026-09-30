@@ -6,12 +6,14 @@ import { EmailStatus, Prisma } from '@prisma/client';
 import prisma from '../db';
 import * as EmailService from './EmailService';
 import * as SubscriberService from './SubscriberService';
+import * as ConversationService from './ConversationService';
 
 export interface ResendEvent {
   type: string;
   created_at: string;
   data: {
     email_id?: string;
+    message_id?: string;
     to?: string[];
     subject?: string;
     bounce?: { type: string; subType: string; message: string };
@@ -63,6 +65,12 @@ export async function handleEvent(svixId: string, event: ResendEvent): Promise<H
 
   const nextStatus = STATUS_BY_EVENT[event.type];
   if (!nextStatus || !resendId) return 'ignored';
+
+  // Remember the RFC Message-ID of Inbox messages so inbound answers can thread via In-Reply-To.
+  // No-op for emails that aren't conversation messages.
+  if (event.data.message_id) {
+    await ConversationService.recordOutboundMessageId(resendId, event.data.message_id);
+  }
 
   const row = await prisma.outboundEmail.findUnique({ where: { resendId } });
   const recipient = (row?.toEmail ?? event.data.to?.[0] ?? '').toLowerCase();

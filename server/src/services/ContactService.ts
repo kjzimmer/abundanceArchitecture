@@ -1,10 +1,9 @@
 import { EmailKind } from '@prisma/client';
-import prisma from '../db';
 import { upsertPerson } from './PersonService';
 import * as EmailService from './EmailService';
+import * as ConversationService from './ConversationService';
 import { contactAck } from '../lib/email/templates';
 import { emailFromAddress } from '../lib/email/config';
-import { brand } from '../lib/brand';
 
 // At most one acknowledgement per address per hour, however many messages arrive
 const ACK_WINDOW_MS = 60 * 60 * 1000;
@@ -15,7 +14,6 @@ export interface ContactInput {
   phone?: string;
   subject: string;
   message: string;
-  sourceSite?: string;
 }
 
 async function sendAck(email: string, personId: string) {
@@ -29,13 +27,14 @@ async function sendAck(email: string, personId: string) {
   });
 }
 
+/** Contact form → new OPEN conversation in the admin Inbox, acknowledgement to sender, notice to admin. */
 export async function createMessage(input: ContactInput) {
-  const { name, email, phone, subject, message, sourceSite = brand.siteKey } = input;
+  const { name, email, phone, subject, message } = input;
 
   const person = await upsertPerson(email, name, phone);
 
-  const msg = await prisma.contactMessage.create({
-    data: { personId: person.id, name, email, phone: phone || null, subject, message, sourceSite },
+  const conversation = await ConversationService.createFromContactForm({
+    personId: person.id, name, email, phone, subject, message,
   });
 
   // Background — never block the response on email
@@ -51,16 +50,5 @@ export async function createMessage(input: ContactInput) {
     body: message,
   }, { replyTo: email });
 
-  return msg;
-}
-
-export async function listMessages() {
-  return prisma.contactMessage.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: { person: { select: { id: true, name: true, tags: true } } },
-  });
-}
-
-export async function markRead(id: string) {
-  return prisma.contactMessage.update({ where: { id }, data: { read: true } });
+  return conversation;
 }

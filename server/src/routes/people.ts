@@ -15,7 +15,7 @@ router.get('/', async (_req, res: Response) => {
     orderBy: { createdAt: 'desc' },
     include: {
       newsletter: { select: { active: true, confirmedAt: true, sourceSite: true, subscribedAt: true } },
-      _count: { select: { contacts: true } },
+      _count: { select: { conversations: true } },
     },
   });
   res.json(people);
@@ -30,7 +30,10 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
       newsletter: {
         select: { active: true, confirmedAt: true, unsubscribedAt: true, sourceSite: true, subscribedAt: true },
       },
-      contacts: { orderBy: { createdAt: 'desc' } },
+      conversations: {
+        orderBy: { lastMessageAt: 'desc' },
+        select: { id: true, subject: true, status: true, channel: true, lastMessageAt: true },
+      },
       listSubscriptions: {
         select: { active: true, confirmedAt: true, list: { select: { key: true, name: true } } },
       },

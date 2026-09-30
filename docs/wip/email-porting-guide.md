@@ -137,3 +137,17 @@ the site runs in log mode and confirmations never send.
   Use `clientIp()` (X-Real-IP)
 - **Page after confirming has no token in its URL.** Test unsubscribe from the emailed link
 - **Test with non-admin addresses** (e.g. a personal Gmail) to judge real subscriber deliverability
+
+## Inbox / Conversations (PR B1)
+
+| Path | Notes |
+|------|-------|
+| `server/src/services/ConversationService.ts` | Create from contact form, list/search (Postgres FTS), detail, reply, compose, status, Message-ID capture |
+| `server/src/lib/email/reply.ts` | Personal-style reply email (paragraphs, signature, quoted message) |
+| `server/src/routes/inbox.ts` | Admin API `/api/inbox/*` |
+| `server/src/routes/contact.ts` | Public POST only; admin endpoints removed |
+| `prisma/migrations/*_conversations` | Adapt: converts legacy `contact_message` rows into conversations |
+| `client/src/components/AdminInbox.tsx` | Three-pane inbox (list, thread, person sidebar) + Compose |
+
+Settings: `inbox.signature` (Settings → Inbox). Replies use `Reply-To: reply+c-<id>@<domain>`, so the catch-all
+must stay pointed at the Worker (B2) for replies to thread.

@@ -31,6 +31,16 @@ export const SETTINGS = [
     placeholder: 'Abundance Architecture\nPO Box 123\nCity, ST 12345',
     maxLength: 300,
   },
+  {
+    key: 'inbox.signature',
+    group: 'Inbox',
+    label: 'Email signature',
+    help: 'Added below every reply and new email sent from the Inbox.',
+    type: 'multiline',
+    default: '— Abundance Architecture\nhttps://abundancearchitecture.world',
+    placeholder: 'Karl Zimmer\nAbundance Architecture\nhttps://abundancearchitecture.world',
+    maxLength: 500,
+  },
 ] as const satisfies readonly SettingDefinition[];
 
 export type SettingKey = (typeof SETTINGS)[number]['key'];

@@ -11,6 +11,7 @@ import subscriptionRouter from './routes/subscription';
 import emailRouter from './routes/email';
 import newsletterRouter from './routes/newsletter';
 import settingsRouter from './routes/settings';
+import inboxRouter from './routes/inbox';
 import { startNewsletterQueue } from './jobs/newsletterQueue';
 import { resendWebhookHandler } from './routes/webhooks';
 import { turnstileSiteKey } from './lib/turnstile';
@@ -50,6 +51,7 @@ app.use('/api/analytics', analyticsRouter);
 app.use('/api/email', emailRouter);
 app.use('/api/newsletter', newsletterRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api/inbox', inboxRouter);
 
 // Public config for public/js/main.js (site key is public by design)
 app.get('/api/public-config', (_req: Request, res: Response) => {
