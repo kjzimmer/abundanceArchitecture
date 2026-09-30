@@ -1,0 +1,19 @@
+{
+  "name": "aa-email-worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cloudflare Email Worker: forwards a raw copy of inbound mail and posts parsed mail to the app's /api/inbound-email",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "postal-mime": "^4.0.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250901.0",
+    "typescript": "^5.9.2",
+    "wrangler": "4.86.0"
+  }
+}

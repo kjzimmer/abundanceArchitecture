@@ -34,7 +34,7 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 
 **In flight:**
 - Email + newsletter: spec `docs/wip/email-newsletter.md` (PR A ✅ → PR C newsletter ✅ →
-  PR B1 conversations (in review) → PR B2 inbound Worker). Porting guide: `docs/wip/email-porting-guide.md`
+  PR B1 conversations ✅ → PR B2 inbound Worker (setup in progress)). Porting guide: `docs/wip/email-porting-guide.md`
 - Email follow-ups shipped: #12 (notify@ sender, Reply-To, logging, resubscribe), #13 (rate limit),
   #14 (`server/src/lib/brand.ts` = all site identity, for porting to HU/FMW)
 - SHARED_FEEDBACK logged 2026-09-24/29: email/newsletter module gap, `worker/` folder +
