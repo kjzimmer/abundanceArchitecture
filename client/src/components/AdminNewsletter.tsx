@@ -179,7 +179,7 @@ function ConfigWarnings({ config }: { config: Config | null }) {
         <p style={styles.warn}>EMAIL_MODE is <strong>{config.mode}</strong> — sends are {config.mode === 'log' ? 'only logged, not delivered' : `redirected to EMAIL_REDIRECT_TO`}.</p>
       )}
       {!config.postalAddressSet && (
-        <p style={styles.warn}>NEWSLETTER_POSTAL_ADDRESS is not set. US law (CAN-SPAM) requires a postal address in every newsletter — sending is blocked until it’s set (tests still work).</p>
+        <p style={styles.warn}>No postal address set. US law (CAN-SPAM) requires one in every newsletter — add it in Settings → Newsletter. Sending is blocked until it’s set (tests still work).</p>
       )}
     </>
   );

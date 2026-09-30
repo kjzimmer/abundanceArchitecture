@@ -54,6 +54,17 @@ export default function AdminPeople() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', notes: '' });
+  const [query, setQuery] = useState('');
+
+  // Client-side search: every word must match name, email, phone, notes or a tag.
+  // Fine at current scale; move server-side when the list grows into the thousands.
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const visible = words.length
+    ? people.filter((p) => {
+        const hay = [p.name, p.email, p.phone, p.notes, ...p.tags].filter(Boolean).join(' ').toLowerCase();
+        return words.every((w) => hay.includes(w));
+      })
+    : people;
 
   useEffect(() => {
     apiFetch<Person[]>('/api/people')
@@ -97,13 +108,26 @@ export default function AdminPeople() {
   return (
     <div style={styles.wrap}>
       <div style={styles.toolbar}>
-        <h2 style={styles.heading}>People <span style={styles.count}>{people.length}</span></h2>
-        <button onClick={copyEmails} style={styles.btnSm}>Copy subscriber emails</button>
+        <h2 style={styles.heading}>
+          People <span style={styles.count}>{words.length ? `${visible.length} of ${people.length}` : people.length}</span>
+        </h2>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search name, email, notes, tags…"
+            style={styles.search}
+            autoFocus
+          />
+          <button onClick={copyEmails} style={styles.btnSm}>Copy subscriber emails</button>
+        </div>
       </div>
 
       <div style={styles.layout}>
         <div style={{ ...styles.list, ...(selected ? styles.listNarrow : {}) }}>
-          {people.map((p) => (
+          {visible.length === 0 && <p style={{ color: '#888', fontSize: '0.85rem' }}>No one matches “{query}”.</p>}
+          {visible.map((p) => (
             <div
               key={p.id}
               onClick={() => selectPerson(p)}
@@ -232,6 +256,7 @@ const styles: Record<string, React.CSSProperties> = {
   cardEmail: { fontSize: '0.82rem', color: '#666', marginBottom: 6 },
   badges: { display: 'flex', gap: 4, flexWrap: 'wrap' },
   badgeGreen: { background: '#e8efe8', color: '#2d4a2d', borderRadius: 3, fontSize: '0.68rem', fontWeight: 600, padding: '1px 6px' },
+  search: { border: '1px solid #ddd', borderRadius: 4, padding: '0.4rem 0.65rem', fontSize: '0.85rem', fontFamily: 'inherit', width: 260 },
   badgeAmber: { background: '#fdf3e0', color: '#8a5a00', borderRadius: 3, fontSize: '0.68rem', fontWeight: 600, padding: '1px 6px' },
   emailRow: { display: 'flex', gap: 10, alignItems: 'baseline', fontSize: '0.84rem', padding: '0.35rem 0', borderBottom: '1px solid #f5f5f5' },
   emailStatus: { fontSize: '0.72rem', color: '#777', whiteSpace: 'nowrap' },

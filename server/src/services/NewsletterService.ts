@@ -6,7 +6,8 @@ import { EmailKind, EmailStatus, IssueStatus } from '@prisma/client';
 import prisma from '../db';
 import * as EmailService from './EmailService';
 import { renderIssue, personalize } from '../lib/email/newsletter';
-import { emailMode, newsletterPostalAddress, adminNotifyEmail, emailFrom, publicBaseUrl } from '../lib/email/config';
+import { emailMode, adminNotifyEmail, emailFrom, publicBaseUrl } from '../lib/email/config';
+import { getSetting } from './SettingsService';
 import { brand } from '../lib/brand';
 
 export class NewsletterError extends Error {
@@ -132,6 +133,7 @@ export async function preview(input: IssueInput) {
     preheader: input.preheader,
     markdown: input.markdown ?? '',
     listName: list?.name ?? brand.defaultList.name,
+    postalAddress: await getSetting('newsletter.postalAddress'),
   });
   return personalize(rendered, SAMPLE_LINKS);
 }
@@ -145,7 +147,10 @@ export async function sendTest(id: string, to?: string) {
   if (!issue.subject.trim()) throw new NewsletterError('Add a subject first');
 
   const rendered = personalize(
-    renderIssue({ subject: issue.subject, preheader: issue.preheader, markdown: issue.markdown, listName: issue.list.name }),
+    renderIssue({
+      subject: issue.subject, preheader: issue.preheader, markdown: issue.markdown, listName: issue.list.name,
+      postalAddress: await getSetting('newsletter.postalAddress'),
+    }),
     SAMPLE_LINKS,
   );
   return EmailService.send({
@@ -164,8 +169,8 @@ export async function startSend(id: string) {
   const issue = await requireDraft(id);
   if (!issue.subject.trim()) throw new NewsletterError('Subject is required');
   if (!issue.markdown.trim()) throw new NewsletterError('Content is required');
-  if (emailMode() === 'live' && !newsletterPostalAddress()) {
-    throw new NewsletterError('Set NEWSLETTER_POSTAL_ADDRESS before sending — US law (CAN-SPAM) requires a postal address in every newsletter');
+  if (emailMode() === 'live' && !(await getSetting('newsletter.postalAddress'))) {
+    throw new NewsletterError('Set the postal address in Admin → Settings before sending — US law (CAN-SPAM) requires a postal address in every newsletter');
   }
 
   const recipients = await mailableRecipients(issue.listId);

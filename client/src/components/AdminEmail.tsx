@@ -95,7 +95,7 @@ export default function AdminEmail() {
     <div>
       <div style={styles.toolbar}>
         <h2 style={styles.heading}>
-          Email
+          Email delivery
           {status && status.mode !== 'live' && (
             <span style={styles.modeBadge} title="EMAIL_MODE — only 'live' sends real email">mode: {status.mode}</span>
           )}

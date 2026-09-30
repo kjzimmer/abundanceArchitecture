@@ -203,6 +203,21 @@ model EmailSuppression {
   @@map("email_suppression")
 }
 
+// Admin-editable app settings (non-secret). Definitions live in server/src/lib/settings.ts;
+// secrets stay in env vars. Scoped per site so a shared DB can hold AA/HU/FMW settings.
+model Setting {
+  id          String   @id @default(cuid())
+  siteKey     String   @map("site_key")
+  key         String
+  value       String
+  updatedById String?  @map("updated_by_id") // Person id of the admin who last changed it
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([siteKey, key])
+  @@map("setting")
+}
+
 model DailyAnalytics {
   id             String   @id @default(cuid())
   date           DateTime @unique

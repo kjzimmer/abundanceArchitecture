@@ -114,3 +114,28 @@ standard), used by the newsletter queue.
 together with Prisma/Vite once local Node ≥ 20.19 (or when the server moves to ESM).
 **Workaround used:** Pinned `marked@^15` in server/package.json.
 
+## [2026-09-30] SHARED_ADMIN_MODULES.md
+**Site:** abundance-architecture
+**Type:** Error (security)
+**Section:** 2. People CRM — API routes
+**Issue:** `GET /api/people`, `GET /api/people/:id` and `PATCH /api/people/:id` returned the full `Person`
+row, including `passwordHash` and `totpSecret`, to the admin SPA. Only admins could see it, but credentials
+should never leave the server. Other sites built from this module likely have the same leak.
+**Suggested fix:** Specify `omit: { passwordHash: true, totpSecret: true }` (Prisma 6) on every Person
+query that's returned to a client, and add it to the module's route examples. Check FMW / HU.
+**Workaround used:** Added the omit to all three AA people routes (verified: no hash/secret in responses).
+
+## [2026-09-30] SHARED_ADMIN_MODULES.md
+**Site:** abundance-architecture
+**Type:** Suggestion
+**Section:** 6. Admin UI Layout — Standard Module Order; (new) Settings module
+**Issue:** (1) "Dashboard" implies a whole-app status summary, but the module is Cloudflare analytics. AA renamed
+the nav item to **Analytics**. A real dashboard (open conversations, new subscribers, last newsletter,
+deliverability) can come later as its own module. (2) The "Settings (if implemented)" slot has no spec. AA
+implemented one: a `Setting` table (siteKey + key + value, unique per site, shared-DB ready), a typed registry
+in `server/src/lib/settings.ts` (label, help, type, default, optional env fallback), `GET /api/settings` +
+`PUT /api/settings/:key`, and an admin Settings page with "General" (auto-rendered from the registry) and
+"Email delivery" (sent log, suppressions, test send) tabs. Rule: secrets stay in env vars.
+**Suggested fix:** Rename item 1 to "Analytics", and add a Settings module section based on AA's implementation.
+**Workaround used:** Implemented in AA. Nav is Analytics · People · Inbox · Newsletter · Settings.
+

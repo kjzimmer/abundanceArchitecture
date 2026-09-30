@@ -5,7 +5,7 @@
 
 import { Marked } from 'marked';
 import { renderLayout, escapeHtml, s, EMAIL_COLORS } from './layout';
-import { publicBaseUrl, newsletterPostalAddress } from './config';
+import { publicBaseUrl } from './config';
 import { brand } from '../brand';
 import type { RenderedEmail } from './templates';
 
@@ -66,6 +66,8 @@ export interface IssueContent {
   preheader?: string | null;
   markdown: string;
   listName: string;
+  /** Settings → Newsletter → Postal address (SettingsService 'newsletter.postalAddress') */
+  postalAddress: string | null;
 }
 
 /**
@@ -74,7 +76,7 @@ export interface IssueContent {
  */
 export function renderIssue(issue: IssueContent): RenderedEmail {
   const siteUrl = publicBaseUrl();
-  const postal = newsletterPostalAddress() ?? '[Postal address not set — NEWSLETTER_POSTAL_ADDRESS]';
+  const postal = issue.postalAddress ?? '[Postal address not set — Admin → Settings]';
 
   const footerHtml = `
     <p style="${s.small}">You're receiving ${escapeHtml(issue.listName)} because you subscribed at ${escapeHtml(brand.domain)}.</p>

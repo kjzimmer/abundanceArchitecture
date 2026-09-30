@@ -22,7 +22,8 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - Newsletter subscriber and contact message persistence (PostgreSQL via Prisma)
 - Admin panel at `/admin` — React SPA, DB-backed JWT auth
 - People CRM, contact inbox, Cloudflare Zone Analytics in admin panel
-- Admin left-nav layout (Module 6) — PR #9, badge fix PR #10
+- Admin left-nav layout (Module 6) — PR #9, badge fix PR #10. Nav: Analytics · People · Inbox · Newsletter · Settings
+- Admin Settings (2026-09-30): `Setting` table + registry `server/src/lib/settings.ts` (non-secrets only). People search
 - Rate limiting on subscribe, contact, and login endpoints
 - Email infrastructure (2026-09-24): Cloudflare Email Routing (catch-all → admin's inbox),
   Resend sending domain verified, DMARC `p=none`

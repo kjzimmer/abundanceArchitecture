@@ -6,8 +6,12 @@ const router = Router();
 
 router.use(requireAdmin);
 
+// Credentials never leave the server, not even to the admin UI
+const OMIT_SECRETS = { passwordHash: true, totpSecret: true } as const;
+
 router.get('/', async (_req, res: Response) => {
   const people = await prisma.person.findMany({
+    omit: OMIT_SECRETS,
     orderBy: { createdAt: 'desc' },
     include: {
       newsletter: { select: { active: true, confirmedAt: true, sourceSite: true, subscribedAt: true } },
@@ -19,6 +23,7 @@ router.get('/', async (_req, res: Response) => {
 
 router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
   const person = await prisma.person.findUnique({
+    omit: OMIT_SECRETS,
     where: { id: req.params.id },
     include: {
       // token omitted — it grants confirm/unsubscribe and has no use in the admin UI
@@ -46,6 +51,7 @@ router.patch('/:id', async (req: Request<{ id: string }>, res: Response) => {
   };
   try {
     const person = await prisma.person.update({
+      omit: OMIT_SECRETS,
       where: { id: req.params.id },
       data: {
         ...(name !== undefined && { name }),

@@ -6,13 +6,13 @@ import type { Tab } from './components/AdminLayout';
 import AdminPeople from './components/AdminPeople';
 import AdminContact from './components/AdminContact';
 import AdminAnalytics from './components/AdminAnalytics';
-import AdminEmail from './components/AdminEmail';
+import AdminSettings from './components/AdminSettings';
 import AdminNewsletter from './components/AdminNewsletter';
 
 export default function App() {
   const [authed, setAuthed] = useState(false);
   const [checking, setChecking] = useState(true);
-  const [tab, setTab] = useState<Tab>('dashboard');
+  const [tab, setTab] = useState<Tab>('analytics');
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -38,11 +38,11 @@ export default function App() {
 
   return (
     <AdminLayout activeTab={tab} onTabChange={setTab} unreadCount={unreadCount}>
-      {tab === 'dashboard' && <AdminAnalytics />}
+      {tab === 'analytics' && <AdminAnalytics />}
       {tab === 'people' && <AdminPeople />}
       {tab === 'inbox' && <AdminContact onUnreadChange={setUnreadCount} />}
       {tab === 'newsletter' && <AdminNewsletter />}
-      {tab === 'email' && <AdminEmail />}
+      {tab === 'settings' && <AdminSettings />}
     </AdminLayout>
   );
 }
