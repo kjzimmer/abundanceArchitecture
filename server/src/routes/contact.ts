@@ -1,6 +1,9 @@
+// src/routes/contact.ts
+// POST /api/contact — public contact form. Creates an Inbox conversation (see ConversationService).
+// Admin reading/replying lives under /api/inbox.
+
 import { Router, Request, Response } from 'express';
 import * as ContactService from '../services/ContactService';
-import { requireAdmin } from '../middleware/auth';
 import { verifyTurnstile } from '../lib/turnstile';
 import { clientIp } from '../lib/clientIp';
 
@@ -42,21 +45,6 @@ router.post('/', async (req: Request<unknown, unknown, ContactBody>, res: Respon
   } catch (err) {
     console.error('[contact] error', err);
     res.status(500).json({ success: false, error: 'Server error' });
-  }
-});
-
-router.get('/', requireAdmin, async (_req, res: Response) => {
-  const messages = await ContactService.listMessages();
-  res.json(messages);
-});
-
-router.patch('/:id/read', requireAdmin, async (req: Request<{ id: string }>, res: Response) => {
-  try {
-    const msg = await ContactService.markRead(req.params.id);
-    res.json(msg);
-  } catch (err) {
-    console.error('[contact] mark-read error', err);
-    res.status(500).json({ error: 'Server error' });
   }
 });
 

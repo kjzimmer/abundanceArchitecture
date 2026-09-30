@@ -23,7 +23,8 @@ model Person {
 
   newsletter        NewsletterSubscriber?
   listSubscriptions ListSubscription[]
-  contacts          ContactMessage[]
+  contacts          ContactMessage[] // legacy — superseded by conversations
+  conversations     Conversation[]
   sessions          RefreshToken[]
   outboundEmails    OutboundEmail[]
 
@@ -118,6 +119,7 @@ model NewsletterIssue {
   @@map("newsletter_issue")
 }
 
+// LEGACY (read-only since 2026-09-30): migrated into Conversation/Message. Drop in a later cleanup PR.
 model ContactMessage {
   id         String   @id @default(cuid())
   personId   String?  @map("person_id")
@@ -132,6 +134,71 @@ model ContactMessage {
   createdAt  DateTime @default(now()) @map("created_at")
 
   @@map("contact_message")
+}
+
+enum ConversationStatus {
+  OPEN // needs a response
+  WAITING // we replied; waiting on them
+  CLOSED
+}
+
+enum ConversationChannel {
+  CONTACT_FORM
+  EMAIL
+  NEWSLETTER_REPLY
+  COMPOSED
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+// Help-desk style thread: contact-form inquiries, inbound email, newsletter replies, composed emails.
+model Conversation {
+  id                String              @id @default(cuid())
+  sourceSite        String              @map("source_site")
+  personId          String?             @map("person_id")
+  person            Person?             @relation(fields: [personId], references: [id], onDelete: SetNull)
+  subject           String
+  status            ConversationStatus  @default(OPEN)
+  channel           ConversationChannel
+  unread            Boolean             @default(true) // has inbound the admin hasn't opened
+  newsletterIssueId String?             @map("newsletter_issue_id") // set for NEWSLETTER_REPLY
+  lastMessageAt     DateTime            @default(now()) @map("last_message_at")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+
+  messages       Message[]
+  outboundEmails OutboundEmail[]
+
+  @@index([status, lastMessageAt])
+  @@index([personId])
+  @@map("conversation")
+}
+
+model Message {
+  id              String           @id @default(cuid())
+  conversationId  String           @map("conversation_id")
+  conversation    Conversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction       MessageDirection
+  fromEmail       String           @map("from_email")
+  fromName        String?          @map("from_name")
+  toEmail         String           @map("to_email")
+  subject         String
+  text            String
+  html            String?
+  messageIdHeader String?          @unique @map("message_id_header") // RFC 5322 Message-ID, for threading
+  inReplyTo       String?          @map("in_reply_to")
+  references      String?
+  outboundEmailId String?          @unique @map("outbound_email_id") // delivery status for OUTBOUND
+  outboundEmail   OutboundEmail?   @relation(fields: [outboundEmailId], references: [id], onDelete: SetNull)
+  attachments     Json? // [{ filename, contentType, size }] — metadata only
+  meta            Json? // channel extras, e.g. { phone } from the contact form
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  @@index([conversationId, createdAt])
+  @@map("message")
 }
 
 enum EmailKind {
@@ -169,7 +236,9 @@ model OutboundEmail {
   sourceSite        String           @map("source_site") // brand.siteKey of the sending site
   newsletterIssueId String?          @map("newsletter_issue_id")
   newsletterIssue   NewsletterIssue? @relation(fields: [newsletterIssueId], references: [id], onDelete: SetNull)
-  conversationId    String?          @map("conversation_id") // PR B
+  conversationId    String?          @map("conversation_id")
+  conversation      Conversation?    @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  message           Message?
   sentAt            DateTime?        @map("sent_at")
   createdAt         DateTime         @default(now()) @map("created_at")
   updatedAt         DateTime         @updatedAt @map("updated_at")

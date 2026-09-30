@@ -219,7 +219,39 @@ PR C adds `marked`, `node-cron`.
 
 ---
 
-## PR B — Inbound (outline; refine at start of PR B)
+## PR B — split into B1 (conversations) and B2 (inbound), designed 2026-09-30
+
+### B1 — Conversations in admin (help-desk pattern)
+
+**Model**
+```prisma
+enum ConversationStatus  { OPEN WAITING CLOSED }
+enum ConversationChannel { CONTACT_FORM EMAIL NEWSLETTER_REPLY COMPOSED }
+enum MessageDirection    { INBOUND OUTBOUND }
+model Conversation { sourceSite, personId?, subject, status, channel, unread, newsletterIssueId?,
+                     lastMessageAt, messages[] }
+model Message      { conversationId, direction, fromEmail, fromName?, toEmail, subject, text, html?,
+                     messageIdHeader? (RFC Message-ID), inReplyTo?, references?, outboundEmailId? (→ status),
+                     attachments Json?, meta Json? (e.g. contact-form phone) }
+OutboundEmail.conversationId gets a real relation.
+```
+- **Migration:** every `ContactMessage` becomes a CONTACT_FORM conversation with one inbound message
+  (unread mirrors `read`). `ContactMessage` stays as a read-only legacy table, to be dropped in a later cleanup PR
+- **Statuses:** new inbound → OPEN + unread. Admin reply → WAITING, or CLOSED with "Send & close". Inbound
+  reply → OPEN again. Manual Close / Reopen
+- **Reply email:** plain personal-email look (not the newsletter layout), From `EMAIL_FROM` (hello@),
+  `Reply-To: reply+c-<conversationId>@<domain>`, `In-Reply-To`/`References` to the last inbound message,
+  subject `Re: …`, a signature from **Settings → Inbox → Signature**, and the previous message quoted below.
+  Resend's delivery webhook fills in our outbound `Message-ID` (from `data.message_id`) for header matching in B2
+- **Compose:** to (email + optional name) → upserts Person → COMPOSED conversation (WAITING after send)
+- **Admin Inbox:** three panes (list | thread | person sidebar). Tabs Open · Waiting · Closed · All,
+  newest activity first. Search (Postgres full-text over subject + bodies, plus sender name/email). The nav badge
+  shows the Open count
+- **Person sidebar:** name, email, phone, tags, notes, newsletter status and lists, other conversations
+- **People detail:** "Conversations" replaces the old "Messages"
+- **Until B2:** replies to our emails reach Karl's EE inbox via the catch-all (not threaded in admin yet)
+
+### B2 — Inbound (outline)
 
 ### Cloudflare Email Worker (`worker/`)
 
@@ -387,12 +419,12 @@ Cloudflare setting (Karl):
   - [x] Admin → Email → "Send test email" works (Karl, 2026-09-25)
   - [x] Admin → People: grandfathered subscribers show as confirmed; new signup shows pending (Karl, 2026-09-25)
 - [x] Follow-up PRs: #12 (notify@, Reply-To, logging, resubscribe) + #13 (rate-limit client IP) + #14 (brand.ts)
-- [ ] PR C — Newsletter: code complete, locally tested 2026-09-29 (log mode full flow + one real Resend
-      batch in redirect mode). Before the first issue:
+- [x] PR C — Newsletter: merged #15 (+ #16 unsubscribe confirmation, #17 Settings). Before the first issue:
   - [ ] Karl: enter postal address in Admin → Settings → Newsletter
   - [ ] Prod: send test issue to self, check layout + `List-Unsubscribe` in Gmail "Show original"
   - [ ] Prod: send first issue ("You're on the list") to grandfathered subscribers
-- [ ] PR B — Inbound + conversations + compose new
+- [ ] PR B1 — Conversations inbox (reply, compose, search, statuses): code complete + locally tested 2026-09-30
+- [ ] PR B2 — Inbound Worker (receive hello@ + replies into threads)
 
 ### Production testing notes (2026-09-24)
 
@@ -404,7 +436,6 @@ Cloudflare setting (Karl):
 - Replies to acknowledgements currently go to `hello@` → EE via catch-all, not linked in the app.
   PR B links them via `reply+c-<id>@` Reply-To and In-Reply-To. Pre-PR-B sends can be matched using
   `message_id` saved in `email_event.payload`
-- [ ] PR B — Inbound + conversations + compose new
 
 ### Unsubscribe confirmation (Karl, 2026-09-30)
 

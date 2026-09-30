@@ -24,6 +24,7 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - People CRM, contact inbox, Cloudflare Zone Analytics in admin panel
 - Admin left-nav layout (Module 6) — PR #9, badge fix PR #10. Nav: Analytics · People · Inbox · Newsletter · Settings
 - Admin Settings (2026-09-30): `Setting` table + registry `server/src/lib/settings.ts` (non-secrets only). People search
+- Inbox = help-desk conversations (PR B1): contact form, replies, compose, search; Open/Waiting/Closed
 - Rate limiting on subscribe, contact, and login endpoints
 - Email infrastructure (2026-09-24): Cloudflare Email Routing (catch-all → admin's inbox),
   Resend sending domain verified, DMARC `p=none`
@@ -32,8 +33,8 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   delivery webhooks with suppression, Turnstile on both forms, admin Email page. Prod-tested
 
 **In flight:**
-- Email + newsletter: spec `docs/wip/email-newsletter.md` (PR A foundation ✅ → PR C newsletter (in review) →
-  PR B inbound + compose). Porting guide: `docs/wip/email-porting-guide.md`
+- Email + newsletter: spec `docs/wip/email-newsletter.md` (PR A ✅ → PR C newsletter ✅ →
+  PR B1 conversations (in review) → PR B2 inbound Worker). Porting guide: `docs/wip/email-porting-guide.md`
 - Email follow-ups shipped: #12 (notify@ sender, Reply-To, logging, resubscribe), #13 (rate limit),
   #14 (`server/src/lib/brand.ts` = all site identity, for porting to HU/FMW)
 - SHARED_FEEDBACK logged 2026-09-24/29: email/newsletter module gap, `worker/` folder +

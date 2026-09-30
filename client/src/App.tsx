@@ -1,19 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiFetch, tryRestoreSession } from './api';
 import Login from './components/Login';
 import AdminLayout from './components/AdminLayout';
 import type { Tab } from './components/AdminLayout';
 import AdminPeople from './components/AdminPeople';
-import AdminContact from './components/AdminContact';
+import AdminInbox from './components/AdminInbox';
 import AdminAnalytics from './components/AdminAnalytics';
 import AdminSettings from './components/AdminSettings';
 import AdminNewsletter from './components/AdminNewsletter';
+
+interface InboxSummary { open: number; waiting: number; closed: number; unread: number }
 
 export default function App() {
   const [authed, setAuthed] = useState(false);
   const [checking, setChecking] = useState(true);
   const [tab, setTab] = useState<Tab>('analytics');
-  const [unreadCount, setUnreadCount] = useState(0);
+  // Inbox nav badge = conversations that need a response (Open)
+  const [openCount, setOpenCount] = useState(0);
 
   useEffect(() => {
     tryRestoreSession().then((ok) => {
@@ -22,13 +25,15 @@ export default function App() {
     });
   }, []);
 
-  // Load unread count on login so the Inbox badge is correct before the Inbox is opened
+  // Load the badge on login so it's correct before the Inbox is opened
   useEffect(() => {
     if (!authed) return;
-    apiFetch<{ read: boolean }[]>('/api/contact')
-      .then((data) => setUnreadCount(data.filter((m) => !m.read).length))
+    apiFetch<InboxSummary>('/api/inbox/summary')
+      .then((s) => setOpenCount(s.open))
       .catch(() => {});
   }, [authed]);
+
+  const onInboxSummary = useCallback((s: InboxSummary) => setOpenCount(s.open), []);
 
   if (checking) return null;
 
@@ -37,10 +42,10 @@ export default function App() {
   }
 
   return (
-    <AdminLayout activeTab={tab} onTabChange={setTab} unreadCount={unreadCount}>
+    <AdminLayout activeTab={tab} onTabChange={setTab} unreadCount={openCount}>
       {tab === 'analytics' && <AdminAnalytics />}
       {tab === 'people' && <AdminPeople />}
-      {tab === 'inbox' && <AdminContact onUnreadChange={setUnreadCount} />}
+      {tab === 'inbox' && <AdminInbox onSummaryChange={onInboxSummary} />}
       {tab === 'newsletter' && <AdminNewsletter />}
       {tab === 'settings' && <AdminSettings />}
     </AdminLayout>
