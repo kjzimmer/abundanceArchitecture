@@ -50,8 +50,8 @@ async function stamp(original: Buffer, { text, footer }: StampOptions): Promise<
     const y = height / 2 - (Math.sin(angle) * textWidth) / 2 - (Math.cos(angle) * size) / 3;
     page.drawText(mark, {
       x, y, size, font,
-      color: rgb(0.55, 0.55, 0.55),
-      opacity: 0.18,
+      color: rgb(0.4, 0.4, 0.4),
+      opacity: 0.3, // strong enough to survive a screenshot, light enough to read through
       rotate: degrees((angle * 180) / Math.PI),
     });
     page.drawText(foot, {
