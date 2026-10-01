@@ -31,7 +31,8 @@ export async function tryRestoreSession(): Promise<boolean> {
 
 export async function apiFetch<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = {
-    ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+    // JSON bodies only — FormData uploads need the browser to set the multipart boundary itself
+    ...(typeof options.body === 'string' ? { 'Content-Type': 'application/json' } : {}),
     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     ...(options.headers as Record<string, string> ?? {}),
   };

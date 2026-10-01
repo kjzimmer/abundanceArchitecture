@@ -12,6 +12,8 @@ import emailRouter from './routes/email';
 import newsletterRouter from './routes/newsletter';
 import settingsRouter from './routes/settings';
 import inboxRouter from './routes/inbox';
+import docsRouter from './routes/docs';
+import sharePagesRouter from './routes/sharePages';
 import { startNewsletterQueue } from './jobs/newsletterQueue';
 import { resendWebhookHandler } from './routes/webhooks';
 import { inboundEmailHandler } from './routes/inbound';
@@ -40,6 +42,7 @@ const limiterDefaults = {
 const formLimiter = rateLimit({ ...limiterDefaults, max: 10 });
 const loginLimiter = rateLimit({ ...limiterDefaults, max: 10 });
 const linkLimiter = rateLimit({ ...limiterDefaults, max: 30 });
+const shareLimiter = rateLimit({ ...limiterDefaults, max: 120 }); // /s/<token> browsing + downloads
 
 // Compiled output is server/dist/index.js — public/ is two levels up
 app.use(express.static(path.join(__dirname, '..', '..', 'public')));
@@ -54,6 +57,7 @@ app.use('/api/email', emailRouter);
 app.use('/api/newsletter', newsletterRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/inbox', inboxRouter);
+app.use('/api/docs', docsRouter);
 
 // Public config for public/js/main.js (site key is public by design)
 app.get('/api/public-config', (_req: Request, res: Response) => {
@@ -64,6 +68,10 @@ app.get('/api/public-config', (_req: Request, res: Response) => {
 // extended: true so repeated checkbox fields (lists=a&lists=b) parse as an array
 app.use(['/confirm', '/unsubscribe', '/preferences'], linkLimiter, express.urlencoded({ extended: true }));
 app.use(subscriptionRouter);
+
+// Secret-link document shares (read-only)
+app.use('/s', shareLimiter);
+app.use(sharePagesRouter);
 
 app.get(['/health', '/api/health'], (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
