@@ -56,7 +56,27 @@ Create token, **Object Read & Write**, scoped to that bucket → copy Access Key
 - [x] Code + local test (local driver), 2026-09-30: share/folder/upload/browse/download, UTF-8 names, security headers, token checks (bad, cross-share, revoked, regenerated), 50 MB limit, object cleanup on delete
 - [x] R2 bucket `aa-files` (private) + token + Railway vars, verified 2026-10-01 (put, presigned get 200, unsigned get denied, delete)
 - [x] Prod: Karl created "book collaboration" + uploaded a PDF (2026-10-01)
-- [ ] Prod: view-only viewer + watermark check (PR "docs view-only")
+- [x] Prod: view-only viewer + server-side watermark verified by Karl (#24); watermark darkened to gray 0.4 /
+      opacity 0.3 after review (#25), 2026-10-01
+- **Shipped:** PRs #23 (shares + R2), #24 (view-only viewer + watermark), #25 (darker watermark)
+
+## Open items (paused 2026-10-01; Karl to decide when to resume)
+
+1. **Video for draft reviews** (likely needed soon: 2-min shorts reviewed by collaborators before final
+   versions). Discussed options:
+   - **A. R2 + in-site player (recommended for drafts):** direct browser→R2 presigned upload (needs bucket
+     CORS; files ~50–200 MB exceed the 50 MB server upload path), player with download/PiP/right-click
+     disabled, Range-request streaming for seeking. Export review cuts as **MP4 (H.264)**: HEVC/MOV doesn't
+     play in Chrome on Windows. Watermark = **"DRAFT · Confidential" burned in by Karl's editor** at export
+   - **B. Cloudflare Stream** (~$5/mo min): adaptive streaming, auto-transcoding, signed/expiring playback,
+     domain lock, watermark profiles. Better fit later for **public** videos on the site
+   - Open question for Karl: editor export format/size; which option
+2. **Images:** see "Deferred: images" below (JPG/PNG → wrap in watermarked PDF page for the viewer)
+3. **Watermark strength per share** (light/medium/strong) if one fixed level stops fitting
+4. **Per-person links** (e.g. "Book collaboration · Jane Smith") so a leaked copy identifies the individual
+5. **Cache stamped PDFs** in R2 if large files make per-view stamping slow
+6. **Porting:** add a shared-docs section to `email-porting-guide.md` (or its own guide) before HU/FMW
+7. When Karl confirms it's done: notify for archiving this spec
 
 ## View-only + watermarking (Karl, 2026-10-01)
 
