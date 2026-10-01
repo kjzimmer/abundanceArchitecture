@@ -76,3 +76,11 @@ served copy is stamped. That's exactly how this works already.
   downloadable but **not watermarked** (admin note)
 - Watermark identifies the **share**, not the person. Per-person links would be needed to trace an individual
 - Each view re-stamps, which is fine for docs of a few MB. Cache stamped copies if large files arrive
+
+## Deferred: images (discussed 2026-10-01)
+
+Today images are non-PDF files: hidden on view-only shares, unwatermarked download when downloads are on.
+Workaround: put images into a PDF before uploading (they then get the viewer + watermark).
+When needed: **JPG/PNG** → at serve time, wrap the image in a page sized to it with pdf-lib (`embedJpg`/`embedPng`),
+stamp the same watermark, show in the same viewer (originals untouched, ~1h). **HEIC/WebP/GIF/TIFF** need
+`sharp` (native image library) to convert/watermark, or convert before upload.
