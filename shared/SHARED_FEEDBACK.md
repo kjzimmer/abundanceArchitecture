@@ -139,3 +139,13 @@ in `server/src/lib/settings.ts` (label, help, type, default, optional env fallba
 **Suggested fix:** Rename item 1 to "Analytics", and add a Settings module section based on AA's implementation.
 **Workaround used:** Implemented in AA. Nav is Analytics · People · Inbox · Newsletter · Settings.
 
+## [2026-10-01] SHARED_TECH_STACK.md
+**Site:** abundance-architecture
+**Type:** Suggestion
+**Section:** Version Pins / Development Toolchain
+**Issue:** Local dev Node is 20.12.2 (Railway runs 24). It now forces pins or workarounds on Prisma 6, Vite 5,
+`marked@^15` (v16+ ESM-only), `wrangler@4.86.0` (newer needs Node 22), and soon the AWS SDK v3, which warns that
+releases after early January 2027 require Node ≥ 22 (used for Cloudflare R2 storage).
+**Suggested fix:** Standardize local dev on Node 22 or 24 LTS across sites, then unpin those packages together.
+**Workaround used:** Kept the pins; the AWS SDK still works on Node 20 for now (warning only).
+

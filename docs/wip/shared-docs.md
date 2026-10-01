@@ -54,5 +54,5 @@ Create token, **Object Read & Write**, scoped to that bucket → copy Access Key
 ## Status
 
 - [x] Code + local test (local driver), 2026-09-30: share/folder/upload/browse/download, UTF-8 names, security headers, token checks (bad, cross-share, revoked, regenerated), 50 MB limit, object cleanup on delete
-- [ ] R2 bucket + token + Railway vars
+- [x] R2 bucket `aa-files` (private) + token + Railway vars, verified 2026-10-01 (put, presigned get 200, unsigned get denied, delete)
 - [ ] Prod test: create share, upload, open link in a private window, download, revoke
