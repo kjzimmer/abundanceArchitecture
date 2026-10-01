@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import prisma from '../db';
 import { brand } from '../lib/brand';
 import * as storage from '../lib/storage';
+import { stampPdf } from '../lib/watermark';
 
 export class DocsError extends Error {
   constructor(message: string, readonly status = 400) {
@@ -59,15 +60,55 @@ async function requireShare(id: string) {
   return share;
 }
 
-export async function updateShare(id: string, input: { name?: unknown; active?: unknown; regenerate?: unknown }) {
+export interface ShareUpdate {
+  name?: unknown;
+  active?: unknown;
+  regenerate?: unknown;
+  allowDownload?: unknown;
+  watermarkText?: unknown; // '' or null → default "Confidential · {name}"
+}
+
+export async function updateShare(id: string, input: ShareUpdate) {
   await requireShare(id);
+  let watermark: string | null | undefined;
+  if (input.watermarkText !== undefined) {
+    const t = typeof input.watermarkText === 'string' ? input.watermarkText.replace(/\s+/g, ' ').trim() : '';
+    if (t.length > 80) throw new DocsError('Watermark text must be 80 characters or fewer');
+    watermark = t || null;
+  }
   return prisma.share.update({
     where: { id },
     data: {
       ...(input.name !== undefined && { name: cleanName(input.name, 'Share') }),
       ...(typeof input.active === 'boolean' && { active: input.active }),
       ...(input.regenerate === true && { token: newToken() }),
+      ...(typeof input.allowDownload === 'boolean' && { allowDownload: input.allowDownload }),
+      ...(watermark !== undefined && { watermarkText: watermark }),
     },
+  });
+}
+
+// ─── Watermarked delivery ─────────────────────────────────────────────────────
+
+export function isPdf(file: { contentType: string; name: string }): boolean {
+  return file.contentType === 'application/pdf' || /\.pdf$/i.test(file.name);
+}
+
+export function watermarkFor(share: { name: string; watermarkText: string | null }): string {
+  return share.watermarkText ?? `Confidential · ${share.name}`;
+}
+
+/**
+ * The served copy of a PDF: original from storage, stamped with the share's watermark and a dated
+ * footer. Throws WatermarkError for PDFs that can't be stamped (encrypted/restricted) — callers must
+ * NOT fall back to the original.
+ */
+export async function stampedPdf(share: { name: string; watermarkText: string | null }, file: { storageKey: string }) {
+  const original = await storage.getObject(file.storageKey);
+  const date = new Date().toLocaleDateString('en-US', { dateStyle: 'medium' });
+  return stampPdf(original, {
+    text: watermarkFor(share),
+    footer: `Shared privately via ${brand.domain} · ${date} · Not for distribution`,
   });
 }
 

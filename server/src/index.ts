@@ -71,6 +71,11 @@ app.use(subscriptionRouter);
 
 // Secret-link document shares (read-only)
 app.use('/s', shareLimiter);
+// PDF.js for the share viewer, self-hosted (no third-party CDN sees share traffic)
+app.use('/vendor/pdfjs', express.static(path.join(__dirname, '..', 'node_modules', 'pdfjs-dist', 'build'), {
+  maxAge: '7d',
+  index: false,
+}));
 app.use(sharePagesRouter);
 
 app.get(['/health', '/api/health'], (_req: Request, res: Response) => {
