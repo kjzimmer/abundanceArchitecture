@@ -22,10 +22,12 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - Newsletter subscriber and contact message persistence (PostgreSQL via Prisma)
 - Admin panel at `/admin` — React SPA, DB-backed JWT auth
 - People CRM, contact inbox, Cloudflare Zone Analytics in admin panel
-- Admin left-nav layout (Module 6) — PR #9, badge fix PR #10. Nav: Analytics · People · Inbox · Newsletter · Settings
+- Admin left-nav layout (Module 6) — PR #9, badge fix PR #10. Nav: Analytics · People · Inbox · Newsletter · Documents · Settings
 - Admin Settings (2026-09-30): `Setting` table + registry `server/src/lib/settings.ts` (non-secrets only). People search
 - Inbox = help-desk conversations (PR B1): contact form, replies, compose, search; Open/Waiting/Closed
-- Shared docs (in progress): secret-link read-only document shares, admin → Documents, Cloudflare R2 storage. Spec `docs/wip/shared-docs.md`
+- Shared docs (PRs #23–#25, 2026-10-01): secret-link document shares, admin → Documents, Cloudflare R2
+  (`aa-files`), view-only PDF viewer with server-side watermark. Open items (video, images, per-person links)
+  in `docs/wip/shared-docs.md`
 - Rate limiting on subscribe, contact, and login endpoints
 - Email infrastructure (2026-09-24): Cloudflare Email Routing (catch-all → admin's inbox),
   Resend sending domain verified, DMARC `p=none`
@@ -35,7 +37,9 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 
 **In flight:**
 - Email + newsletter: spec `docs/wip/email-newsletter.md` (PR A ✅ → PR C newsletter ✅ →
-  PR B1 conversations ✅ → PR B2 inbound Worker (setup in progress)). Porting guide: `docs/wip/email-porting-guide.md`
+  PR B1 conversations ✅ → PR B2 inbound ✅ + #20–#22 polish). Remaining: postal address + first issue (Karl),
+  test suite, legacy contact_message drop, porting-guide refresh, shared-module write-ups, newsletter images.
+  Porting guide: `docs/wip/email-porting-guide.md`
 - Email follow-ups shipped: #12 (notify@ sender, Reply-To, logging, resubscribe), #13 (rate limit),
   #14 (`server/src/lib/brand.ts` = all site identity, for porting to HU/FMW)
 - SHARED_FEEDBACK logged 2026-09-24/29: email/newsletter module gap, `worker/` folder +
