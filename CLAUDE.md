@@ -58,7 +58,9 @@ IP on the Cloudflare path, while X-Real-IP is the true client on both paths and 
 Don't "fix" this by enabling `trust proxy`
 
 **Deferred:**
-- First-run admin setup via Resend (currently using `seed:admin` CLI script) — unblocked
+- Accounts + login (subscribers, team roles, invites), then per-user mailboxes (e.g. `karl@`). See
+  `docs/wip/email-newsletter.md` → "Deferred: mailboxes". Until then: hello@ only; no extra admin logins
+- First-run admin setup via Resend (currently using `seed:admin` CLI script) — unblocked; folds into accounts work
   once email PR A ships
 
 **Post-transition cleanup:** done — `docs/_transition/` removed

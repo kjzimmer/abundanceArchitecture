@@ -338,6 +338,24 @@ their current state (grandfathered confirmed subscribers stay confirmed). Backfi
 - Public web archive / "view in browser", scheduled sends, per-list sign-up checkboxes on other sites' forms,
   replies grouped under issues (needs PR B), visual editor
 
+### Deferred: mailboxes and multiple inboxes (Karl, 2026-10-01)
+
+Karl may move his AA-related personal email to `karl@abundancearchitecture.world`. **Order decided:**
+1. **Accounts + login** for subscribers and team members, with roles (Owner, Support) and an email invite flow
+   (absorbs the deferred "first-run admin setup via Resend")
+2. **Per-user mailbox access.** Support sees `hello@` but not personal mailboxes. **Must exist before anyone else
+   gets an admin login**, because today every admin sees every conversation
+3. **Mailboxes:** a `Mailbox` record (address, display name, signature, members), and conversations remember the
+   mailbox they arrived at. Replies go out **from that address** ("Karl Zimmer <karl@…>"); Compose gets a From
+   choice; Inbox gets mailbox filters; notices name the mailbox. Worker: add the local parts to
+   `APP_LOCAL_PARTS` (e.g. `"hello,karl"`) and redeploy
+4. Team extras: assignment + "Mine" view, internal notes, collision warning ("Karl is replying…"), per-user signatures
+
+**Interim (now):** give out `hello@` only. Mail to any other address (e.g. `karl@`) is **not** in admin: the
+catch-all Worker forwards a raw copy to `karl.zimmer+aa-raw@enterpriseedge.com`, and replying from EE sends
+from the EE address. ⚠ A Gmail filter "deliveredto:+aa-raw → Skip Inbox" would silently archive such mail.
+If `karl@` gets used before mailboxes exist, skip the inbox only for raw copies addressed **to `hello@`**.
+
 ---
 
 ## Admin Notifications
@@ -393,8 +411,9 @@ Cloudflare setting (Karl):
 - **Log successful sends:** live mode only logs failures. Add one line per send (kind, masked recipient, resendId)
 - **Clear `aa_subscribed` on unsubscribe:** the unsubscribe result page should run
   `localStorage.removeItem('aa_subscribed')` (same origin) so the home-page form re-enables for resubscribing
-- **Cloudflare Browser Cache TTL:** Karl to set "Respect Existing Headers". The default 4h override kept
-  the old `main.js` in browsers after deploy (subscribe 403s until the cache expired)
+- **Cloudflare Browser Cache TTL:** ✅ set to "Respect Existing Headers" by Karl 2026-10-01 (verified: `main.js`
+  and pages `max-age=0`, PDF.js `max-age=604800`). The default 4h override had kept the old `main.js` in
+  browsers after deploy (subscribe 403s until the cache expired)
 - **Admin notices from `notify@`** (`EMAIL_NOTIFY_FROM`) with **Reply-To** set to the person the notice is
   about (inquirer or subscriber; none for Deliverability). HTML layout kept (Karl, 2026-09-25). Context: the
   first `[AA Inquiry]`/`[AA Unsubscribe]` notices went to EE spam ("similar to messages identified as spam"),
