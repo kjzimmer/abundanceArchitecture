@@ -39,7 +39,9 @@ router.post('/shares', wrap(async (req, res) => { res.status(201).json(await Doc
 router.get('/shares/:id', wrap<{ id: string }>(async (req, res) => { res.json(await Docs.getShareTree(req.params.id)); }));
 router.patch('/shares/:id', wrap<{ id: string }>(async (req, res) => {
   const b = body(req);
-  res.json(await Docs.updateShare(req.params.id, { name: b.name, active: b.active, regenerate: b.regenerate }));
+  res.json(await Docs.updateShare(req.params.id, {
+    name: b.name, active: b.active, regenerate: b.regenerate, allowDownload: b.allowDownload, watermarkText: b.watermarkText,
+  }));
 }));
 router.delete('/shares/:id', wrap<{ id: string }>(async (req, res) => {
   await Docs.deleteShare(req.params.id);

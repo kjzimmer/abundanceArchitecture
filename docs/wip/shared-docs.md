@@ -55,4 +55,24 @@ Create token, **Object Read & Write**, scoped to that bucket → copy Access Key
 
 - [x] Code + local test (local driver), 2026-09-30: share/folder/upload/browse/download, UTF-8 names, security headers, token checks (bad, cross-share, revoked, regenerated), 50 MB limit, object cleanup on delete
 - [x] R2 bucket `aa-files` (private) + token + Railway vars, verified 2026-10-01 (put, presigned get 200, unsigned get denied, delete)
-- [ ] Prod test: create share, upload, open link in a private window, download, revoke
+- [x] Prod: Karl created "book collaboration" + uploaded a PDF (2026-10-01)
+- [ ] Prod: view-only viewer + watermark check (PR "docs view-only")
+
+## View-only + watermarking (Karl, 2026-10-01)
+
+Goal: discourage copying (not DRM: a screen can always be photographed). Karl uploads PDFs, not editable
+formats. Future: when R2 becomes the primary document repository, originals stay unmodified and every
+served copy is stamped. That's exactly how this works already.
+
+- **Per share `allowDownload`** (default **off** = view-only). Existing shares became view-only on deploy
+- **Viewer** `/s/<token>/view/<fileId>`: self-hosted PDF.js (`/vendor/pdfjs`, no CDN) renders pages to canvas
+  with lazy page rendering. No download/print controls, right-click, Ctrl+S/P and drag blocked, print CSS
+  blanks the page, no text selection. Download button only when the share allows it
+- **Server-side watermark** (`lib/watermark.ts`, pdf-lib): every PDF that leaves the server (view or
+  download) is stamped with a large diagonal `watermarkText` (default `Confidential · {share name}`, max 80,
+  WinAnsi-safe) plus a dated footer. Originals in storage are never modified. Any stamping failure
+  (encrypted, corrupt) → not served (never falls back to the original)
+- **Non-PDF files**: view-only share → hidden from collaborators (admin sees a note). Downloads allowed →
+  downloadable but **not watermarked** (admin note)
+- Watermark identifies the **share**, not the person. Per-person links would be needed to trace an individual
+- Each view re-stamps, which is fine for docs of a few MB. Cache stamped copies if large files arrive

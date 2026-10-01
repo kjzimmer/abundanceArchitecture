@@ -292,14 +292,16 @@ model Setting {
 // Secret-link document shares for collaborators: view + download only.
 
 model Share {
-  id           String    @id @default(cuid())
-  sourceSite   String    @map("source_site")
-  name         String
-  token        String    @unique // 64 hex — the secret in /s/<token>
-  active       Boolean   @default(true) // false = revoked
-  lastAccessAt DateTime? @map("last_access_at")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  id            String    @id @default(cuid())
+  sourceSite    String    @map("source_site")
+  name          String
+  token         String    @unique // 64 hex — the secret in /s/<token>
+  active        Boolean   @default(true) // false = revoked
+  allowDownload Boolean   @default(false) @map("allow_download") // false = view-only (in-site viewer)
+  watermarkText String?   @map("watermark_text") // null = "Confidential · {name}"
+  lastAccessAt  DateTime? @map("last_access_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
   folders SharedFolder[]
   files   SharedFile[]

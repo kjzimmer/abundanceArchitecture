@@ -75,6 +75,16 @@ export async function downloadUrl(key: string, filename: string, contentType: st
   );
 }
 
+/** Whole object as bytes (used when the server must transform a file, e.g. watermarking). */
+export async function getObject(key: string): Promise<Buffer> {
+  if (storageDriver() === 'r2') {
+    const out = await r2().send(new GetObjectCommand({ Bucket: process.env.R2_BUCKET, Key: key }));
+    if (!out.Body) throw new Error(`Empty object: ${key}`);
+    return Buffer.from(await out.Body.transformToByteArray());
+  }
+  return fs.promises.readFile(localPath(key));
+}
+
 /** Local driver only: a readable stream of the stored file. */
 export function localReadStream(key: string): fs.ReadStream {
   return fs.createReadStream(localPath(key));

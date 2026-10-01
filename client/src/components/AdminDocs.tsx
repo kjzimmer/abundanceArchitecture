@@ -6,6 +6,8 @@ interface ShareSummary {
   name: string;
   token: string;
   active: boolean;
+  allowDownload: boolean;
+  watermarkText: string | null;
   lastAccessAt: string | null;
   createdAt: string;
   fileCount: number;
@@ -24,6 +26,39 @@ function size(bytes: number): string {
 }
 
 const shareUrl = (token: string) => `${window.location.origin}/s/${token}`;
+const isPdf = (f: { contentType: string; name: string }) => f.contentType === 'application/pdf' || /\.pdf$/i.test(f.name);
+
+/** View-only / download switch and watermark text for one share. */
+function ShareProtection({ share, busy, onSave }: {
+  share: ShareSummary;
+  busy: boolean;
+  onSave: (patch: Record<string, unknown>, done: string) => void;
+}) {
+  const [text, setText] = useState(share.watermarkText ?? '');
+  useEffect(() => { setText(share.watermarkText ?? ''); }, [share.watermarkText]);
+  const defaultText = `Confidential · ${share.name}`;
+  const dirty = text.trim() !== (share.watermarkText ?? '');
+  return (
+    <div style={styles.protect}>
+      <label style={styles.protectRow}>
+        <input type="checkbox" checked={share.allowDownload} disabled={busy}
+          onChange={(e) => onSave({ allowDownload: e.target.checked }, e.target.checked ? 'Downloads allowed (PDFs still watermarked)' : 'View-only')} />
+        <span><strong>Allow downloads</strong> — off = view-only: PDFs open in the in-site viewer with no download or print buttons; other file types are hidden from collaborators.</span>
+      </label>
+      <div style={styles.protectRow}>
+        <span style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>Watermark</span>
+        <input value={text} onChange={(e) => setText(e.target.value)} placeholder={defaultText} maxLength={80}
+          style={{ ...styles.input, flex: 1, minWidth: 200 }} />
+        <button style={dirty ? styles.btnPrimary : styles.btnSm} disabled={busy || !dirty}
+          onClick={() => onSave({ watermarkText: text }, 'Watermark saved')}>Save</button>
+      </div>
+      <p style={{ ...styles.hint, margin: 0 }}>
+        Stamped on the server across every page of every PDF view and download (plus a dated footer). Originals are never changed.
+        Leave empty for “{defaultText}”.
+      </p>
+    </div>
+  );
+}
 
 export default function AdminDocs() {
   const [shares, setShares] = useState<ShareSummary[]>([]);
@@ -203,6 +238,9 @@ function ShareView({ id, onBack }: { id: string; onBack: () => void }) {
             && act('Deleting', async () => { await apiFetch(`/api/docs/shares/${id}`, { method: 'DELETE' }); onBack(); })}>Delete share</button>
       </div>
 
+      <ShareProtection share={share} busy={busy}
+        onSave={(patch, done) => act('Saving', () => apiFetch(`/api/docs/shares/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }), done)} />
+
       <div style={styles.toolbar}>
         <div style={styles.crumbs}>
           <button onClick={() => setFolderId(null)} style={styles.linkBtn}>{share.name}</button>
@@ -245,9 +283,11 @@ function ShareView({ id, onBack }: { id: string; onBack: () => void }) {
               {here.map((f) => (
                 <tr key={f.id}>
                   <td style={styles.td}>
-                    📄 {share.active
-                      ? <a href={`${shareUrl(share.token)}/file/${f.id}`} style={{ color: '#1a1917' }}>{f.name}</a>
+                    {isPdf(f) ? '📄' : '📎'} {share.active && (isPdf(f) || share.allowDownload)
+                      ? <a href={`${shareUrl(share.token)}/${isPdf(f) ? 'view' : 'file'}/${f.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1a1917' }}>{f.name}</a>
                       : f.name}
+                    {!isPdf(f) && !share.allowDownload && <span style={styles.fileNote}> · not visible to collaborators (view-only share, not a PDF)</span>}
+                    {!isPdf(f) && share.allowDownload && <span style={styles.fileNote}> · download only, not watermarked</span>}
                   </td>
                   <td style={{ ...styles.td, color: '#888' }}>{size(f.size)}</td>
                   <td style={{ ...styles.td, color: '#888' }}>{new Date(f.createdAt).toLocaleDateString()}</td>
@@ -286,6 +326,9 @@ const styles: Record<string, React.CSSProperties> = {
   linkBox: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', background: 'white', border: '1px solid #e5e5e5', borderRadius: 6, padding: '0.65rem 0.8rem', marginBottom: '1.1rem' },
   code: { fontSize: '0.78rem', background: '#f5f5f3', padding: '0.3rem 0.5rem', borderRadius: 3, wordBreak: 'break-all' },
   crumbs: { fontSize: '0.88rem', color: '#777' },
+  protect: { display: 'flex', flexDirection: 'column', gap: 10, background: 'white', border: '1px solid #e5e5e5', borderRadius: 6, padding: '0.75rem 0.9rem', marginBottom: '1.1rem', fontSize: '0.84rem' },
+  protectRow: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
+  fileNote: { fontSize: '0.72rem', color: '#a07a2c' },
   badgeOff: { background: '#eee', color: '#777', borderRadius: 3, fontSize: '0.7rem', fontWeight: 600, padding: '2px 7px' },
   linkBtn: { background: 'none', border: 'none', padding: 0, color: '#2d4a2d', cursor: 'pointer', fontSize: '0.8rem', fontFamily: 'inherit' },
   btnSm: { background: 'white', border: '1px solid #ddd', borderRadius: 4, padding: '0.35rem 0.85rem', fontSize: '0.8rem', cursor: 'pointer', color: '#1a1917', textDecoration: 'none' },
