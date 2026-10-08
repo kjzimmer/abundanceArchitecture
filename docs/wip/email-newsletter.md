@@ -351,7 +351,7 @@ Karl may move his AA-related personal email to `karl@abundancearchitecture.world
    `APP_LOCAL_PARTS` (e.g. `"hello,karl"`) and redeploy
 4. Team extras: assignment + "Mine" view, internal notes, collision warning ("Karl is replying…"), per-user signatures
 
-**Single-user mailboxes (2026-10-08, pulled ahead of accounts):** Karl needed `karl@` now, and he is the only
+**Single-user mailboxes (PR #28, shipped + prod-verified 2026-10-08, pulled ahead of accounts):** Karl needed `karl@` now, and he is the only
 admin, so the ordering rule above (no second login before per-user access) still holds.
 - `brand.mailboxes` = `hello` (site address, follows `EMAIL_FROM`) + `karl` ("Karl Zimmer", `personal`).
   Helpers in `server/src/lib/email/mailboxes.ts`. `Conversation.mailbox` = local part, default `hello`

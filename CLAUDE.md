@@ -57,9 +57,10 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 IP on the Cloudflare path, while X-Real-IP is the true client on both paths and can't be spoofed.
 Don't "fix" this by enabling `trust proxy`
 
-- Single-user mailboxes (2026-10-08, `feat/mailboxes`): `karl@` receives into the admin Inbox and sends from it
-  (Compose From picker, per-mailbox signature, mailbox filter). Registry `brand.mailboxes`; `Conversation.mailbox`.
-  Deploy order: app (migration) → `cd worker && npx wrangler deploy` (`APP_LOCAL_PARTS = "hello,karl"`)
+- Single-user mailboxes (PR #28, 2026-10-08, prod-verified by Karl): `karl@` receives into the admin Inbox and
+  sends from it (Compose From picker, per-mailbox signature, mailbox filter). Registry `brand.mailboxes`;
+  `Conversation.mailbox`. Worker deployed with `APP_LOCAL_PARTS = "hello,karl"`. Adding a mailbox = brand.ts +
+  signature setting + Worker var, deploying the app before the Worker
 
 **Deferred:**
 - Accounts + login (subscribers, team roles, invites), then per-user mailbox access. See
