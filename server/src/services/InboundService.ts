@@ -14,6 +14,7 @@ import * as EmailService from './EmailService';
 import { upsertPerson } from './PersonService';
 import { brand } from '../lib/brand';
 import { splitQuotedReply } from '../lib/email/quotes';
+import { defaultMailbox, mailboxByKey, mailboxForRecipient } from '../lib/email/mailboxes';
 
 export interface InboundPayload {
   recipient: string;
@@ -159,6 +160,8 @@ export async function handleInbound(p: InboundPayload): Promise<InboundResult> {
         newsletterIssueId: issue?.id ?? null,
         status: ConversationStatus.OPEN,
         unread: true,
+        // New threads live in the mailbox they were sent to (hello@ for reply+… addresses)
+        mailbox: (mailboxForRecipient(p.recipient) ?? defaultMailbox()).key,
       },
     });
     conversationId = conv.id;
@@ -184,11 +187,12 @@ export async function handleInbound(p: InboundPayload): Promise<InboundResult> {
   });
 
   // Auto-replies are recorded quietly; real mail (re)opens the thread and notifies
-  await prisma.conversation.update({
+  const updated = await prisma.conversation.update({
     where: { id: conversationId },
     data: automated
       ? { lastMessageAt: new Date() }
       : { status: ConversationStatus.OPEN, unread: true, lastMessageAt: new Date() },
+    select: { mailbox: true },
   });
 
   if (!automated) {
@@ -198,6 +202,7 @@ export async function handleInbound(p: InboundPayload): Promise<InboundResult> {
       title: issue ? `${issue.subject} — ${fromName ?? fromEmail}` : `${subject} — ${fromName ?? fromEmail}`,
       rows: [
         ['From', who],
+        ['Mailbox', mailboxByKey(updated.mailbox).address],
         ['To', p.recipient],
         ...(p.attachments.length ? ([['Attachments', p.attachments.map((a) => a.filename ?? 'unnamed').join(', ')]] as [string, string][]) : []),
       ],

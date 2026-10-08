@@ -57,9 +57,13 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 IP on the Cloudflare path, while X-Real-IP is the true client on both paths and can't be spoofed.
 Don't "fix" this by enabling `trust proxy`
 
+- Single-user mailboxes (2026-10-08, `feat/mailboxes`): `karl@` receives into the admin Inbox and sends from it
+  (Compose From picker, per-mailbox signature, mailbox filter). Registry `brand.mailboxes`; `Conversation.mailbox`.
+  Deploy order: app (migration) → `cd worker && npx wrangler deploy` (`APP_LOCAL_PARTS = "hello,karl"`)
+
 **Deferred:**
-- Accounts + login (subscribers, team roles, invites), then per-user mailboxes (e.g. `karl@`). See
-  `docs/wip/email-newsletter.md` → "Deferred: mailboxes". Until then: hello@ only; no extra admin logins
+- Accounts + login (subscribers, team roles, invites), then per-user mailbox access. See
+  `docs/wip/email-newsletter.md` → "Deferred: mailboxes". No extra admin logins until per-user access exists
 - First-run admin setup via Resend (currently using `seed:admin` CLI script) — unblocked; folds into accounts work
   once email PR A ships
 
