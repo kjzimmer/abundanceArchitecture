@@ -164,6 +164,7 @@ model Conversation {
   status            ConversationStatus  @default(OPEN)
   channel           ConversationChannel
   unread            Boolean             @default(true) // has inbound the admin hasn't opened
+  mailbox           String              @default("hello") // local part of the address it lives in (brand.mailboxes)
   newsletterIssueId String?             @map("newsletter_issue_id") // set for NEWSLETTER_REPLY
   lastMessageAt     DateTime            @default(now()) @map("last_message_at")
   createdAt         DateTime            @default(now()) @map("created_at")

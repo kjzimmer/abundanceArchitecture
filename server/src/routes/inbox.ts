@@ -27,21 +27,26 @@ function wrap<P = Record<string, string>>(fn: Handler<P>) {
 const FILTERS: StatusFilter[] = ['open', 'waiting', 'closed', 'all'];
 const STATUSES = Object.values(ConversationStatus) as string[];
 
-router.get('/summary', wrap(async (_req, res) => {
-  res.json(await ConversationService.summary());
+const str = (v: unknown) => (typeof v === 'string' ? v : undefined);
+
+router.get('/summary', wrap(async (req, res) => {
+  res.json(await ConversationService.summary(str(req.query.mailbox)));
+}));
+
+router.get('/mailboxes', wrap(async (_req, res) => {
+  res.json(await ConversationService.listMailboxes());
 }));
 
 router.get('/conversations', wrap(async (req, res) => {
   const status = FILTERS.includes(req.query.status as StatusFilter) ? (req.query.status as StatusFilter) : 'open';
   const q = typeof req.query.q === 'string' ? req.query.q.slice(0, 200) : undefined;
-  res.json(await ConversationService.listConversations(status, q));
+  res.json(await ConversationService.listConversations(status, q, str(req.query.mailbox)));
 }));
 
 router.post('/conversations', wrap(async (req, res) => {
   const b = (req.body ?? {}) as Record<string, unknown>;
-  const str = (v: unknown) => (typeof v === 'string' ? v : undefined);
   res.status(201).json(await ConversationService.compose({
-    to: str(b.to), name: str(b.name), subject: str(b.subject), body: str(b.body),
+    to: str(b.to), name: str(b.name), subject: str(b.subject), body: str(b.body), from: str(b.from),
   }));
 }));
 

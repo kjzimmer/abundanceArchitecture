@@ -15,4 +15,4 @@ APP_INBOUND_URL = "https://abundancearchitecture.world/api/inbound-email"
 FORWARD_TO = "karl.zimmer+aa-raw@enterpriseedge.com"
 # Site domain; local parts below (and reply+…) are posted to the app, anything else is forward-only
 DOMAIN = "abundancearchitecture.world"
-APP_LOCAL_PARTS = "hello"
+APP_LOCAL_PARTS = "hello,karl"   # must match brand.mailboxes in server/src/lib/brand.ts

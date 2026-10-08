@@ -19,6 +19,18 @@ export const brand = {
   from: 'Abundance Architecture <hello@abundancearchitecture.world>',
   notifyFrom: 'Abundance Architecture <notify@abundancearchitecture.world>',
 
+  /**
+   * Addresses that receive into the admin Inbox and can send from it. `key` is the local part.
+   * The first is the site address (its sender follows EMAIL_FROM). `personal` mailboxes send without
+   * the reply+c- Reply-To, so recipients see the real address; replies thread via In-Reply-To.
+   * Every key must also be in the Worker's APP_LOCAL_PARTS, and needs a signature setting
+   * (`inbox.signature` for the first, `inbox.signature.<key>` for the rest) in lib/settings.ts.
+   */
+  mailboxes: [
+    { key: 'hello', name: 'Abundance Architecture', personal: false },
+    { key: 'karl', name: 'Karl Zimmer', personal: true },
+  ],
+
   /** Newsletter list the home-page subscribe form joins. Created by migration; upserted at runtime too */
   defaultList: {
     key: 'aa',

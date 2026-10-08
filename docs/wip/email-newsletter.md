@@ -351,10 +351,21 @@ Karl may move his AA-related personal email to `karl@abundancearchitecture.world
    `APP_LOCAL_PARTS` (e.g. `"hello,karl"`) and redeploy
 4. Team extras: assignment + "Mine" view, internal notes, collision warning ("Karl is replying…"), per-user signatures
 
-**Interim (now):** give out `hello@` only. Mail to any other address (e.g. `karl@`) is **not** in admin: the
-catch-all Worker forwards a raw copy to `karl.zimmer+aa-raw@enterpriseedge.com`, and replying from EE sends
-from the EE address. ⚠ A Gmail filter "deliveredto:+aa-raw → Skip Inbox" would silently archive such mail.
-If `karl@` gets used before mailboxes exist, skip the inbox only for raw copies addressed **to `hello@`**.
+**Single-user mailboxes (2026-10-08, pulled ahead of accounts):** Karl needed `karl@` now, and he is the only
+admin, so the ordering rule above (no second login before per-user access) still holds.
+- `brand.mailboxes` = `hello` (site address, follows `EMAIL_FROM`) + `karl` ("Karl Zimmer", `personal`).
+  Helpers in `server/src/lib/email/mailboxes.ts`. `Conversation.mailbox` = local part, default `hello`
+- Inbound: a new thread takes the mailbox it was addressed to (`reply+…` → hello). Appended mail keeps the
+  thread's mailbox. Notices gain a "Mailbox" row
+- Outbound: replies and Compose send from the conversation's mailbox. Compose has a From picker. **Personal
+  mailboxes send without `Reply-To: reply+c-…`** (recipients see `karl@`), so their threading relies on
+  In-Reply-To/References (Resend `message_id` from the webhook) with the sender + subject fallback
+- Signatures: `inbox.signature` (hello@) and `inbox.signature.karl` in Settings → Inbox
+- Inbox: mailbox filter (tabs follow it; the nav badge counts all), badge on list rows and thread header
+- Worker: `APP_LOCAL_PARTS = "hello,karl"`. **Deploy the app first, then `wrangler deploy`**
+- The raw backup copy to `+aa-raw` still arrives for every message, `karl@` included. It's now safe to have Gmail
+  skip the inbox for those copies
+- Still deferred: the `Mailbox` DB record with members, roles, per-user visibility, team extras
 
 ---
 

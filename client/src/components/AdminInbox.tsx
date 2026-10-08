@@ -10,11 +10,14 @@ type Channel = 'CONTACT_FORM' | 'EMAIL' | 'NEWSLETTER_REPLY' | 'COMPOSED';
 
 interface Summary { open: number; waiting: number; closed: number; unread: number }
 
+interface Mailbox { key: string; address: string; name: string; personal: boolean; open: number }
+
 interface ListItem {
   id: string;
   subject: string;
   status: Status;
   channel: Channel;
+  mailbox: string;
   unread: boolean;
   lastMessageAt: string;
   messageCount: number;
@@ -42,6 +45,7 @@ interface Detail {
   subject: string;
   status: Status;
   channel: Channel;
+  mailbox: string;
   createdAt: string;
   messages: Message[];
   person: {
@@ -93,6 +97,8 @@ function useWide(minWidth: number) {
 
 export default function AdminInbox({ onSummaryChange }: { onSummaryChange: (s: Summary) => void }) {
   const [filter, setFilter] = useState<Filter>('open');
+  const [mailbox, setMailbox] = useState(''); // '' = all mailboxes
+  const [mailboxes, setMailboxes] = useState<Mailbox[]>([]);
   const [query, setQuery] = useState('');
   const [items, setItems] = useState<ListItem[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -102,32 +108,46 @@ export default function AdminInbox({ onSummaryChange }: { onSummaryChange: (s: S
   const searchTimer = useRef<number | undefined>(undefined);
   const showSidebar = useWide(1280);
 
-  const refreshSummary = useCallback(async () => {
-    const s = await apiFetch<Summary>('/api/inbox/summary');
-    setSummary(s);
-    onSummaryChange(s);
+  // The nav badge always counts every mailbox; the tabs follow the mailbox filter
+  const refreshSummary = useCallback(async (mb: string) => {
+    const [all, boxes] = await Promise.all([
+      apiFetch<Summary>('/api/inbox/summary'),
+      apiFetch<Mailbox[]>('/api/inbox/mailboxes'),
+    ]);
+    onSummaryChange(all);
+    setMailboxes(boxes);
+    setSummary(mb ? await apiFetch<Summary>(`/api/inbox/summary?mailbox=${encodeURIComponent(mb)}`) : all);
   }, [onSummaryChange]);
 
-  const loadList = useCallback(async (f: Filter, q: string) => {
+  const loadList = useCallback(async (f: Filter, q: string, mb: string) => {
     const params = new URLSearchParams({ status: f });
     if (q.trim()) params.set('q', q.trim());
+    if (mb) params.set('mailbox', mb);
     setItems(await apiFetch<ListItem[]>(`/api/inbox/conversations?${params}`));
   }, []);
 
   useEffect(() => {
-    Promise.all([loadList('open', ''), refreshSummary()]).finally(() => setLoading(false));
+    Promise.all([loadList('open', '', ''), refreshSummary('')]).finally(() => setLoading(false));
   }, [loadList, refreshSummary]);
 
   useEffect(() => {
     window.clearTimeout(searchTimer.current);
-    searchTimer.current = window.setTimeout(() => loadList(filter, query), query ? 300 : 0);
+    searchTimer.current = window.setTimeout(() => loadList(filter, query, mailbox), query ? 300 : 0);
     return () => window.clearTimeout(searchTimer.current);
-  }, [filter, query, loadList]);
+  }, [filter, query, mailbox, loadList]);
 
   async function afterChange(id?: string) {
-    await Promise.all([loadList(filter, query), refreshSummary()]);
+    await Promise.all([loadList(filter, query, mailbox), refreshSummary(mailbox)]);
     if (id) setSelectedId(id);
   }
+
+  function pickMailbox(mb: string) {
+    setMailbox(mb);
+    refreshSummary(mb);
+  }
+
+  const multi = mailboxes.length > 1;
+  const local = (key: string) => `${key}@`;
 
   if (loading) return <p style={{ color: '#888' }}>Loading…</p>;
 
@@ -143,6 +163,14 @@ export default function AdminInbox({ onSummaryChange }: { onSummaryChange: (s: S
       <div style={styles.toolbar}>
         <h2 style={styles.heading}>Inbox</h2>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          {multi && (
+            <select value={mailbox} onChange={(e) => pickMailbox(e.target.value)} style={styles.select} title="Mailbox">
+              <option value="">All mailboxes</option>
+              {mailboxes.map((m) => (
+                <option key={m.key} value={m.key}>{m.address}{m.open ? ` (${m.open})` : ''}</option>
+              ))}
+            </select>
+          )}
           <input type="search" value={query} onChange={(e) => setQuery(e.target.value)}
             placeholder="Search conversations…" style={styles.search} />
           <button onClick={() => { setComposing(true); setSelectedId(null); }} style={styles.btnPrimary}>Compose</button>
@@ -178,6 +206,7 @@ export default function AdminInbox({ onSummaryChange }: { onSummaryChange: (s: S
                 {c.last?.text}
               </div>
               <div style={styles.itemMeta}>
+                {multi && !mailbox && <span style={styles.mailboxBadge}>{local(c.mailbox)}</span>}
                 {filter === 'all' && <StatusBadge status={c.status} />}
                 <span>{CHANNEL_LABEL[c.channel]}</span>
                 {c.messageCount > 1 && <span>· {c.messageCount} messages</span>}
@@ -188,10 +217,11 @@ export default function AdminInbox({ onSummaryChange }: { onSummaryChange: (s: S
 
         <div style={styles.threadPane}>
           {composing ? (
-            <Compose onCancel={() => setComposing(false)}
+            <Compose mailboxes={mailboxes} initialFrom={mailbox} onCancel={() => setComposing(false)}
               onSent={async (id) => { setComposing(false); setFilter('waiting'); await afterChange(id); }} />
           ) : selectedId ? (
-            <Thread key={selectedId} id={selectedId} onChanged={() => afterChange()} showSidebar={showSidebar} />
+            <Thread key={selectedId} id={selectedId} onChanged={() => afterChange()} showSidebar={showSidebar}
+              mailboxes={mailboxes} />
           ) : (
             <p style={styles.empty}>Select a conversation, or Compose a new email.</p>
           )}
@@ -210,7 +240,9 @@ function StatusBadge({ status }: { status: Status }) {
 
 // ─── Thread ──────────────────────────────────────────────────────────────────
 
-function Thread({ id, onChanged, showSidebar }: { id: string; onChanged: () => void; showSidebar: boolean }) {
+function Thread({ id, onChanged, showSidebar, mailboxes }: {
+  id: string; onChanged: () => void; showSidebar: boolean; mailboxes: Mailbox[];
+}) {
   const [detail, setDetail] = useState<Detail | null>(null);
   const [body, setBody] = useState('');
   const [busy, setBusy] = useState(false);
@@ -253,6 +285,8 @@ function Thread({ id, onChanged, showSidebar }: { id: string; onChanged: () => v
 
   if (!detail) return <p style={styles.empty}>Loading…</p>;
 
+  const fromAddress = mailboxes.find((m) => m.key === detail.mailbox)?.address ?? `${detail.mailbox}@`;
+
   return (
     <div style={styles.thread}>
       <div style={styles.threadHeader}>
@@ -260,6 +294,7 @@ function Thread({ id, onChanged, showSidebar }: { id: string; onChanged: () => v
           <h3 style={styles.threadSubject}>{detail.subject}</h3>
           <div style={styles.threadMeta}>
             <StatusBadge status={detail.status} /> <span>{CHANNEL_LABEL[detail.channel]}</span>
+            {mailboxes.length > 1 && <span style={styles.mailboxBadge}>{fromAddress}</span>}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
@@ -275,7 +310,7 @@ function Thread({ id, onChanged, showSidebar }: { id: string; onChanged: () => v
           <div key={m.id} style={{ ...styles.msg, ...(m.direction === 'OUTBOUND' ? styles.msgOut : {}) }}>
             <div style={styles.msgHead}>
               <span style={{ fontWeight: 600 }}>
-                {m.direction === 'OUTBOUND' ? `You → ${m.toEmail}` : (m.fromName ? `${m.fromName} <${m.fromEmail}>` : m.fromEmail)}
+                {m.direction === 'OUTBOUND' ? `You${mailboxes.length > 1 ? ` (${m.fromEmail})` : ''} → ${m.toEmail}` :(m.fromName ? `${m.fromName} <${m.fromEmail}>` : m.fromEmail)}
               </span>
               <span style={styles.msgTime}>{new Date(m.createdAt).toLocaleString()}</span>
             </div>
@@ -298,7 +333,7 @@ function Thread({ id, onChanged, showSidebar }: { id: string; onChanged: () => v
 
       <div style={styles.replyBox}>
         <textarea value={body} onChange={(e) => { setBody(e.target.value); setNotice(null); }}
-          placeholder={`Reply to ${detail.person?.name || detail.person?.email || 'sender'}… (signature is added automatically)`}
+          placeholder={`Reply to ${detail.person?.name || detail.person?.email || 'sender'} from ${fromAddress}… (signature is added automatically)`}
           style={styles.replyInput} rows={6} />
         <div style={styles.replyActions}>
           {notice && <span style={{ fontSize: '0.8rem', color: notice.error ? '#b22' : '#555' }}>{notice.text}</span>}
@@ -378,7 +413,10 @@ function SidebarPortal({ slot, children }: { slot: HTMLElement; children: React.
 
 // ─── Compose ─────────────────────────────────────────────────────────────────
 
-function Compose({ onCancel, onSent }: { onCancel: () => void; onSent: (id: string) => void }) {
+function Compose({ mailboxes, initialFrom, onCancel, onSent }: {
+  mailboxes: Mailbox[]; initialFrom: string; onCancel: () => void; onSent: (id: string) => void;
+}) {
+  const [from, setFrom] = useState(initialFrom || mailboxes[0]?.key || '');
   const [to, setTo] = useState('');
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
@@ -391,7 +429,7 @@ function Compose({ onCancel, onSent }: { onCancel: () => void; onSent: (id: stri
     setError(null);
     try {
       const d = await apiFetch<Detail>('/api/inbox/conversations', {
-        method: 'POST', body: JSON.stringify({ to, name, subject, body }),
+        method: 'POST', body: JSON.stringify({ to, name, subject, body, ...(from ? { from } : {}) }),
       });
       onSent(d.id);
     } catch (err) {
@@ -401,9 +439,19 @@ function Compose({ onCancel, onSent }: { onCancel: () => void; onSent: (id: stri
     }
   }
 
+  const sender = mailboxes.find((m) => m.key === from);
+
   return (
     <div style={{ ...styles.thread, padding: '1rem 1.1rem', gap: 10 }}>
       <h3 style={styles.threadSubject}>New email</h3>
+      {mailboxes.length > 1 && (
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem', color: '#555' }}>
+          From
+          <select value={from} onChange={(e) => setFrom(e.target.value)} style={{ ...styles.input, flex: 1 }}>
+            {mailboxes.map((m) => <option key={m.key} value={m.key}>{m.name} &lt;{m.address}&gt;</option>)}
+          </select>
+        </label>
+      )}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         <RecipientInput value={to} onChange={setTo} style={styles.input} autoFocus
           onPick={(m) => { setTo(m.email); if (m.name) setName(m.name); }} />
@@ -420,8 +468,8 @@ function Compose({ onCancel, onSent }: { onCancel: () => void; onSent: (id: stri
         </button>
       </div>
       <p style={{ fontSize: '0.75rem', color: '#999', margin: 0 }}>
-        Sent from your hello@ address. Replies come back into this conversation (once inbound email is connected) and
-        to your email inbox.
+        Sent from {sender?.address ?? 'your site address'}. Replies come back into this conversation (a copy also reaches
+        your email inbox).
       </p>
     </div>
   );
@@ -432,6 +480,8 @@ const styles: Record<string, React.CSSProperties> = {
   toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: '0.75rem', flexWrap: 'wrap' },
   heading: { fontSize: '1.1rem', fontWeight: 600, margin: 0 },
   search: { border: '1px solid #ddd', borderRadius: 4, padding: '0.4rem 0.65rem', fontSize: '0.85rem', fontFamily: 'inherit', width: 260 },
+  select: { border: '1px solid #ddd', borderRadius: 4, padding: '0.4rem 0.5rem', fontSize: '0.85rem', fontFamily: 'inherit', background: 'white' },
+  mailboxBadge: { borderRadius: 3, fontSize: '0.66rem', fontWeight: 600, padding: '1px 6px', background: '#eef0f4', color: '#4a5568' },
   tabs: { display: 'flex', gap: 4, borderBottom: '1px solid #e5e5e5', marginBottom: '0.75rem' },
   tab: { background: 'transparent', border: 'none', borderBottom: '2px solid transparent', padding: '0.45rem 0.85rem', fontSize: '0.85rem', color: '#777', cursor: 'pointer', marginBottom: -1 },
   tabActive: { color: '#1a1917', borderBottomColor: '#2d4a2d', fontWeight: 500 },

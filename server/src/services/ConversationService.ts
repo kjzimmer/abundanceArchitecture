@@ -11,6 +11,7 @@ import { upsertPerson } from './PersonService';
 import { getSetting } from './SettingsService';
 import { renderReply, replySubject } from '../lib/email/reply';
 import { emailFromAddress } from '../lib/email/config';
+import { Mailbox, defaultMailbox, isMailboxKey, mailboxByKey, mailboxes } from '../lib/email/mailboxes';
 import { brand } from '../lib/brand';
 
 export class ConversationError extends Error {
@@ -88,9 +89,10 @@ async function searchIds(q: string): Promise<string[]> {
   return rows.map((r) => r.id);
 }
 
-export async function listConversations(filter: StatusFilter, q?: string) {
+export async function listConversations(filter: StatusFilter, q?: string, mailbox?: string) {
   const where: Prisma.ConversationWhereInput = {};
   if (filter !== 'all') where.status = STATUS_BY_FILTER[filter];
+  if (isMailboxKey(mailbox)) where.mailbox = mailbox;
   if (q?.trim()) where.id = { in: await searchIds(q.trim()) };
 
   const rows = await prisma.conversation.findMany({
@@ -116,13 +118,28 @@ export async function listConversations(filter: StatusFilter, q?: string) {
   }));
 }
 
-export async function summary() {
+/** Status counts across all mailboxes (the nav badge), or for one mailbox when given. */
+export async function summary(mailbox?: string) {
+  const scope: Prisma.ConversationWhereInput = isMailboxKey(mailbox) ? { mailbox } : {};
   const [groups, unread] = await Promise.all([
-    prisma.conversation.groupBy({ by: ['status'], _count: { _all: true } }),
-    prisma.conversation.count({ where: { unread: true, status: { not: ConversationStatus.CLOSED } } }),
+    prisma.conversation.groupBy({ by: ['status'], where: scope, _count: { _all: true } }),
+    prisma.conversation.count({ where: { ...scope, unread: true, status: { not: ConversationStatus.CLOSED } } }),
   ]);
   const n = (s: ConversationStatus) => groups.find((g) => g.status === s)?._count._all ?? 0;
   return { open: n(ConversationStatus.OPEN), waiting: n(ConversationStatus.WAITING), closed: n(ConversationStatus.CLOSED), unread };
+}
+
+/** Mailboxes for the Inbox UI (filter + Compose From), with open counts. */
+export async function listMailboxes() {
+  const open = await prisma.conversation.groupBy({
+    by: ['mailbox'],
+    where: { status: ConversationStatus.OPEN },
+    _count: { _all: true },
+  });
+  return mailboxes().map(({ key, address, name, personal }) => ({
+    key, address, name, personal,
+    open: open.find((g) => g.mailbox === key)?._count._all ?? 0,
+  }));
 }
 
 // ─── Detail ───────────────────────────────────────────────────────────────────
@@ -176,6 +193,7 @@ function counterparty(messages: { direction: MessageDirection; fromEmail: string
 
 async function sendOutbound(opts: {
   conversationId: string;
+  mailbox: Mailbox;
   personId: string | null;
   to: string;
   subject: string;
@@ -184,7 +202,7 @@ async function sendOutbound(opts: {
   inReplyTo?: string | null;
   references?: string | null;
 }) {
-  const signature = await getSetting('inbox.signature');
+  const signature = await getSetting(opts.mailbox.signatureKey);
   const { html, text } = renderReply({ body: opts.body, signature, quoted: opts.quoted });
   const headers: Record<string, string> = {};
   if (opts.inReplyTo) headers['In-Reply-To'] = opts.inReplyTo;
@@ -197,7 +215,9 @@ async function sendOutbound(opts: {
     text,
     kind: EmailKind.REPLY,
     personId: opts.personId,
-    replyTo: conversationReplyTo(opts.conversationId),
+    from: opts.mailbox.from,
+    // Personal mailboxes show their real address on Reply; answers thread via In-Reply-To instead
+    replyTo: opts.mailbox.personal ? undefined : conversationReplyTo(opts.conversationId),
     headers: Object.keys(headers).length ? headers : undefined,
     conversationId: opts.conversationId,
   });
@@ -214,7 +234,7 @@ async function sendOutbound(opts: {
     data: {
       conversationId: opts.conversationId,
       direction: MessageDirection.OUTBOUND,
-      fromEmail: emailFromAddress(),
+      fromEmail: opts.mailbox.address,
       toEmail: opts.to,
       subject: opts.subject,
       text: opts.body.trim(),
@@ -242,6 +262,7 @@ export async function reply(id: string, body: string, close = false) {
 
   await sendOutbound({
     conversationId: id,
+    mailbox: mailboxByKey(conv.mailbox),
     personId: conv.personId,
     to: to.email,
     subject: replySubject(conv.subject),
@@ -266,16 +287,19 @@ export interface ComposeInput {
   name?: string;
   subject?: string;
   body?: string;
+  from?: string; // mailbox key; default mailbox when omitted
 }
 
 export async function compose(input: ComposeInput) {
   const to = input.to?.trim().toLowerCase() ?? '';
   const subject = input.subject?.trim() ?? '';
   const body = input.body ?? '';
+  if (input.from !== undefined && !isMailboxKey(input.from)) throw new ConversationError('Unknown From address');
   if (!EMAIL_PATTERN.test(to)) throw new ConversationError('Enter a valid email address');
   if (!subject) throw new ConversationError('Subject is required');
   if (!body.trim()) throw new ConversationError('Write a message first');
 
+  const mailbox = input.from ? mailboxByKey(input.from) : defaultMailbox();
   const person = await upsertPerson(to, input.name?.trim() || undefined);
   const conv = await prisma.conversation.create({
     data: {
@@ -285,10 +309,11 @@ export async function compose(input: ComposeInput) {
       channel: ConversationChannel.COMPOSED,
       status: ConversationStatus.WAITING,
       unread: false,
+      mailbox: mailbox.key,
     },
   });
   try {
-    await sendOutbound({ conversationId: conv.id, personId: person.id, to, subject, body, quoted: null });
+    await sendOutbound({ conversationId: conv.id, mailbox, personId: person.id, to, subject, body, quoted: null });
   } catch (err) {
     // Don't leave an empty thread behind when the first send fails
     await prisma.conversation.delete({ where: { id: conv.id } });
