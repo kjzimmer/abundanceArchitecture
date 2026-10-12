@@ -22,7 +22,7 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - Newsletter subscriber and contact message persistence (PostgreSQL via Prisma)
 - Admin panel at `/admin` — React SPA, DB-backed JWT auth
 - People CRM, contact inbox, Cloudflare Zone Analytics in admin panel
-- Admin left-nav layout (Module 6) — PR #9, badge fix PR #10. Nav: Analytics · People · Inbox · Newsletter · Documents · Settings
+- Admin left-nav layout (Module 6) — PR #9, badge fix PR #10. Nav: Analytics · People · Groups · Inbox · Newsletter · Documents · Settings
 - Admin Settings (2026-09-30): `Setting` table + registry `server/src/lib/settings.ts` (non-secrets only). People search
 - Inbox = help-desk conversations (PR B1): contact form, replies, compose, search; Open/Waiting/Closed
 - Shared docs (PRs #23–#25, 2026-10-01): secret-link document shares, admin → Documents, Cloudflare R2
@@ -34,8 +34,18 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - Email foundation (PR #11, 2026-09-24): Resend sending with OutboundEmail log, double opt-in
   with /confirm and /unsubscribe pages, contact acknowledgements, `[AA …]` admin notices, Resend
   delivery webhooks with suppression, Turnstile on both forms, admin Email page. Prod-tested
+- Single-user mailboxes (PR #28, 2026-10-08, prod-verified by Karl): `karl@` receives into the admin Inbox and
+  sends from it (Compose From picker, per-mailbox signature, mailbox filter). Registry `brand.mailboxes`;
+  `Conversation.mailbox`. Worker deployed with `APP_LOCAL_PARTS = "hello,karl"`. Adding a mailbox = brand.ts +
+  signature setting + Worker var, deploying the app before the Worker
 
 **In flight:**
+- Groups + CC/BCC (2026-10-12, `feat/groups-cc`): spec `docs/wip/email-groups.md`. Multi-recipient
+  conversations with reply-all, saved Groups (admin → Groups), "Email this group", conversations filed under
+  their group. Built + smoke-tested locally; needs PR, deploy (migration only, no Worker change), prod test
+- **Roadmap:** `docs/wip/conversations-roadmap.md`: direction (conversations → actionable projects) and
+  build-ready sketches for attachments, images, per-person share links, Projects + AI synthesis, notes/labels,
+  accounts, etc. Start future work from there
 - Email + newsletter: spec `docs/wip/email-newsletter.md` (PR A ✅ → PR C newsletter ✅ →
   PR B1 conversations ✅ → PR B2 inbound ✅ + #20–#22 polish). Remaining: postal address + first issue (Karl),
   test suite, legacy contact_message drop, porting-guide refresh, shared-module write-ups, newsletter images.
@@ -57,10 +67,6 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 IP on the Cloudflare path, while X-Real-IP is the true client on both paths and can't be spoofed.
 Don't "fix" this by enabling `trust proxy`
 
-- Single-user mailboxes (PR #28, 2026-10-08, prod-verified by Karl): `karl@` receives into the admin Inbox and
-  sends from it (Compose From picker, per-mailbox signature, mailbox filter). Registry `brand.mailboxes`;
-  `Conversation.mailbox`. Worker deployed with `APP_LOCAL_PARTS = "hello,karl"`. Adding a mailbox = brand.ts +
-  signature setting + Worker var, deploying the app before the Worker
 
 **Deferred:**
 - Accounts + login (subscribers, team roles, invites), then per-user mailbox access. See

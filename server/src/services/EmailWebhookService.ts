@@ -89,6 +89,24 @@ export async function handleEvent(svixId: string, event: ResendEvent): Promise<H
 
   if (!recipient) return 'processed';
 
+  // A shared send (CC/BCC/group): the event can't be pinned to one address, so tell the admin
+  // instead of suppressing or unsubscribing whoever happens to be first
+  const shared = (row?.otherRecipients.length ?? 0) > 0 || (event.data.to?.length ?? 0) > 1;
+  if (shared && (event.type === 'email.complained' || (event.type === 'email.bounced' && event.data.bounce?.type === 'Permanent'))) {
+    const all = row ? [row.toEmail, ...row.otherRecipients] : event.data.to ?? [];
+    EmailService.notifyAdmin({
+      type: 'Deliverability',
+      title: `${event.type === 'email.complained' ? 'Spam complaint' : 'Hard bounce'} on a group email`,
+      rows: [
+        ['Recipients', all.join(', ')],
+        ['Subject', event.data.subject ?? row?.subject ?? ''],
+        ...(event.data.bounce ? ([['Reason', event.data.bounce.message]] as [string, string][]) : []),
+      ],
+      body: 'Nothing was suppressed automatically. Check which address failed (the reason above, or the Resend dashboard) and remove or fix it.',
+    });
+    return 'processed';
+  }
+
   if (event.type === 'email.bounced' && event.data.bounce?.type === 'Permanent') {
     await EmailService.suppress(recipient, 'bounce');
     EmailService.notifyAdmin({

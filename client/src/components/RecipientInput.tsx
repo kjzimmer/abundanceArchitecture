@@ -13,13 +13,17 @@ interface Props {
   onPick: (match: Match) => void;
   style?: React.CSSProperties;
   autoFocus?: boolean;
+  placeholder?: string;
+  /** Keys the dropdown didn't handle (e.g. Enter/comma to commit an address in AddressListInput) */
+  onKeyDownExtra?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onBlur?: () => void;
 }
 
 /**
  * Email field with type-ahead over People (GET /api/people/lookup). Typing an address that
  * isn't in People still works — the dropdown is only a shortcut.
  */
-export default function RecipientInput({ value, onChange, onPick, style, autoFocus }: Props) {
+export default function RecipientInput({ value, onChange, onPick, style, autoFocus, placeholder, onKeyDownExtra, onBlur }: Props) {
   const [matches, setMatches] = useState<Match[]>([]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -54,11 +58,12 @@ export default function RecipientInput({ value, onChange, onPick, style, autoFoc
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!open || matches.length === 0) return;
+    if (!open || matches.length === 0) { onKeyDownExtra?.(e); return; }
     if (e.key === 'ArrowDown') { e.preventDefault(); setActive((a) => (a + 1) % matches.length); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((a) => (a - 1 + matches.length) % matches.length); }
     else if (e.key === 'Enter' || e.key === 'Tab') { if (matches[active]) { e.preventDefault(); pick(matches[active]); } }
     else if (e.key === 'Escape') { setOpen(false); }
+    else onKeyDownExtra?.(e);
   }
 
   return (
@@ -68,8 +73,8 @@ export default function RecipientInput({ value, onChange, onPick, style, autoFoc
         onChange={(e) => { lastPicked.current = null; onChange(e.target.value); }}
         onKeyDown={onKeyDown}
         onFocus={() => matches.length > 0 && setOpen(true)}
-        onBlur={() => window.setTimeout(() => setOpen(false), 120)} // let a click on a match land first
-        placeholder="To — type a name or email"
+        onBlur={() => window.setTimeout(() => { setOpen(false); onBlur?.(); }, 120)} // let a click on a match land first
+        placeholder={placeholder ?? 'To — type a name or email'}
         style={{ ...style, width: '100%', boxSizing: 'border-box' }}
         autoFocus={autoFocus}
         autoComplete="off"

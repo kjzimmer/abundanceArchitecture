@@ -174,6 +174,8 @@ export async function handleInbound(p: InboundPayload): Promise<InboundResult> {
       fromEmail,
       fromName,
       toEmail: p.recipient,
+      toEmails: p.to.map((a) => a.toLowerCase()),
+      ccEmails: p.cc.map((a) => a.toLowerCase()), // kept so Reply defaults to reply-all
       subject,
       text,
       quotedText,

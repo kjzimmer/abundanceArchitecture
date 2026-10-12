@@ -38,6 +38,7 @@ interface Person {
   _count?: { conversations: number };
   conversations?: ConversationSummary[];
   outboundEmails?: SentEmail[];
+  groupMemberships?: { group: { id: string; name: string } }[];
   listSubscriptions?: { active: boolean; confirmedAt: string | null; unsubscribedAt?: string | null; list: { key: string; name: string } }[];
 }
 
@@ -185,6 +186,15 @@ export default function AdminPeople() {
                 {selected.phone && <span style={styles.metaItem}>📞 {selected.phone}</span>}
                 {selected.notes && <p style={styles.notes}>{selected.notes}</p>}
                 <span style={styles.metaItem}>Joined {new Date(selected.createdAt).toLocaleDateString()}</span>
+              </div>
+            )}
+
+            {selected.groupMemberships && selected.groupMemberships.length > 0 && (
+              <div style={styles.section}>
+                <h4 style={styles.sectionTitle}>Groups</h4>
+                <div style={styles.badges}>
+                  {selected.groupMemberships.map(({ group }) => <span key={group.id} style={styles.badgeBlue}>{group.name}</span>)}
+                </div>
               </div>
             )}
 
