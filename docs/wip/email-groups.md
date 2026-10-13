@@ -1,6 +1,6 @@
 # Email Groups + CC/BCC — WIP Spec
 
-*Status: built 2026-10-12 on `feat/groups-cc`. Follows the single-user mailboxes work (PR #28).
+*Status: PR #30, deployed 2026-10-13; prod test pending. Follows the single-user mailboxes work (PR #28).
 Roadmap for what comes next: `docs/wip/conversations-roadmap.md`.*
 
 ## Goal
@@ -66,5 +66,5 @@ Migration `20261012120000_groups_and_cc` backfills `to_emails = [to_email]` on o
 
 - [x] Code, migration, local smoke test (16 checks: groups CRUD, compose to group with CC/BCC, inbound
       reply-all threading, reply-all defaults, validation, suppression block, shared-bounce no-suppress, search)
-- [ ] PR + deploy (migration runs on Railway; no Worker change)
+- [x] PR #30 merged + deployed 2026-10-13 (migration applied, `/api/groups` live, new admin bundle served)
 - [ ] Prod: create a group, email it from `karl@`, have a member reply-all, reply from the Inbox

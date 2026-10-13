@@ -40,9 +40,9 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   signature setting + Worker var, deploying the app before the Worker
 
 **In flight:**
-- Groups + CC/BCC (2026-10-12, `feat/groups-cc`): spec `docs/wip/email-groups.md`. Multi-recipient
+- Groups + CC/BCC (PR #30, deployed 2026-10-13): spec `docs/wip/email-groups.md`. Multi-recipient
   conversations with reply-all, saved Groups (admin → Groups), "Email this group", conversations filed under
-  their group. Built + smoke-tested locally; needs PR, deploy (migration only, no Worker change), prod test
+  their group. Awaiting Karl's prod test (group email from karl@ → member reply-all → reply from Inbox)
 - **Roadmap:** `docs/wip/conversations-roadmap.md`: direction (conversations → actionable projects) and
   build-ready sketches for attachments, images, per-person share links, Projects + AI synthesis, notes/labels,
   accounts, etc. Start future work from there
