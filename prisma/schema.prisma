@@ -25,6 +25,7 @@ model Person {
   listSubscriptions ListSubscription[]
   contacts          ContactMessage[] // legacy — superseded by conversations
   conversations     Conversation[]
+  groupMemberships  GroupMember[]
   sessions          RefreshToken[]
   outboundEmails    OutboundEmail[]
 
@@ -166,6 +167,8 @@ model Conversation {
   unread            Boolean             @default(true) // has inbound the admin hasn't opened
   mailbox           String              @default("hello") // local part of the address it lives in (brand.mailboxes)
   newsletterIssueId String?             @map("newsletter_issue_id") // set for NEWSLETTER_REPLY
+  groupId           String?             @map("group_id") // set when started by emailing a Group
+  group             Group?              @relation(fields: [groupId], references: [id], onDelete: SetNull)
   lastMessageAt     DateTime            @default(now()) @map("last_message_at")
   createdAt         DateTime            @default(now()) @map("created_at")
   updatedAt         DateTime            @updatedAt @map("updated_at")
@@ -175,6 +178,7 @@ model Conversation {
 
   @@index([status, lastMessageAt])
   @@index([personId])
+  @@index([groupId])
   @@map("conversation")
 }
 
@@ -185,7 +189,10 @@ model Message {
   direction       MessageDirection
   fromEmail       String           @map("from_email")
   fromName        String?          @map("from_name")
-  toEmail         String           @map("to_email")
+  toEmail         String           @map("to_email") // INBOUND: envelope recipient (our address); OUTBOUND: first To
+  toEmails        String[]         @default([]) @map("to_emails") // full To header list
+  ccEmails        String[]         @default([]) @map("cc_emails")
+  bccEmails       String[]         @default([]) @map("bcc_emails") // OUTBOUND only
   subject         String
   text            String // for INBOUND: only the new part of the message (quoted history split off)
   quotedText      String?          @map("quoted_text") // earlier messages the sender's client quoted below
@@ -229,6 +236,7 @@ model OutboundEmail {
   personId          String?          @map("person_id")
   person            Person?          @relation(fields: [personId], references: [id], onDelete: SetNull)
   toEmail           String           @map("to_email") // denormalized — readable if Person deleted
+  otherRecipients   String[]         @default([]) @map("other_recipients") // extra To/CC/BCC on a shared send
   fromEmail         String           @map("from_email")
   subject           String
   kind              EmailKind
@@ -287,6 +295,36 @@ model Setting {
 
   @@unique([siteKey, key])
   @@map("setting")
+}
+
+// ─── Groups (docs/wip/email-groups.md) ────────────────────────────────────────
+// Ad hoc sets of People (e.g. design collaborators). Compose can address a group; the conversation
+// remembers it so everything a group discussed can be pulled together later.
+
+model Group {
+  id          String   @id @default(cuid())
+  sourceSite  String   @map("source_site")
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  members       GroupMember[]
+  conversations Conversation[]
+
+  @@map("contact_group")
+}
+
+model GroupMember {
+  groupId  String   @map("group_id")
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  personId String   @map("person_id")
+  person   Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  addedAt  DateTime @default(now()) @map("added_at")
+
+  @@id([groupId, personId])
+  @@index([personId])
+  @@map("contact_group_member")
 }
 
 // ─── Shared docs (docs/wip/shared-docs.md) ────────────────────────────────────

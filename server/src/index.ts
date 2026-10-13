@@ -13,6 +13,7 @@ import newsletterRouter from './routes/newsletter';
 import settingsRouter from './routes/settings';
 import inboxRouter from './routes/inbox';
 import docsRouter from './routes/docs';
+import groupsRouter from './routes/groups';
 import sharePagesRouter from './routes/sharePages';
 import { startNewsletterQueue } from './jobs/newsletterQueue';
 import { resendWebhookHandler } from './routes/webhooks';
@@ -58,6 +59,7 @@ app.use('/api/newsletter', newsletterRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/inbox', inboxRouter);
 app.use('/api/docs', docsRouter);
+app.use('/api/groups', groupsRouter);
 
 // Public config for public/js/main.js (site key is public by design)
 app.get('/api/public-config', (_req: Request, res: Response) => {

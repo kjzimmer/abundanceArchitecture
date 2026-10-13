@@ -8,6 +8,7 @@ import {
 import prisma from '../db';
 import * as EmailService from './EmailService';
 import { upsertPerson } from './PersonService';
+import { groupExists } from './GroupService';
 import { getSetting } from './SettingsService';
 import { renderReply, replySubject } from '../lib/email/reply';
 import { emailFromAddress } from '../lib/email/config';
@@ -83,7 +84,8 @@ async function searchIds(q: string): Promise<string[]> {
     WHERE to_tsvector('english', c.subject || ' ' || coalesce(m.text, '')) @@ websearch_to_tsquery('english', ${q})
        OR c.subject ILIKE ${like}
        OR (m.direction = 'INBOUND' AND (m.from_email ILIKE ${like} OR m.from_name ILIKE ${like}))
-       OR (m.direction = 'OUTBOUND' AND m.to_email ILIKE ${like})  -- our own address never matches
+       OR (m.direction = 'OUTBOUND' AND array_to_string(m.to_emails || m.cc_emails || m.bcc_emails, ' ') ILIKE ${like})  -- our own address never matches
+       OR (m.direction = 'INBOUND' AND array_to_string(m.cc_emails, ' ') ILIKE ${like})
        OR p.email ILIKE ${like} OR p.name ILIKE ${like}
     LIMIT 500`;
   return rows.map((r) => r.id);
@@ -101,6 +103,7 @@ export async function listConversations(filter: StatusFilter, q?: string, mailbo
     take: 200,
     include: {
       person: { select: { id: true, name: true, email: true } },
+      group: { select: { id: true, name: true } },
       messages: {
         orderBy: { createdAt: 'desc' },
         take: 1,
@@ -152,6 +155,7 @@ export async function getConversation(id: string, markRead = true) {
         orderBy: { createdAt: 'asc' },
         include: { outboundEmail: { select: { status: true, error: true } } },
       },
+      group: { select: { id: true, name: true } },
       person: {
         omit: { passwordHash: true, totpSecret: true },
         include: {
@@ -172,7 +176,7 @@ export async function getConversation(id: string, markRead = true) {
     await prisma.conversation.update({ where: { id }, data: { unread: false } });
     conv.unread = false;
   }
-  return conv;
+  return { ...conv, replyAll: replyAllDefaults(conv.messages) };
 }
 
 export async function setStatus(id: string, status: ConversationStatus) {
@@ -183,25 +187,90 @@ export async function setStatus(id: string, status: ConversationStatus) {
 
 // ─── Sending ──────────────────────────────────────────────────────────────────
 
-/** The address a reply should go to: the latest inbound sender, else the original recipient. */
-function counterparty(messages: { direction: MessageDirection; fromEmail: string; fromName: string | null; toEmail: string }[]) {
-  const lastIn = [...messages].reverse().find((m) => m.direction === MessageDirection.INBOUND);
-  if (lastIn) return { email: lastIn.fromEmail, name: lastIn.fromName };
-  const firstOut = messages.find((m) => m.direction === MessageDirection.OUTBOUND);
-  return firstOut ? { email: firstOut.toEmail, name: null } : null;
+// ─── Recipients ───────────────────────────────────────────────────────────────
+
+export interface RecipientsInput { to?: unknown; cc?: unknown; bcc?: unknown }
+export interface Recipients { to: string[]; cc: string[]; bcc: string[] }
+
+const MAX_RECIPIENTS = 50; // Resend's per-email limit across To + CC + BCC
+
+/** A list from the API: an array of strings, or one string separated by commas/semicolons. */
+function parseList(v: unknown): string[] {
+  const parts = Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : typeof v === 'string' ? [v] : [];
+  return parts.flatMap((p) => p.split(/[,;]/));
+}
+
+function isOurAddress(address: string): boolean {
+  return address.endsWith(`@${brand.domain}`) || mailboxes().some((m) => m.address === address);
+}
+
+/** Validates and de-duplicates To/CC/BCC (an address appears once, in the first list it's in). */
+function cleanRecipients(input: RecipientsInput): Recipients {
+  const to = EmailService.normalizeAddresses(parseList(input.to));
+  const cc = EmailService.normalizeAddresses(parseList(input.cc), to);
+  const bcc = EmailService.normalizeAddresses(parseList(input.bcc), [...to, ...cc]);
+  const all = [...to, ...cc, ...bcc];
+  const invalid = all.filter((a) => !EMAIL_PATTERN.test(a));
+  if (invalid.length) throw new ConversationError(`Not a valid email address: ${invalid.join(', ')}`);
+  if (to.length === 0) throw new ConversationError('Add at least one To address');
+  if (all.length > MAX_RECIPIENTS) throw new ConversationError(`Too many recipients (${all.length}); the limit is ${MAX_RECIPIENTS}`);
+  return { to, cc, bcc };
+}
+
+async function assertNotSuppressed(r: Recipients) {
+  const rows = await prisma.emailSuppression.findMany({
+    where: { email: { in: [...r.to, ...r.cc, ...r.bcc] } },
+    select: { email: true },
+  });
+  if (rows.length) {
+    throw new ConversationError(
+      `Remove ${rows.map((x) => x.email).join(', ')}: on the suppression list (bounced or reported spam), so nothing was sent`,
+    );
+  }
+}
+
+type ThreadMessage = {
+  direction: MessageDirection; fromEmail: string; toEmail: string; toEmails: string[]; ccEmails: string[];
+};
+
+/**
+ * Reply-all defaults from the latest message: answering an inbound email goes To its sender and CCs
+ * everyone else it was addressed to (minus our own addresses); following up our own message reuses
+ * its To/CC. BCC is never carried forward.
+ */
+export function replyAllDefaults(messages: ThreadMessage[]): { to: string[]; cc: string[] } {
+  const last = messages.at(-1);
+  if (!last) return { to: [], cc: [] };
+  if (last.direction === MessageDirection.INBOUND) {
+    const to = [last.fromEmail.toLowerCase()];
+    const cc = EmailService.normalizeAddresses([...last.toEmails, ...last.ccEmails], to).filter((a) => !isOurAddress(a));
+    return { to, cc };
+  }
+  const to = last.toEmails.length ? last.toEmails : [last.toEmail];
+  return { to, cc: EmailService.normalizeAddresses(last.ccEmails, to) };
+}
+
+/** Every address gets a Person, so participants show up in People and can be added to groups. */
+async function upsertRecipients(r: Recipients, firstName?: string) {
+  const people = [];
+  for (const [i, email] of [...r.to, ...r.cc, ...r.bcc].entries()) {
+    people.push(await upsertPerson(email, i === 0 ? firstName : undefined));
+  }
+  return people;
 }
 
 async function sendOutbound(opts: {
   conversationId: string;
   mailbox: Mailbox;
   personId: string | null;
-  to: string;
+  recipients: Recipients;
   subject: string;
   body: string;
   quoted: Parameters<typeof renderReply>[0]['quoted'];
   inReplyTo?: string | null;
   references?: string | null;
 }) {
+  const { to, cc, bcc } = opts.recipients;
   const signature = await getSetting(opts.mailbox.signatureKey);
   const { html, text } = renderReply({ body: opts.body, signature, quoted: opts.quoted });
   const headers: Record<string, string> = {};
@@ -209,7 +278,9 @@ async function sendOutbound(opts: {
   if (opts.references) headers['References'] = opts.references;
 
   const outbound = await EmailService.send({
-    to: opts.to,
+    to,
+    cc,
+    bcc,
     subject: opts.subject,
     html,
     text,
@@ -224,7 +295,7 @@ async function sendOutbound(opts: {
   if (outbound.status === 'FAILED' || outbound.status === 'SUPPRESSED') {
     throw new ConversationError(
       outbound.status === 'SUPPRESSED'
-        ? `${opts.to} is on the suppression list (bounced or complained) — not sent`
+        ? 'A recipient is on the suppression list (bounced or complained) — not sent'
         : `Send failed: ${outbound.error ?? 'unknown error'}`,
       502,
     );
@@ -235,7 +306,10 @@ async function sendOutbound(opts: {
       conversationId: opts.conversationId,
       direction: MessageDirection.OUTBOUND,
       fromEmail: opts.mailbox.address,
-      toEmail: opts.to,
+      toEmail: to[0],
+      toEmails: to,
+      ccEmails: cc,
+      bccEmails: bcc,
       subject: opts.subject,
       text: opts.body.trim(),
       html,
@@ -246,15 +320,29 @@ async function sendOutbound(opts: {
   });
 }
 
-export async function reply(id: string, body: string, close = false) {
+export interface ReplyInput extends RecipientsInput {
+  body?: string;
+  close?: boolean;
+}
+
+/** Replies in a thread. To/CC default to reply-all (replyAllDefaults); pass them to override. */
+export async function reply(id: string, input: ReplyInput) {
+  const body = input.body ?? '';
   if (!body.trim()) throw new ConversationError('Write a reply first');
   const conv = await prisma.conversation.findUnique({
     where: { id },
     include: { messages: { orderBy: { createdAt: 'asc' } } },
   });
   if (!conv) throw new ConversationError('Conversation not found', 404);
-  const to = counterparty(conv.messages);
-  if (!to) throw new ConversationError('No recipient found for this conversation');
+
+  const defaults = replyAllDefaults(conv.messages);
+  const recipients = cleanRecipients({
+    to: input.to ?? defaults.to,
+    cc: input.cc ?? defaults.cc,
+    bcc: input.bcc,
+  });
+  await assertNotSuppressed(recipients);
+  await upsertRecipients(recipients);
 
   const withIds = conv.messages.filter((m) => m.messageIdHeader);
   const lastIn = [...conv.messages].reverse().find((m) => m.direction === MessageDirection.INBOUND);
@@ -264,7 +352,7 @@ export async function reply(id: string, body: string, close = false) {
     conversationId: id,
     mailbox: mailboxByKey(conv.mailbox),
     personId: conv.personId,
-    to: to.email,
+    recipients,
     subject: replySubject(conv.subject),
     body,
     quoted: lastIn ? { fromName: lastIn.fromName, fromEmail: lastIn.fromEmail, date: lastIn.createdAt, text: lastIn.text } : null,
@@ -274,7 +362,7 @@ export async function reply(id: string, body: string, close = false) {
   await prisma.conversation.update({
     where: { id },
     data: {
-      status: close ? ConversationStatus.CLOSED : ConversationStatus.WAITING,
+      status: input.close ? ConversationStatus.CLOSED : ConversationStatus.WAITING,
       unread: false,
       lastMessageAt: new Date(),
     },
@@ -282,25 +370,26 @@ export async function reply(id: string, body: string, close = false) {
   return getConversation(id, false);
 }
 
-export interface ComposeInput {
-  to?: string;
-  name?: string;
+export interface ComposeInput extends RecipientsInput {
+  name?: string;     // name for the first To address, if it's a new Person
   subject?: string;
   body?: string;
-  from?: string; // mailbox key; default mailbox when omitted
+  from?: string;     // mailbox key; default mailbox when omitted
+  groupId?: string;  // set when the recipients came from a Group
 }
 
 export async function compose(input: ComposeInput) {
-  const to = input.to?.trim().toLowerCase() ?? '';
   const subject = input.subject?.trim() ?? '';
   const body = input.body ?? '';
   if (input.from !== undefined && !isMailboxKey(input.from)) throw new ConversationError('Unknown From address');
-  if (!EMAIL_PATTERN.test(to)) throw new ConversationError('Enter a valid email address');
+  const recipients = cleanRecipients(input);
   if (!subject) throw new ConversationError('Subject is required');
   if (!body.trim()) throw new ConversationError('Write a message first');
+  if (input.groupId && !(await groupExists(input.groupId))) throw new ConversationError('Group not found');
+  await assertNotSuppressed(recipients);
 
   const mailbox = input.from ? mailboxByKey(input.from) : defaultMailbox();
-  const person = await upsertPerson(to, input.name?.trim() || undefined);
+  const [person] = await upsertRecipients(recipients, input.name?.trim() || undefined);
   const conv = await prisma.conversation.create({
     data: {
       sourceSite: brand.siteKey,
@@ -310,10 +399,11 @@ export async function compose(input: ComposeInput) {
       status: ConversationStatus.WAITING,
       unread: false,
       mailbox: mailbox.key,
+      groupId: input.groupId || null,
     },
   });
   try {
-    await sendOutbound({ conversationId: conv.id, mailbox, personId: person.id, to, subject, body, quoted: null });
+    await sendOutbound({ conversationId: conv.id, mailbox, personId: person.id, recipients, subject, body, quoted: null });
   } catch (err) {
     // Don't leave an empty thread behind when the first send fails
     await prisma.conversation.delete({ where: { id: conv.id } });

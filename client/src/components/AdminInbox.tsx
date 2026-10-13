@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { apiFetch } from '../api';
 import NewsletterInvite from './NewsletterInvite';
-import RecipientInput from './RecipientInput';
+import AddressListInput from './AddressListInput';
 
 type Status = 'OPEN' | 'WAITING' | 'CLOSED';
 type Filter = 'open' | 'waiting' | 'closed' | 'all';
@@ -18,6 +18,7 @@ interface ListItem {
   status: Status;
   channel: Channel;
   mailbox: string;
+  group: { id: string; name: string } | null;
   unread: boolean;
   lastMessageAt: string;
   messageCount: number;
@@ -31,6 +32,9 @@ interface Message {
   fromEmail: string;
   fromName: string | null;
   toEmail: string;
+  toEmails: string[];
+  ccEmails: string[];
+  bccEmails: string[];
   subject: string;
   text: string;
   quotedText: string | null;
@@ -46,6 +50,8 @@ interface Detail {
   status: Status;
   channel: Channel;
   mailbox: string;
+  group: { id: string; name: string } | null;
+  replyAll: { to: string[]; cc: string[] };
   createdAt: string;
   messages: Message[];
   person: {
@@ -95,7 +101,13 @@ function useWide(minWidth: number) {
   return wide;
 }
 
-export default function AdminInbox({ onSummaryChange }: { onSummaryChange: (s: Summary) => void }) {
+export interface ComposeRequest { groupId: string }
+
+export default function AdminInbox({ onSummaryChange, composeRequest, onComposeRequestHandled }: {
+  onSummaryChange: (s: Summary) => void;
+  composeRequest?: ComposeRequest | null; // e.g. "Email this group" from Groups
+  onComposeRequestHandled?: () => void;
+}) {
   const [filter, setFilter] = useState<Filter>('open');
   const [mailbox, setMailbox] = useState(''); // '' = all mailboxes
   const [mailboxes, setMailboxes] = useState<Mailbox[]>([]);
@@ -103,7 +115,8 @@ export default function AdminInbox({ onSummaryChange }: { onSummaryChange: (s: S
   const [items, setItems] = useState<ListItem[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [composing, setComposing] = useState(false);
+  const [composing, setComposing] = useState(!!composeRequest);
+  const [composeGroupId] = useState(composeRequest?.groupId ?? null);
   const [loading, setLoading] = useState(true);
   const searchTimer = useRef<number | undefined>(undefined);
   const showSidebar = useWide(1280);
@@ -129,6 +142,9 @@ export default function AdminInbox({ onSummaryChange }: { onSummaryChange: (s: S
   useEffect(() => {
     Promise.all([loadList('open', '', ''), refreshSummary('')]).finally(() => setLoading(false));
   }, [loadList, refreshSummary]);
+
+  // The request was consumed into initial state; clear it so revisiting Inbox doesn't reopen Compose
+  useEffect(() => { if (composeRequest) onComposeRequestHandled?.(); }, [composeRequest, onComposeRequestHandled]);
 
   useEffect(() => {
     window.clearTimeout(searchTimer.current);
@@ -207,6 +223,7 @@ export default function AdminInbox({ onSummaryChange }: { onSummaryChange: (s: S
               </div>
               <div style={styles.itemMeta}>
                 {multi && !mailbox && <span style={styles.mailboxBadge}>{local(c.mailbox)}</span>}
+                {c.group && <span style={styles.groupBadge}>{c.group.name}</span>}
                 {filter === 'all' && <StatusBadge status={c.status} />}
                 <span>{CHANNEL_LABEL[c.channel]}</span>
                 {c.messageCount > 1 && <span>· {c.messageCount} messages</span>}
@@ -217,7 +234,7 @@ export default function AdminInbox({ onSummaryChange }: { onSummaryChange: (s: S
 
         <div style={styles.threadPane}>
           {composing ? (
-            <Compose mailboxes={mailboxes} initialFrom={mailbox} onCancel={() => setComposing(false)}
+            <Compose mailboxes={mailboxes} initialFrom={mailbox} initialGroupId={composeGroupId} onCancel={() => setComposing(false)}
               onSent={async (id) => { setComposing(false); setFilter('waiting'); await afterChange(id); }} />
           ) : selectedId ? (
             <Thread key={selectedId} id={selectedId} onChanged={() => afterChange()} showSidebar={showSidebar}
@@ -245,12 +262,23 @@ function Thread({ id, onChanged, showSidebar, mailboxes }: {
 }) {
   const [detail, setDetail] = useState<Detail | null>(null);
   const [body, setBody] = useState('');
+  const [to, setTo] = useState<string[]>([]);
+  const [cc, setCc] = useState<string[]>([]);
+  const [bcc, setBcc] = useState<string[]>([]);
+  const [showBcc, setShowBcc] = useState(false);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ text: string; error?: boolean } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Reply-all by default: the server's suggestion, editable before sending
+  function loadRecipients(d: Detail) {
+    setTo(d.replyAll.to);
+    setCc(d.replyAll.cc);
+    setBcc([]);
+  }
+
   useEffect(() => {
-    apiFetch<Detail>(`/api/inbox/conversations/${id}`).then((d) => { setDetail(d); onChanged(); });
+    apiFetch<Detail>(`/api/inbox/conversations/${id}`).then((d) => { setDetail(d); loadRecipients(d); onChanged(); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -264,9 +292,10 @@ function Thread({ id, onChanged, showSidebar, mailboxes }: {
     setNotice({ text: 'Sending…' });
     try {
       const d = await apiFetch<Detail>(`/api/inbox/conversations/${id}/reply`, {
-        method: 'POST', body: JSON.stringify({ body, close }),
+        method: 'POST', body: JSON.stringify({ body, close, to, cc, bcc }),
       });
       setDetail(d);
+      loadRecipients(d);
       setBody('');
       setNotice({ text: close ? 'Sent and closed' : 'Sent — moved to Waiting' });
       onChanged();
@@ -295,6 +324,7 @@ function Thread({ id, onChanged, showSidebar, mailboxes }: {
           <div style={styles.threadMeta}>
             <StatusBadge status={detail.status} /> <span>{CHANNEL_LABEL[detail.channel]}</span>
             {mailboxes.length > 1 && <span style={styles.mailboxBadge}>{fromAddress}</span>}
+            {detail.group && <span style={styles.groupBadge}>{detail.group.name}</span>}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
@@ -310,10 +340,11 @@ function Thread({ id, onChanged, showSidebar, mailboxes }: {
           <div key={m.id} style={{ ...styles.msg, ...(m.direction === 'OUTBOUND' ? styles.msgOut : {}) }}>
             <div style={styles.msgHead}>
               <span style={{ fontWeight: 600 }}>
-                {m.direction === 'OUTBOUND' ? `You${mailboxes.length > 1 ? ` (${m.fromEmail})` : ''} → ${m.toEmail}` :(m.fromName ? `${m.fromName} <${m.fromEmail}>` : m.fromEmail)}
+                {m.direction === 'OUTBOUND' ? `You${mailboxes.length > 1 ? ` (${m.fromEmail})` : ''} → ${(m.toEmails.length ? m.toEmails : [m.toEmail]).join(', ')}` :(m.fromName ? `${m.fromName} <${m.fromEmail}>` : m.fromEmail)}
               </span>
               <span style={styles.msgTime}>{new Date(m.createdAt).toLocaleString()}</span>
             </div>
+            <Participants m={m} />
             {m.meta?.phone && <div style={styles.msgExtra}>📞 {m.meta.phone}</div>}
             <div style={styles.msgBody}>{m.text}</div>
             {m.quotedText && <QuotedText text={m.quotedText} />}
@@ -332,17 +363,39 @@ function Thread({ id, onChanged, showSidebar, mailboxes }: {
       </div>
 
       <div style={styles.replyBox}>
+        <AddressListInput label="To" value={to} onChange={setTo} />
+        <AddressListInput label="Cc" value={cc} onChange={setCc} placeholder="Add people to copy" />
+        {showBcc && <AddressListInput label="Bcc" value={bcc} onChange={setBcc} placeholder="Hidden recipients" />}
         <textarea value={body} onChange={(e) => { setBody(e.target.value); setNotice(null); }}
-          placeholder={`Reply to ${detail.person?.name || detail.person?.email || 'sender'} from ${fromAddress}… (signature is added automatically)`}
+          placeholder={`Reply from ${fromAddress}… (signature is added automatically)`}
           style={styles.replyInput} rows={6} />
         <div style={styles.replyActions}>
+          {!showBcc && <button onClick={() => setShowBcc(true)} style={styles.linkBtn}>Bcc</button>}
+          {(to.join() !== detail.replyAll.to.join() || cc.join() !== detail.replyAll.cc.join()) && (
+            <button onClick={() => loadRecipients(detail)} style={styles.linkBtn}>Reset to reply-all</button>
+          )}
+          <span style={{ flex: 1 }} />
           {notice && <span style={{ fontSize: '0.8rem', color: notice.error ? '#b22' : '#555' }}>{notice.text}</span>}
-          <button onClick={() => send(true)} disabled={busy || !body.trim()} style={styles.btnSm}>Send &amp; close</button>
-          <button onClick={() => send(false)} disabled={busy || !body.trim()} style={styles.btnPrimary}>Send</button>
+          <button onClick={() => send(true)} disabled={busy || !body.trim() || !to.length} style={styles.btnSm}>Send &amp; close</button>
+          <button onClick={() => send(false)} disabled={busy || !body.trim() || !to.length} style={styles.btnPrimary}>Send</button>
         </div>
       </div>
 
       {showSidebar && detail.person && <PersonSidebar person={detail.person} onChanged={reload} />}
+    </div>
+  );
+}
+
+// Who else was on a message: CC/BCC on ours; To/CC on inbound mail when it went to more than us
+function Participants({ m }: { m: Message }) {
+  const lines: [string, string[]][] = m.direction === 'OUTBOUND'
+    ? [['Cc', m.ccEmails], ['Bcc', m.bccEmails]]
+    : [['To', m.toEmails.length > 1 ? m.toEmails : []], ['Cc', m.ccEmails]];
+  const shown = lines.filter(([, list]) => list.length);
+  if (!shown.length) return null;
+  return (
+    <div style={{ ...styles.msgExtra, marginTop: -2, marginBottom: 6 }}>
+      {shown.map(([label, list]) => <div key={label}>{label}: {list.join(', ')}</div>)}
     </div>
   );
 }
@@ -413,23 +466,51 @@ function SidebarPortal({ slot, children }: { slot: HTMLElement; children: React.
 
 // ─── Compose ─────────────────────────────────────────────────────────────────
 
-function Compose({ mailboxes, initialFrom, onCancel, onSent }: {
-  mailboxes: Mailbox[]; initialFrom: string; onCancel: () => void; onSent: (id: string) => void;
+interface GroupSummary { id: string; name: string; memberCount: number }
+interface GroupDetail { id: string; name: string; members: { id: string; name: string | null; email: string }[] }
+
+function Compose({ mailboxes, initialFrom, initialGroupId, onCancel, onSent }: {
+  mailboxes: Mailbox[]; initialFrom: string; initialGroupId: string | null; onCancel: () => void; onSent: (id: string) => void;
 }) {
   const [from, setFrom] = useState(initialFrom || mailboxes[0]?.key || '');
-  const [to, setTo] = useState('');
-  const [name, setName] = useState('');
+  const [to, setTo] = useState<string[]>([]);
+  const [cc, setCc] = useState<string[]>([]);
+  const [bcc, setBcc] = useState<string[]>([]);
+  const [showCopies, setShowCopies] = useState(false);
+  const [groups, setGroups] = useState<GroupSummary[]>([]);
+  const [group, setGroup] = useState<{ id: string; name: string } | null>(null);
+  const [groupHidden, setGroupHidden] = useState(false); // add members as Bcc instead of To
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    apiFetch<GroupSummary[]>('/api/groups').then(setGroups).catch(() => setGroups([]));
+    if (initialGroupId) addGroup(initialGroupId, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function addGroup(id: string, hidden: boolean) {
+    if (!id) return;
+    const g = await apiFetch<GroupDetail>(`/api/groups/${id}`);
+    const emails = g.members.map((m) => m.email);
+    if (hidden) { setBcc((cur) => [...cur, ...emails.filter((e) => !cur.includes(e))]); setShowCopies(true); }
+    else setTo((cur) => [...cur, ...emails.filter((e) => !cur.includes(e))]);
+    setGroup({ id: g.id, name: g.name });
+  }
+
+  const sender = mailboxes.find((m) => m.key === from);
+  // An all-Bcc email still needs a To: address it to ourselves (that copy is ignored by the Inbox)
+  const toFinal = to.length ? to : bcc.length && sender ? [sender.address] : [];
 
   async function send() {
     setBusy(true);
     setError(null);
     try {
       const d = await apiFetch<Detail>('/api/inbox/conversations', {
-        method: 'POST', body: JSON.stringify({ to, name, subject, body, ...(from ? { from } : {}) }),
+        method: 'POST',
+        body: JSON.stringify({ to: toFinal, cc, bcc, subject, body, ...(from ? { from } : {}), ...(group ? { groupId: group.id } : {}) }),
       });
       onSent(d.id);
     } catch (err) {
@@ -439,37 +520,61 @@ function Compose({ mailboxes, initialFrom, onCancel, onSent }: {
     }
   }
 
-  const sender = mailboxes.find((m) => m.key === from);
+  const count = toFinal.length + cc.length + bcc.length;
 
   return (
-    <div style={{ ...styles.thread, padding: '1rem 1.1rem', gap: 10 }}>
+    <div style={{ ...styles.thread, padding: '1rem 1.1rem', gap: 8, overflowY: 'auto' }}>
       <h3 style={styles.threadSubject}>New email</h3>
       {mailboxes.length > 1 && (
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem', color: '#555' }}>
-          From
+        <label style={styles.composeRow}>
+          <span style={styles.composeLabel}>From</span>
           <select value={from} onChange={(e) => setFrom(e.target.value)} style={{ ...styles.input, flex: 1 }}>
             {mailboxes.map((m) => <option key={m.key} value={m.key}>{m.name} &lt;{m.address}&gt;</option>)}
           </select>
         </label>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <RecipientInput value={to} onChange={setTo} style={styles.input} autoFocus
-          onPick={(m) => { setTo(m.email); if (m.name) setName(m.name); }} />
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name (optional)" style={styles.input} />
-      </div>
+      {groups.length > 0 && (
+        <div style={styles.composeRow}>
+          <span style={styles.composeLabel}>Group</span>
+          <select value="" onChange={(e) => addGroup(e.target.value, groupHidden)} style={{ ...styles.input, flex: 1 }}>
+            <option value="">{group ? `${group.name} — add another group…` : 'Add a group’s members…'}</option>
+            {groups.map((g) => <option key={g.id} value={g.id}>{g.name} ({g.memberCount})</option>)}
+          </select>
+          <label style={{ fontSize: '0.78rem', color: '#666', display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
+            title="Hidden: members get the email as Bcc and don't see each other; their replies come back to you individually">
+            <input type="checkbox" checked={groupHidden} onChange={(e) => setGroupHidden(e.target.checked)} /> hide members (Bcc)
+          </label>
+        </div>
+      )}
+      {group && (
+        <div style={{ fontSize: '0.75rem', color: '#777', marginLeft: 42 }}>
+          This conversation will be filed under <span style={styles.groupBadge}>{group.name}</span>{' '}
+          <button onClick={() => setGroup(null)} style={styles.linkBtn}>don’t file it</button>
+        </div>
+      )}
+      <AddressListInput label="To" value={to} onChange={setTo} autoFocus={!initialGroupId}
+        placeholder={bcc.length && sender ? `${sender.address} (when everyone is Bcc)` : 'Type a name or email'} />
+      {showCopies ? (
+        <>
+          <AddressListInput label="Cc" value={cc} onChange={setCc} placeholder="Copy — everyone sees these" />
+          <AddressListInput label="Bcc" value={bcc} onChange={setBcc} placeholder="Hidden recipients" />
+        </>
+      ) : (
+        <div style={{ marginLeft: 42 }}><button onClick={() => setShowCopies(true)} style={styles.linkBtn}>Cc / Bcc</button></div>
+      )}
       <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" style={styles.input} />
       <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Message… (signature is added automatically)"
-        style={{ ...styles.replyInput, flex: 1, minHeight: 240 }} />
+        style={{ ...styles.replyInput, flex: 1, minHeight: 220 }} />
       <div style={styles.replyActions}>
         {error && <span style={{ fontSize: '0.8rem', color: '#b22' }}>{error}</span>}
         <button onClick={onCancel} style={styles.btnSm} disabled={busy}>Cancel</button>
-        <button onClick={send} style={styles.btnPrimary} disabled={busy || !to.trim() || !subject.trim() || !body.trim()}>
-          {busy ? 'Sending…' : 'Send'}
+        <button onClick={send} style={styles.btnPrimary} disabled={busy || !toFinal.length || !subject.trim() || !body.trim()}>
+          {busy ? 'Sending…' : count > 1 ? `Send to ${count}` : 'Send'}
         </button>
       </div>
       <p style={{ fontSize: '0.75rem', color: '#999', margin: 0 }}>
-        Sent from {sender?.address ?? 'your site address'}. Replies come back into this conversation (a copy also reaches
-        your email inbox).
+        Sent from {sender?.address ?? 'your site address'} as one email. Replies come back into this conversation (a copy
+        also reaches your email inbox). Everyone in To and Cc sees each other and can reply-all.
       </p>
     </div>
   );
@@ -481,6 +586,10 @@ const styles: Record<string, React.CSSProperties> = {
   heading: { fontSize: '1.1rem', fontWeight: 600, margin: 0 },
   search: { border: '1px solid #ddd', borderRadius: 4, padding: '0.4rem 0.65rem', fontSize: '0.85rem', fontFamily: 'inherit', width: 260 },
   select: { border: '1px solid #ddd', borderRadius: 4, padding: '0.4rem 0.5rem', fontSize: '0.85rem', fontFamily: 'inherit', background: 'white' },
+  composeRow: { display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem', color: '#555' },
+  composeLabel: { width: 34, flexShrink: 0, fontSize: '0.8rem', color: '#777' },
+  groupBadge: { borderRadius: 3, fontSize: '0.66rem', fontWeight: 600, padding: '1px 6px', background: '#f3ecf8', color: '#5b3a7a' },
+  linkBtn: { background: 'transparent', border: 'none', color: '#2d4a2d', fontSize: '0.78rem', cursor: 'pointer', padding: '0 4px', textDecoration: 'underline' },
   mailboxBadge: { borderRadius: 3, fontSize: '0.66rem', fontWeight: 600, padding: '1px 6px', background: '#eef0f4', color: '#4a5568' },
   tabs: { display: 'flex', gap: 4, borderBottom: '1px solid #e5e5e5', marginBottom: '0.75rem' },
   tab: { background: 'transparent', border: 'none', borderBottom: '2px solid transparent', padding: '0.45rem 0.85rem', fontSize: '0.85rem', color: '#777', cursor: 'pointer', marginBottom: -1 },

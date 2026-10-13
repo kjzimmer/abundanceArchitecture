@@ -45,6 +45,10 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
       listSubscriptions: {
         select: { active: true, confirmedAt: true, unsubscribedAt: true, list: { select: { key: true, name: true } } },
       },
+      groupMemberships: {
+        select: { group: { select: { id: true, name: true } } },
+        orderBy: { group: { name: 'asc' } },
+      },
       outboundEmails: {
         orderBy: { createdAt: 'desc' },
         take: 20,

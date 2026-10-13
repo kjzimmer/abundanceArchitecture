@@ -5,6 +5,8 @@ import AdminLayout from './components/AdminLayout';
 import type { Tab } from './components/AdminLayout';
 import AdminPeople from './components/AdminPeople';
 import AdminInbox from './components/AdminInbox';
+import type { ComposeRequest } from './components/AdminInbox';
+import AdminGroups from './components/AdminGroups';
 import AdminAnalytics from './components/AdminAnalytics';
 import AdminSettings from './components/AdminSettings';
 import AdminNewsletter from './components/AdminNewsletter';
@@ -18,6 +20,8 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('analytics');
   // Inbox nav badge = conversations that need a response (Open)
   const [openCount, setOpenCount] = useState(0);
+  // "Email this group" (Groups) → Inbox opens Compose with the members
+  const [composeRequest, setComposeRequest] = useState<ComposeRequest | null>(null);
 
   useEffect(() => {
     tryRestoreSession().then((ok) => {
@@ -35,6 +39,7 @@ export default function App() {
   }, [authed]);
 
   const onInboxSummary = useCallback((s: InboxSummary) => setOpenCount(s.open), []);
+  const clearComposeRequest = useCallback(() => setComposeRequest(null), []);
 
   if (checking) return null;
 
@@ -46,7 +51,9 @@ export default function App() {
     <AdminLayout activeTab={tab} onTabChange={setTab} unreadCount={openCount}>
       {tab === 'analytics' && <AdminAnalytics />}
       {tab === 'people' && <AdminPeople />}
-      {tab === 'inbox' && <AdminInbox onSummaryChange={onInboxSummary} />}
+      {tab === 'groups' && <AdminGroups onEmailGroup={(groupId) => { setComposeRequest({ groupId }); setTab('inbox'); }} />}
+      {tab === 'inbox' && <AdminInbox onSummaryChange={onInboxSummary}
+        composeRequest={composeRequest} onComposeRequestHandled={clearComposeRequest} />}
       {tab === 'newsletter' && <AdminNewsletter />}
       {tab === 'documents' && <AdminDocs />}
       {tab === 'settings' && <AdminSettings />}

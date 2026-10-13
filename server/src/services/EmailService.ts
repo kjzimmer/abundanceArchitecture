@@ -22,7 +22,9 @@ export function getResend(): Resend {
 }
 
 export interface SendInput extends RenderedEmail {
-  to: string;
+  to: string | string[]; // the first To address is the row's toEmail
+  cc?: string[];
+  bcc?: string[];
   kind: EmailKind;
   personId?: string | null;
   from?: string; // defaults to EMAIL_FROM
@@ -63,11 +65,27 @@ export async function sentRecently(email: string, kind: EmailKind, withinMs: num
  * Records and sends one email. Never throws for delivery problems — failures are
  * recorded on the OutboundEmail row (status FAILED + error) and returned.
  */
+/** Lowercased, trimmed, de-duplicated (also against `exclude`), empties dropped. */
+export function normalizeAddresses(list: string[] | undefined, exclude: string[] = []): string[] {
+  const seen = new Set(exclude);
+  const out: string[] = [];
+  for (const raw of list ?? []) {
+    const a = raw.trim().toLowerCase();
+    if (a && !seen.has(a)) { seen.add(a); out.push(a); }
+  }
+  return out;
+}
+
 export async function send(input: SendInput): Promise<OutboundEmail> {
-  const to = input.to.toLowerCase().trim();
+  const toList = normalizeAddresses(Array.isArray(input.to) ? input.to : [input.to]);
+  const ccList = normalizeAddresses(input.cc, toList);
+  const bccList = normalizeAddresses(input.bcc, [...toList, ...ccList]);
+  const to = toList[0] ?? '';
+  const others = [...toList.slice(1), ...ccList, ...bccList];
   const from = input.from ?? emailFrom();
   const base = {
     toEmail: to,
+    otherRecipients: others,
     fromEmail: from,
     subject: input.subject,
     kind: input.kind,
@@ -77,23 +95,28 @@ export async function send(input: SendInput): Promise<OutboundEmail> {
     conversationId: input.conversationId ?? null,
   };
 
-  if (await isSuppressed(to)) {
-    console.log(`[email] suppressed ${input.kind} → ${maskEmail(to)}`);
+  // Any suppressed recipient blocks a shared send; callers check first and tell the admin which one
+  const suppressed = await prisma.emailSuppression.findFirst({ where: { email: { in: [to, ...others] } }, select: { email: true } });
+  if (suppressed) {
+    console.log(`[email] suppressed ${input.kind} → ${maskEmail(suppressed.email)}`);
     return prisma.outboundEmail.create({ data: { ...base, status: EmailStatus.SUPPRESSED } });
   }
 
   const row = await prisma.outboundEmail.create({ data: { ...base, status: EmailStatus.QUEUED } });
   const mode = emailMode();
+  const extra = [ccList.length && `cc ${ccList.join(', ')}`, bccList.length && `bcc ${bccList.join(', ')}`].filter(Boolean).join('; ');
 
   if (mode === 'log') {
-    console.log(`[email] (log mode) ${input.kind} → ${to} — "${input.subject}"\n${input.text}\n`);
+    console.log(`[email] (log mode) ${input.kind} → ${toList.join(', ')}${extra ? ` (${extra})` : ''} — "${input.subject}"\n${input.text}\n`);
     return prisma.outboundEmail.update({
       where: { id: row.id },
       data: { status: EmailStatus.SENT, sentAt: new Date() },
     });
   }
 
-  let actualTo = to;
+  let actualTo: string | string[] = toList;
+  let cc: string[] | undefined = ccList.length ? ccList : undefined;
+  let bcc: string[] | undefined = bccList.length ? bccList : undefined;
   let subject = input.subject;
   if (mode === 'redirect') {
     const redirectTo = process.env.EMAIL_REDIRECT_TO;
@@ -104,7 +127,8 @@ export async function send(input: SendInput): Promise<OutboundEmail> {
       });
     }
     actualTo = redirectTo;
-    subject = `[→ ${to}] ${input.subject}`;
+    cc = bcc = undefined;
+    subject = `[→ ${toList.join(', ')}${extra ? `; ${extra}` : ''}] ${input.subject}`;
   }
 
   try {
@@ -112,6 +136,8 @@ export async function send(input: SendInput): Promise<OutboundEmail> {
       {
         from,
         to: actualTo,
+        cc,
+        bcc,
         subject,
         html: input.html,
         text: input.text,

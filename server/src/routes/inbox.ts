@@ -45,8 +45,10 @@ router.get('/conversations', wrap(async (req, res) => {
 
 router.post('/conversations', wrap(async (req, res) => {
   const b = (req.body ?? {}) as Record<string, unknown>;
+  // to/cc/bcc: arrays of addresses (or one comma-separated string)
   res.status(201).json(await ConversationService.compose({
-    to: str(b.to), name: str(b.name), subject: str(b.subject), body: str(b.body), from: str(b.from),
+    to: b.to, cc: b.cc, bcc: b.bcc, name: str(b.name), subject: str(b.subject), body: str(b.body),
+    from: str(b.from), groupId: str(b.groupId),
   }));
 }));
 
@@ -55,8 +57,11 @@ router.get('/conversations/:id', wrap<{ id: string }>(async (req, res) => {
 }));
 
 router.post('/conversations/:id/reply', wrap<{ id: string }>(async (req, res) => {
-  const b = (req.body ?? {}) as { body?: unknown; close?: unknown };
-  res.json(await ConversationService.reply(req.params.id, typeof b.body === 'string' ? b.body : '', b.close === true));
+  // to/cc omitted = reply-all defaults (detail.replyAll); bcc is never defaulted
+  const b = (req.body ?? {}) as Record<string, unknown>;
+  res.json(await ConversationService.reply(req.params.id, {
+    body: str(b.body) ?? '', close: b.close === true, to: b.to, cc: b.cc, bcc: b.bcc,
+  }));
 }));
 
 router.patch('/conversations/:id', wrap<{ id: string }>(async (req, res) => {
