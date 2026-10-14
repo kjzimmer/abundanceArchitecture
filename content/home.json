@@ -1,0 +1,103 @@
+{
+  "note": "Copy transcribed verbatim from the brief's home.md (docs/wip/site-draft/home-copy.md). Edit the copy here. Bracketed preview labels are placeholders from the wireframe.",
+  "opening": {
+    "purpose": "A public inquiry into human flourishing, applying what we now know about complex adaptive systems.",
+    "question": "Why does the future feel smaller in an age of unprecedented possibility?",
+    "paragraphs": [
+      "We can do more than any generation before us. We produce more, know more, and reach each other more easily. Yet for most people the sense of scarcity has not lifted. The phone is faster. The anxiety is the same.",
+      "This site is an attempt to understand why, and what it would take to change it."
+    ],
+    "actions": [
+      { "label": "Start with the questions", "href": "/questions", "primary": true },
+      { "label": "Read the latest report", "href": "/report" }
+    ]
+  },
+  "whatAbundanceIs": {
+    "label": "What abundance is",
+    "heading": "Abundance is not what we were told it was.",
+    "body": [
+      "It is not wealth, and it is not consumption. Abundance is the condition in which people and communities are secure enough, healthy enough, and free enough to choose long-term creation over short-term survival."
+    ],
+    "ordinary": {
+      "heading": "It looks ordinary.",
+      "items": [
+        "A saver whose patience is rewarded instead of eroded.",
+        "A parent who is present for the afternoon instead of calculating through it.",
+        "A worker who can answer “what is your work for?” with something other than survival."
+      ],
+      "imagePlaceholder": "[IMAGE]"
+    },
+    "evidence": [
+      { "label": "Research on scarcity", "claim": "When survival is in question, attention narrows to the immediate.", "cite": "mullainathan-shafir-2013" },
+      { "label": "Research on motivation", "claim": "People do their best work when they have autonomy, competence and connection.", "cite": "ryan-deci-2000" },
+      { "label": "Research on shared resources", "claim": "Communities can govern them well, under the right conditions, without central direction.", "cite": "ostrom-1990" }
+    ],
+    "closing": "Abundance lengthens the horizon.",
+    "links": [
+      { "label": "What the evidence suggests, and where it runs out", "href": "/learn" }
+    ]
+  },
+  "whyItIsntArriving": {
+    "label": "Why it isn't arriving",
+    "heading": "The problem is not the people. It is the structure.",
+    "body": [
+      "Money, health, food, knowledge and governance are living systems. They stay healthy the way ecosystems do: through many centers, local knowledge, and honest feedback. We have increasingly managed them the other way, from the center and one part at a time, as if the parts were separate."
+    ],
+    "cards": [
+      { "title": "Health", "text": "A health system organized around treating disease more than building health." },
+      { "title": "Money", "text": "Money that quietly rewards debt over patience." },
+      { "title": "Education", "text": "Education that certifies more reliably than it teaches." }
+    ],
+    "after": [
+      "No one designed these outcomes. People inside these systems mostly act reasonably. The incentives produce the result."
+    ],
+    "boxed": "What makes this moment matter is that the next layer is being built now. As the cost of producing almost everything falls, the question of who coordinates that capability, a few centers or many, is being settled largely without public discussion. Some of those choices will be hard to reverse. You cannot exit a highway that has no off-ramps.",
+    "links": [
+      { "label": "Explore the questions", "href": "/questions" }
+    ]
+  },
+  "whatItWouldTake": {
+    "label": "What it would take",
+    "heading": "See the whole. Build with many centers.",
+    "shifts": [
+      { "eyebrow": "First shift", "title": "Holism", "text": "Learning to see systems whole, as living things with their own dynamics, before trying to fix their parts." },
+      { "eyebrow": "Second shift", "title": "Polycentricity", "text": "Authority and initiative spread across many centers that can try, fail, learn and correct." }
+    ],
+    "body": [
+      "From those follow what we call abundance structures: the institutions, protocols, tools and commons that work with the way living systems function. Some exist already. Some exist in part. Some have yet to be invented.",
+      "None of this is a blueprint. Complex systems are not built from specifications. They are grown through trial, observation and adjustment. So this project keeps a public register of its open questions, including the ones that could prove it wrong."
+    ],
+    "links": [
+      { "label": "Start with holism", "href": "/learn" },
+      { "label": "The open questions", "href": "/questions" },
+      { "label": "The twelve domains", "href": "/domains" }
+    ]
+  },
+  "whereWeAre": {
+    "label": "Where we are, and where you come in",
+    "heading": "An inquiry you can watch, test, and join.",
+    "cards": [
+      { "title": "Vital Signs", "text": "A small set of measures, read regularly, asking one question: are we moving toward abundance or away from it?", "linkText": "See the readings", "href": "/vital-signs", "preview": "[LATEST READINGS]" },
+      { "title": "Initiatives", "text": "A register of real attempts to build abundance structures, ours and other people's, and what each is teaching.", "linkText": "Open the register", "href": "/initiatives", "preview": "[RECENTLY UPDATED]" },
+      { "title": "Learn", "text": "An open commons of what is known, how confidently, and how to learn it.", "linkText": "Start learning", "href": "/learn", "preview": "[HOLISM PATH]" },
+      { "title": "The Report", "text": "Once a month: what moved, what changed, what we got wrong.", "linkText": "Read the report", "href": "/report", "preview": "[THIS MONTH'S REPORT]" }
+    ],
+    "membership": {
+      "heading": "Everything here is free to read.",
+      "text": "Members are the people who keep it going and help shape it. Nothing here obligates you. If the questions pull at you, that is reason enough.",
+      "activitiesHeading": "What members do",
+      "activities": [
+        "Propose questions and help decide which come next",
+        "Comment on work in progress",
+        "Join initiatives",
+        "Meet once a month"
+      ],
+      "actions": [
+        { "label": "Become a member", "href": "/join", "primary": true },
+        { "label": "Follow the report", "href": "/report" },
+        { "label": "Ask a question", "href": "/ask", "plain": true }
+      ]
+    },
+    "closing": "We possess the tools. We possess the knowledge. We possess the capacity. What remains is alignment."
+  }
+}

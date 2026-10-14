@@ -8,6 +8,7 @@ import { acceptReviewLink, ownerOnly, reviewerOf, reviewGate } from '../middlewa
 import { renderPage } from '../site/layout';
 import { notFoundPage, PageBody, signInPage, stubPage } from '../site/pages/common';
 import { flagsPage } from '../site/pages/flags';
+import { homePage } from '../site/pages/home';
 
 export function createSiteRouter(): Router {
   // Load now so invalid content fails startup (and the deploy) instead of a page request
@@ -35,7 +36,7 @@ export function createSiteRouter(): Router {
   router.get('/review/flags', reviewGate, ownerOnly, (req, res) => send(req, res, flagsPage(c)));
 
   // Built stage by stage; stubs until then (brief §10)
-  page('/', () => stubPage('Home'));
+  page('/', () => homePage(c));
   page('/domains', () => stubPage('Domains'));
   page('/domains/:slug', (req) => (c.domain(slug(req)) ? stubPage(c.domain(slug(req))!.name) : null));
   page('/questions', () => stubPage('Questions'));

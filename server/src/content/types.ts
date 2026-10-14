@@ -173,6 +173,64 @@ export interface Learn {
   commons: { heading: string; intro: string; cards: LearnCard[] };
 }
 
+export interface HomeAction {
+  label: string;
+  href: string;
+  /** Filled button; otherwise outlined */
+  primary?: boolean;
+  /** A plain text link rather than a button */
+  plain?: boolean;
+}
+
+export interface HomeLink {
+  label: string;
+  href: string;
+}
+
+/** content/home.json: Home copy, verbatim from the brief */
+export interface Home {
+  note?: string;
+  opening: { purpose: string; question: string; paragraphs: string[]; actions: HomeAction[] };
+  whatAbundanceIs: {
+    label: string;
+    heading: string;
+    body: string[];
+    ordinary: { heading: string; items: string[]; imagePlaceholder: string };
+    evidence: { label: string; claim: string; cite: string }[];
+    closing: string;
+    links: HomeLink[];
+  };
+  whyItIsntArriving: {
+    label: string;
+    heading: string;
+    body: string[];
+    cards: { title: string; text: string }[];
+    after: string[];
+    boxed: string;
+    links: HomeLink[];
+  };
+  whatItWouldTake: {
+    label: string;
+    heading: string;
+    shifts: { eyebrow: string; title: string; text: string }[];
+    body: string[];
+    links: HomeLink[];
+  };
+  whereWeAre: {
+    label: string;
+    heading: string;
+    cards: { title: string; text: string; linkText: string; href: string; preview: string }[];
+    membership: {
+      heading: string;
+      text: string;
+      activitiesHeading: string;
+      activities: string[];
+      actions: HomeAction[];
+    };
+    closing: string;
+  };
+}
+
 /** A record or file awaiting Karl's edit, for the owner-only flags page */
 export interface FlagEntry {
   collection: string;

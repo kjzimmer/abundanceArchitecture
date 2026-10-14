@@ -32,8 +32,14 @@ routes, data model and content rules; this file records the plan and decisions m
   Locally tested: no cookie → 403 private page; forged/revoked token → 403; owner sees `/review/flags`, reviewer
   gets 404; unknown slugs 404; `X-Robots-Tag` + `robots.txt` disallow; with `SITE_MODE` unset `/` is still the
   teaser and no draft routes exist. Stubs remain for every page built in stages 4–8
-- **Karl, staging vars for stage 3:** `SITE_MODE=draft`, `REVIEW_LINK_SECRET` (32+ chars). Then make his owner link
-- **Next: stage 4** — Home from `content/home.md` verbatim, with the three citation notes
+- **Staging live 2026-10-14:** `draft.abundancearchitecture.world` verified (gate, noindex, owner link works).
+  Staging vars checked: `SITE_MODE=draft`, `EMAIL_MODE=redirect` + `EMAIL_REDIRECT_TO`, own `JWT_SECRET` and
+  `REVIEW_LINK_SECRET`, `PUBLIC_BASE_URL` = draft domain; webhook secrets and `R2_*` removed. Karl's owner link was
+  issued 2026-10-14 (regenerate any time with `review:link --owner`)
+- **Stage 4 (Home):** ✅ 2026-10-14. Copy moved to `content/home.json` (71 strings machine-checked verbatim against
+  the brief's copy, kept at `site-draft/home-copy.md`). `site/citation.ts` = the shared Source note (`<details>`:
+  in place, keyboard + touch, no JS). Screenshots checked at 1280px and 390px (no overflow)
+- **Next: stage 5** — Domains + the domain page (structures table, computed questions/signs/initiatives, side panel)
 - `incoming/` emptied 2026-10-14 (no `_assessment.md`: a feature brief, not a standards transition)
 - Also pending (unrelated): Karl's prod test of PR #30 (groups); `docs/groups-deployed` not yet merged to main
 
