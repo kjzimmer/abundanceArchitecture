@@ -149,6 +149,7 @@ export type NoticeType =
   | 'Newsletter'
   | 'Email'
   | 'Newsletter Reply'
+  | 'Review' // site-draft reviewer comments (docs/wip/site-draft.md)
   | 'Test';
 
 export interface NoticeInput {

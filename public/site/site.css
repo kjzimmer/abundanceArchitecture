@@ -601,6 +601,17 @@ p { margin-bottom: 1.2rem; color: var(--ink-mid); }
 .member-activities-list li { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.25rem 0; }
 .member-activities-list .lock { margin-top: 0.4rem; }
 
+/* ── Reviewer feedback ("Comment on this page") ───────────────────────────── */
+.feedback { max-width: var(--wide); width: calc(100% - 4rem); margin: 2rem auto 0; border: 1px solid var(--accent); border-radius: 3px; background: var(--accent-light); }
+.feedback summary {
+  cursor: pointer; padding: 0.8rem 1.2rem; min-height: 44px;
+  font-family: var(--sans); font-size: 0.85rem; font-weight: 500; color: var(--accent);
+}
+.feedback[open] summary { border-bottom: 1px solid rgba(45,74,45,0.25); }
+.feedback-body { padding: 0.5rem 1.2rem 1.2rem; }
+.feedback .site-form { max-width: 40rem; }
+@media (max-width: 600px) { .feedback { width: calc(100% - 2rem); } }
+
 /* ── Learn ────────────────────────────────────────────────────────────────── */
 .ask-box { background: var(--card); border: 1px dashed var(--ink-light); border-radius: 3px; padding: 1.5rem; margin: 2rem 0 3rem; }
 .ask-head { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }

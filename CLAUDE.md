@@ -40,9 +40,11 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   signature setting + Worker var, deploying the app before the Worker
 
 **In flight:**
-- **Site draft (started 2026-10-13):** new multi-page site from the brief in `docs/wip/site-draft/`, built on
-  branch `feat/site-draft`, deployed to the Railway `staging` env only. Content as files in `content/`. Plan,
-  decisions and progress: `docs/wip/site-draft.md`. Never merge to main until Karl says the draft is ready
+- **Site draft (built 2026-10-14, in Karl's review):** new multi-page site from the brief in `docs/wip/site-draft/`,
+  on branch `feat/site-draft`, live only on Railway `staging` (`draft.abundancearchitecture.world`, `SITE_MODE=draft`,
+  signed reviewer links, noindex). All 9 brief stages done. Content as files in `content/` (editing guide:
+  `content/README.md`). Plan, decisions, done-criteria: `docs/wip/site-draft.md`. Never merge to main until Karl
+  says the draft is ready. Staging serves only the draft until it ships
 - Groups + CC/BCC (PR #30, deployed 2026-10-13): spec `docs/wip/email-groups.md`. Multi-recipient
   conversations with reply-all, saved Groups (admin → Groups), "Email this group", conversations filed under
   their group. Awaiting Karl's prod test (group email from karl@ → member reply-all → reply from Inbox)

@@ -3,7 +3,10 @@
 // than adding tables: People, Groups and Inbox conversations.
 
 import * as ContactService from './ContactService';
+import * as EmailService from './EmailService';
 import * as GroupService from './GroupService';
+import { publicBaseUrl } from '../lib/email/config';
+import type { Reviewer } from '../site/review';
 
 export const FOUNDING_INTEREST_GROUP = 'Founding member interest';
 
@@ -12,6 +15,25 @@ async function ensureGroup(name: string, description: string): Promise<string> {
   if (existing) return existing.id;
   const created = await GroupService.createGroup({ name, description });
   return created.id;
+}
+
+/**
+ * "Comment on this page" → an [AA Review] email to Karl (ADMIN_NOTIFY_EMAIL; on staging, EMAIL_MODE=redirect
+ * delivers it to EMAIL_REDIRECT_TO). Email is the durable record: the staging database is disposable.
+ * Reply-To is the reviewer, so Karl can answer from his mail client.
+ */
+export function recordReviewComment(reviewer: Reviewer, input: { path: string; comment: string }) {
+  const url = `${publicBaseUrl()}${input.path}`;
+  console.log(`[review] comment from ${reviewer.email} on ${input.path}`);
+  EmailService.notifyAdmin({
+    type: 'Review',
+    title: `${input.path} — ${reviewer.name}`,
+    rows: [
+      ['Page', url],
+      ['Reviewer', `${reviewer.name} <${reviewer.email}>`],
+    ],
+    body: input.comment,
+  }, { replyTo: reviewer.email });
 }
 
 /**

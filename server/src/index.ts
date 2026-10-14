@@ -62,7 +62,9 @@ if (process.env.SITE_MODE === 'draft') {
     res.type('text/plain').send('User-agent: *\nDisallow: /\n');
   });
   app.use('/r', linkLimiter);
-  app.use('/api/site', formLimiter, siteFormsRouter);
+  app.use('/api/site/join', formLimiter);
+  app.use('/api/site/feedback', linkLimiter); // reviewers may leave many comments in a session
+  app.use('/api/site', siteFormsRouter);
   app.use(createSiteRouter());
 }
 

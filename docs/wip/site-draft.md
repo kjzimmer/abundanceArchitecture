@@ -66,7 +66,31 @@ routes, data model and content rules; this file records the plan and decisions m
   answer modes and feedback buttons visibly disabled ("After first launch"); 3 video + 1 podcast placeholders.
   New UI wording of mine for Karl to check: Join "No payment is taken here. This records your interest.", button
   "Register interest", success "Thank you. Your interest is recorded."
-- **Next: stage 9** — "Comment on this page" reviewer feedback on every page + a note for Karl on editing records
+- **Stage 9 (reviewer feedback + editing note):** ✅ 2026-10-14. "Comment on this page" (`<details>` above the
+  footer, every page) → `POST /api/site/feedback` (reviewer gate; identity from the signed link, never the form;
+  same-site paths only; no Turnstile) → `SiteDraftService.recordReviewComment` → `[AA Review] <page> — <name>`
+  admin notice (new `NoticeType` 'Review'), Reply-To = reviewer. Editing guide: `content/README.md`
+- **Build complete 2026-10-14; awaiting Karl's review on staging.** Not merged to `main` (by design)
+
+## Definition of done (brief §10) — status
+
+| Criterion | Status |
+|---|---|
+| Every menu and footer link leads to a working page; every seed record has its own page | ✅ Crawl: 75 pages, 0 non-200; all 43 seed records have pages |
+| Changing a record in one place changes it everywhere | ✅ One file per collection; every page reads `content/` |
+| Health domain page lists its structures and, automatically, its initiatives | ✅ 2 structures; 2 initiatives by tag |
+| The three Home citations open their notes and link to the right references | ✅ Each reference page lists Home under "Cited on" |
+| A reviewer can read every page on a phone and leave a comment that reaches Karl | ✅ Locally (log mode). **Karl to confirm on staging**: comment → `[AA Review]` email at the redirect address |
+| No bracketed placeholder replaced with invented text | ✅ All `[…]` render as placeholders; Home copy machine-checked verbatim |
+| Live site, subscribers and data unchanged | ✅ Nothing merged to `main`; prod verified unchanged (teaser, no noindex) |
+
+## For Karl after review (not blocking)
+
+- Content gaps the build surfaced: no question tagged `health`; three records untagged (see Draft flags page)
+- Two vital-sign "basis" fields mention the internal "metrics chat"
+- UI wording of mine to confirm: Join note/button/success text (stage 8); "Commenting as … Your comment goes to
+  Karl with the address of this page."
+- To make it public later: add a `live` `SITE_MODE`, lift the `index.html` freeze in CLAUDE.md, merge to `main`
 - `incoming/` emptied 2026-10-14 (no `_assessment.md`: a feature brief, not a standards transition)
 - Also pending (unrelated): Karl's prod test of PR #30 (groups); `docs/groups-deployed` not yet merged to main
 

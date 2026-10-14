@@ -29,6 +29,8 @@ export interface PageInput {
   title?: string;
   /** Request path, for the current menu item */
   path: string;
+  /** Full page address incl. query string, recorded with reviewer comments */
+  url?: string;
   reviewer: Reviewer | null;
   /** Number of flagged records, shown to the owner only */
   flagCount?: number;
@@ -38,7 +40,28 @@ export interface PageInput {
 /** The members-only lock used beside inactive member actions */
 export const lockIcon = html`<svg class="lock" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>`;
 
-export function renderPage({ title, path, reviewer, flagCount, body }: PageInput): string {
+/** "Comment on this page" (brief §8): every page, delivered to Karl by email with the page and reviewer */
+function feedbackControl(reviewer: Reviewer | null, url: string) {
+  if (!reviewer) return '';
+  return html`<details class="feedback">
+  <summary>Comment on this page</summary>
+  <div class="feedback-body">
+    <form class="site-form" id="feedback-form" data-api="/api/site/feedback" data-no-turnstile
+          data-success="Thank you. Your comment has been sent." novalidate>
+      <input type="hidden" name="path" value="${url}">
+      <p class="hint">Commenting as ${reviewer.name}. Your comment goes to Karl with the address of this page.</p>
+      <div class="form-field">
+        <label for="feedback-comment">Your comment</label>
+        <textarea id="feedback-comment" name="comment" rows="5" required></textarea>
+      </div>
+      <button type="submit" class="button">Send comment</button>
+      <p class="form-status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</details>`;
+}
+
+export function renderPage({ title, path, url, reviewer, flagCount, body }: PageInput): string {
   const current = (href: string) => path === href || path.startsWith(href + '/');
   const pageTitle = title ? `${title} — ${brand.name}` : brand.name;
 
@@ -79,6 +102,7 @@ ${html`<html lang="en">
 <main id="main">
 ${body}
 </main>
+${feedbackControl(reviewer, url ?? path)}
 <footer class="site-footer">
   <ul>
     ${FOOTER.map((f) => f.external

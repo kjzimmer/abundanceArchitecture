@@ -6,7 +6,7 @@ import { Router, Request, Response } from 'express';
 import * as SiteDraftService from '../services/SiteDraftService';
 import { verifyTurnstile } from '../lib/turnstile';
 import { clientIp } from '../lib/clientIp';
-import { reviewGate } from '../middleware/reviewGate';
+import { reviewerOf, reviewGate } from '../middleware/reviewGate';
 
 const router = Router();
 router.use(reviewGate);
@@ -45,6 +45,29 @@ router.post('/join', async (req: Request<unknown, unknown, JoinBody>, res: Respo
     console.error('[site/join] error', err);
     res.status(500).json({ success: false, error: 'Server error' });
   }
+});
+
+interface FeedbackBody {
+  path?: string;
+  comment?: string;
+}
+
+// "Comment on this page". The reviewer's name and email come from their signed review link, never the form
+router.post('/feedback', (req: Request<unknown, unknown, FeedbackBody>, res: Response) => {
+  const reviewer = reviewerOf(res);
+  const path = typeof req.body.path === 'string' ? req.body.path.trim() : '';
+  const comment = typeof req.body.comment === 'string' ? req.body.comment.trim() : '';
+  // Same-site paths only: the page address is shown as a link in Karl's email
+  if (!reviewer || !path.startsWith('/') || path.startsWith('//') || path.length > 500) {
+    res.status(400).json({ success: false, error: 'Invalid page' });
+    return;
+  }
+  if (!comment || comment.length > 10000) {
+    res.status(400).json({ success: false, error: 'Comment is required (up to 10,000 characters)' });
+    return;
+  }
+  SiteDraftService.recordReviewComment(reviewer, { path, comment });
+  res.status(201).json({ success: true });
 });
 
 export default router;

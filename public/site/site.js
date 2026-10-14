@@ -13,7 +13,9 @@
   // --- Forms (Ask, Report sign-up, Join): JSON POST to data-api, with Cloudflare Turnstile ---
   // Same approach as public/js/main.js: the widget stays invisible unless Cloudflare needs a click.
   var forms = document.querySelectorAll('form[data-api]');
-  var turnstileReady = forms.length
+  // Reviewer comments are already behind the review link, so they skip Turnstile (and its script load)
+  var needsTurnstile = document.querySelector('form[data-api]:not([data-no-turnstile])');
+  var turnstileReady = needsTurnstile
     ? fetch('/api/public-config')
         .then(function (r) { return r.json(); })
         .then(function (cfg) {
@@ -28,7 +30,7 @@
           });
         })
         .catch(function () { return null; })
-    : null;
+    : Promise.resolve(null);
 
   forms.forEach(function (form) {
     var status = form.querySelector('.form-status');
@@ -36,7 +38,8 @@
     var holder = document.createElement('div');
     holder.className = 'turnstile';
     button.insertAdjacentElement('beforebegin', holder);
-    var widget = turnstileReady.then(function (siteKey) {
+    var skip = form.hasAttribute('data-no-turnstile');
+    var widget = (skip ? Promise.resolve(null) : turnstileReady).then(function (siteKey) {
       if (!siteKey || !window.turnstile) return null;
       return window.turnstile.render(holder, { sitekey: siteKey, appearance: 'interaction-only' });
     });

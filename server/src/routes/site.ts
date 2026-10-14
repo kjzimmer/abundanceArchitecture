@@ -27,6 +27,7 @@ export function createSiteRouter(): Router {
     res.status(status).type('html').send(renderPage({
       ...page,
       path: req.path,
+      url: req.originalUrl,
       reviewer: reviewerOf(res),
       flagCount: c.flags.length,
     }));
