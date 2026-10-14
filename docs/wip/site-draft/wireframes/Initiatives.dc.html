@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Initiatives section wireframe</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#1A1D23}a:hover{color:#1D4ED8}
+</style>
+</helmet>
+<div id="top" style="background:#F3F4F6; color:#1A1D23; font-family:'IBM Plex Sans', system-ui, sans-serif; font-size:16px; line-height:1.55">
+
+<header style="background:#FFFFFF; border-bottom:1px solid #C9CED8">
+<div style="max-width:1120px; margin:0 auto; padding:14px 24px; display:flex; flex-wrap:wrap; align-items:center; gap:8px 28px">
+<a href="Main.dc.html" style="font-weight:600; font-size:17px; text-decoration:none; min-height:44px; display:inline-flex; align-items:center; color:#1A1D23">Abundance Architecture</a>
+<nav aria-label="Main" style="display:flex; flex-wrap:wrap; gap:0 4px; flex:1 1 480px">
+<a href="Domains.dc.html" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Domains</a>
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Questions</a>
+<a href="Learn.dc.html" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Learn</a>
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Vital Signs</a>
+<a href="Initiatives.dc.html" aria-current="page" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; font-weight:600; text-decoration:none; border-bottom:2px solid #1A1D23">Initiatives</a>
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Book</a>
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Report</a>
+</nav>
+<div style="display:flex; align-items:center; gap:8px">
+<sc-if value="{{ isVisitor }}" hint-placeholder-val="{{ true }}">
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Sign in</a>
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 18px; font-size:15px; font-weight:500; text-decoration:none; background:#1A1D23; color:#FFFFFF; border-radius:4px">Join</a>
+</sc-if>
+<sc-if value="{{ isMember }}" hint-placeholder-val="{{ false }}">
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 14px; font-size:15px; font-weight:500; text-decoration:none; border:1px solid #1D4ED8; color:#1D3FAE; background:#EEF3FE; border-radius:4px">Member home</a>
+</sc-if>
+</div>
+</div>
+</header>
+
+<main style="max-width:1120px; margin:0 auto; padding:32px 24px 72px">
+
+<nav aria-label="Breadcrumb" style="font-size:14px; color:#4A5160; display:flex; gap:8px; align-items:center">
+<a href="Main.dc.html" style="min-height:44px; display:inline-flex; align-items:center; color:#4A5160">Home</a>
+<span aria-hidden="true">/</span>
+<span>Initiatives</span>
+</nav>
+
+<div style="display:flex; flex-wrap:wrap; gap:24px 48px; align-items:flex-end; justify-content:space-between">
+<div style="flex:1 1 520px; min-width:0">
+<h1 style="margin:4px 0 0; font-size:40px; line-height:1.2; font-weight:600">Initiatives</h1>
+<p style="margin:12px 0 0; font-size:17px; line-height:1.6; max-width:640px">A register of real attempts to build abundance structures, ours and other people's, and what each is teaching.</p>
+</div>
+<div>
+<sc-if value="{{ isMember }}" hint-placeholder-val="{{ false }}">
+<button type="button" style="min-height:48px; padding:0 22px; background:#1D4ED8; color:#FFFFFF; border:0; border-radius:4px; font:inherit; font-weight:500; cursor:pointer">Propose an initiative</button>
+</sc-if>
+<sc-if value="{{ isVisitor }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex; gap:10px; align-items:center; padding:10px 14px; border:1px solid #1D4ED8; border-radius:4px; background:#EEF3FE; color:#1D3FAE; font-size:15px">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+<span>Members can propose initiatives.</span>
+<a href="#top" style="color:#1D3FAE; font-weight:600; min-height:44px; display:inline-flex; align-items:center">Join</a>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="margin-top:32px; display:flex; flex-wrap:wrap; gap:28px; align-items:flex-start">
+
+<div style="flex:999 1 560px; min-width:0">
+
+<div style="background:#FFFFFF; border:1px solid #C9CED8; border-radius:4px; padding:16px">
+<div style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:#4A5160">Form</div>
+<div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px">
+<sc-for list="{{ types }}" as="t" hint-placeholder-count="7">
+<sc-if value="{{ t.on }}" hint-placeholder-val="{{ false }}">
+<button type="button" aria-pressed="true" onClick="{{ t.pick }}" style="min-height:44px; padding:0 14px; border:1.5px solid #1A1D23; background:#1A1D23; color:#FFFFFF; border-radius:22px; font:inherit; font-size:15px; font-weight:500; cursor:pointer">{{ t.label }}</button>
+</sc-if>
+<sc-if value="{{ t.off }}" hint-placeholder-val="{{ true }}">
+<button type="button" aria-pressed="false" onClick="{{ t.pick }}" style="min-height:44px; padding:0 14px; border:1px solid #8A93A3; background:#FFFFFF; color:#1A1D23; border-radius:22px; font:inherit; font-size:15px; cursor:pointer">{{ t.label }}</button>
+</sc-if>
+</sc-for>
+</div>
+<div style="margin-top:16px; display:flex; flex-wrap:wrap; gap:12px 16px; align-items:flex-end">
+<div style="flex:1 1 150px; display:flex; flex-direction:column; gap:4px">
+<label for="f-domain" style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:#4A5160">Domain</label>
+<select id="f-domain" style="min-height:44px; padding:0 10px; border:1px solid #8A93A3; border-radius:4px; background:#FFFFFF; font:inherit; font-size:15px">
+<option>All twelve domains</option>
+<option>Money</option>
+<option>Information and knowledge</option>
+<option>Governance</option>
+<option>Health</option>
+<option>Education</option>
+<option>Production and labor</option>
+<option>Community</option>
+<option>Ecology</option>
+<option>Energy</option>
+<option>Security and defence</option>
+<option>Justice and conflict resolution</option>
+<option>Global coordination and borders</option>
+</select>
+</div>
+<div style="flex:1 1 150px; display:flex; flex-direction:column; gap:4px">
+<label for="f-stage" style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:#4A5160">Stage</label>
+<select id="f-stage" style="min-height:44px; padding:0 10px; border:1px solid #8A93A3; border-radius:4px; background:#FFFFFF; font:inherit; font-size:15px">
+<option>All stages</option>
+<option>Question</option>
+<option>Idea</option>
+<option>Proposal</option>
+<option>Small test</option>
+<option>Running</option>
+<option>Reported or retired</option>
+</select>
+</div>
+<div style="flex:1 1 150px; display:flex; flex-direction:column; gap:4px">
+<label for="f-who" style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:#4A5160">Whose</label>
+<select id="f-who" style="min-height:44px; padding:0 10px; border:1px solid #8A93A3; border-radius:4px; background:#FFFFFF; font:inherit; font-size:15px">
+<option>Ours and watching</option>
+<option>Ours</option>
+<option>Watching</option>
+</select>
+</div>
+<div style="flex:2 1 200px; display:flex; flex-direction:column; gap:4px">
+<label for="f-search" style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:#4A5160">Search</label>
+<input id="f-search" type="search" placeholder="Search the register" style="min-height:44px; padding:0 12px; border:1px solid #8A93A3; border-radius:4px; background:#FFFFFF; font:inherit; font-size:15px">
+</div>
+</div>
+</div>
+
+<div style="margin-top:20px; background:#FFFFFF; border:1px solid #C9CED8; border-radius:4px; overflow-x:auto">
+<div style="min-width:700px">
+<div style="display:grid; grid-template-columns:minmax(190px, 2fr) minmax(120px, 1.2fr) repeat(2, minmax(90px, 1fr)) minmax(130px, 1.4fr); gap:12px; padding:12px 16px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:#4A5160; background:#F3F4F6">
+<div>Initiative</div>
+<div>Form</div>
+<div>Domain</div>
+<div>Stage</div>
+<div>Leaves in common</div>
+</div>
+<sc-for list="{{ rows }}" as="r" hint-placeholder-count="9">
+<div style="display:grid; grid-template-columns:minmax(190px, 2fr) minmax(120px, 1.2fr) repeat(2, minmax(90px, 1fr)) minmax(130px, 1.4fr); gap:12px; padding:12px 16px; align-items:center; border-top:1px solid #C9CED8; font-size:15px">
+<div>
+<a href="{{ r.href }}" style="font-weight:600; min-height:44px; display:inline-flex; align-items:center">{{ r.name }}</a>
+<div><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:#4A5160; border:1px solid #C9CED8; border-radius:3px; padding:1px 7px">{{ r.who }}</span></div>
+</div>
+<div>{{ r.type }}</div>
+<div>{{ r.domain }}</div>
+<div>{{ r.stage }}</div>
+<div style="color:#4A5160">{{ r.leaves }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="margin-top:12px; font-size:14px; color:#4A5160">{{ count }} shown. Nothing is listed without a named owner.</div>
+
+</div>
+
+<aside style="flex:1 1 260px; min-width:0; display:flex; flex-direction:column; gap:16px">
+
+<div style="background:#FFFFFF; border:1px solid #C9CED8; border-radius:4px; padding:20px">
+<h2 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">How an initiative moves</h2>
+<ol style="margin:12px 0 0; padding:0 0 0 20px; font-size:15px; line-height:1.5; display:flex; flex-direction:column; gap:6px">
+<li><strong style="font-weight:600">Question.</strong> Something open, worth acting on.</li>
+<li><strong style="font-weight:600">Idea.</strong> A possible way to act on it.</li>
+<li><strong style="font-weight:600">Proposal.</strong> Written up, with a named owner.</li>
+<li><strong style="font-weight:600">Small test.</strong> Tried for real, at small scale.</li>
+<li><strong style="font-weight:600">Running.</strong> Operating, with status from its owner.</li>
+<li><strong style="font-weight:600">Reported or retired.</strong> What it taught us.</li>
+</ol>
+</div>
+
+<div style="background:#FFFFFF; border:1px solid #C9CED8; border-radius:4px; padding:20px">
+<h2 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">From the latest report</h2>
+<p style="margin:8px 0 0; font-size:15px; line-height:1.5; color:#4A5160">[WHAT CHANGED IN INITIATIVES THIS MONTH]</p>
+<a href="InitiativeDetail.dc.html" style="margin-top:4px; font-size:15px; font-weight:500; text-decoration:underline; text-underline-offset:3px; min-height:44px; display:inline-flex; align-items:center">Bitcoin-native accounting for nonprofits</a>
+</div>
+
+<div style="border:1px dashed #1D4ED8; border-radius:4px; padding:20px; background:#EEF3FE; color:#1D3FAE">
+<div style="display:flex; gap:10px; align-items:center">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+<h2 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">Working groups</h2>
+</div>
+<p style="margin:8px 0 0; font-size:15px; line-height:1.5">Members working on an initiative together. After first launch.</p>
+</div>
+
+</aside>
+
+</div>
+</main>
+
+<footer style="background:#FFFFFF; border-top:1px solid #C9CED8">
+<div style="max-width:1120px; margin:0 auto; padding:40px 24px; display:flex; flex-wrap:wrap; gap:24px 56px; justify-content:space-between; align-items:center">
+<div style="flex:1 1 280px">
+<div style="font-weight:600">Abundance Architecture</div>
+<div style="color:#4A5160; font-size:15px; margin-top:4px">A public inquiry into human flourishing</div>
+</div>
+<nav aria-label="Footer" style="display:flex; flex-wrap:wrap; gap:0 20px; align-items:center">
+<a href="#top" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">About</a>
+<a href="#top" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">Ask a question</a>
+<a href="References.dc.html" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">References</a>
+<a href="#top" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">Licence</a>
+<a href="https://freemarketwatch.world" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">FreeMarketWatch.world</a>
+</nav>
+</div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"viewer":{"editor":"enum","options":["Visitor","Member"],"default":"Visitor"},"$preview":{"width":1280,"height":1680}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const member = (this.props.viewer ?? 'Visitor') === 'Member';
+    const picked = (this.state && this.state.type) || 'All';
+    const all = [
+      { name: 'Bitcoin-native accounting for nonprofits', who: 'Ours', type: 'Infrastructure commons', domain: 'Money', stage: 'Idea', leaves: 'Open-source code', href: 'InitiativeDetail.dc.html' },
+      { name: 'Patient-owned health record', who: 'Ours', type: 'Infrastructure commons', domain: 'Health', stage: 'Idea', leaves: 'An open standard', href: '#top' },
+      { name: 'Vital Signs development', who: 'Ours', type: 'Knowledge commons', domain: 'Information and knowledge', stage: 'Idea', leaves: 'Open data and methods', href: '#top' },
+      { name: 'The Learn commons', who: 'Ours', type: 'Knowledge commons', domain: 'Education', stage: 'Idea', leaves: 'Open learning material', href: '#top' },
+      { name: 'Colorado acequias', who: 'Watching', type: 'Resource commons', domain: 'Ecology', stage: 'Running', leaves: 'Shared irrigation water', href: '#top' },
+      { name: 'Open Food Network', who: 'Watching', type: 'Infrastructure commons', domain: 'Production and labor', stage: 'Running', leaves: 'Open-source software', href: '#top' },
+      { name: 'BTCPay Server', who: 'Watching', type: 'Infrastructure commons', domain: 'Money', stage: 'Running', leaves: 'Open-source software', href: '#top' },
+      { name: 'Direct primary care', who: 'Watching', type: 'Enterprise', domain: 'Health', stage: 'Running', leaves: '[TO ASSESS]', href: '#top' },
+      { name: "Citizens' assemblies", who: 'Watching', type: 'Public', domain: 'Governance', stage: 'Running', leaves: '[TO ASSESS]', href: '#top' },
+      { name: 'Mutual aid networks', who: 'Watching', type: 'Civic', domain: 'Community', stage: 'Running', leaves: '[TO ASSESS]', href: '#top' }
+    ];
+    const names = ['All', 'Resource commons', 'Knowledge commons', 'Infrastructure commons', 'Enterprise', 'Public', 'Civic'];
+    const rows = all.filter((r) => picked === 'All' || r.type === picked);
+    return {
+      isMember: member,
+      isVisitor: !member,
+      types: names.map((n) => ({
+        label: n,
+        on: n === picked,
+        off: n !== picked,
+        pick: () => this.setState({ type: n })
+      })),
+      rows: rows,
+      count: String(rows.length)
+    };
+  }
+}
+</script>
+</body>
+</html>

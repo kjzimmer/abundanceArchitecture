@@ -1,0 +1,124 @@
+{
+  "note": "Needs for domains 1 to 9 are one-line paraphrases of Abundance Structures v0.3. Needs for domains 10 to 12 are Claude's drafts. Structure names and statuses are from Abundance Structures v0.3. A null form or capture risk is still to be written: render it as a placeholder.",
+  "domains": [
+    {
+      "order": 1, "slug": "money", "name": "Money",
+      "need": "A monetary system that preserves the value of savings and that no single actor can manipulate.",
+      "analysisStatus": "drafted", "draft": false,
+      "structures": [
+        { "name": "Bitcoin and fixed-supply digital assets", "status": "exists", "forms": null, "captureRisk": null },
+        { "name": "Bitcoin payment infrastructure (Lightning and layer 2)", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Value investment channels from sound money to productive activity", "status": "needed", "forms": null, "captureRisk": null },
+        { "name": "Decentralized financial intermediation", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Sound money standards and monetary reform", "status": "needed", "forms": null, "captureRisk": null }
+      ]
+    },
+    {
+      "order": 2, "slug": "information-and-knowledge", "name": "Information and knowledge",
+      "need": "Information that gives honest feedback, and that no central actor controls access to.",
+      "analysisStatus": "drafted", "draft": false,
+      "structures": [
+        { "name": "Open source software and protocol infrastructure", "status": "exists", "forms": null, "captureRisk": null },
+        { "name": "Distributed information verification infrastructure", "status": "needed", "forms": null, "captureRisk": null },
+        { "name": "Open knowledge and research infrastructure", "status": "partial", "forms": null, "captureRisk": null }
+      ]
+    },
+    {
+      "order": 3, "slug": "governance", "name": "Governance",
+      "need": "Decisions made at the right scale, tied to their consequences, hard to capture and able to change their own rules.",
+      "analysisStatus": "drafted", "draft": false,
+      "structures": [
+        { "name": "Polycentric local governance frameworks", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Citizens' assemblies and deliberative democracy mechanisms", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Decentralized autonomous organizations and smart contract governance", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Long-horizon governance institutions", "status": "needed", "forms": null, "captureRisk": null }
+      ]
+    },
+    {
+      "order": 4, "slug": "health", "name": "Health",
+      "need": "Incentives that reward producing health more than managing disease.",
+      "needFull": "An incentive architecture in which producing health, not managing disease events, is the main activity of health systems, and in which people have real capacity to make informed decisions about their own health.",
+      "analysisStatus": "drafted", "draft": false,
+      "primaryCaseStudy": true,
+      "analysis": {
+        "howItWorksToday": "A health system organized around treating disease more than building health. [SUMMARY OF THE HIDDEN TIDE IN THIS DOMAIN]",
+        "whatAbundanceWouldLookLike": "[WHAT CHANGES FOR AN ORDINARY PERSON WHEN THE STRUCTURE CHANGES]",
+        "whatStandsInTheWay": "[THE INCENTIVES THAT KEEP THE PRESENT ARRANGEMENT IN PLACE]",
+        "whatWeDontKnow": "[WHERE THE EVIDENCE RUNS OUT, AND THE STRONGEST OBJECTION]"
+      },
+      "neighbouringDomains": ["information-and-knowledge", "community", "money"],
+      "neighbouringDomainsNote": "Claude's guess.",
+      "structures": [
+        { "name": "Direct primary care and value-based care", "status": "partial", "forms": ["enterprise"], "captureRisk": "Growth pressure. A practice that starts billing insurance gives up the incentive that defines it." },
+        { "name": "Open prevention knowledge", "status": "partial", "forms": ["knowledge-commons"], "captureRisk": "Wellness-industry capture. Low-quality information travels through the same channels as sound guidance." }
+      ]
+    },
+    {
+      "order": 5, "slug": "education", "name": "Education",
+      "need": "Learning that builds real competence, open to everyone, and recognized without institutional gatekeeping.",
+      "analysisStatus": "drafted", "draft": false,
+      "note": "Merges the two education domains in Abundance Structures v0.3.",
+      "structures": [
+        { "name": "Massively open online education platforms", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Competency-based credentialing systems", "status": "needed", "forms": null, "captureRisk": null },
+        { "name": "Distributed practice environments and mentorship networks", "status": "partial", "forms": null, "captureRisk": null }
+      ]
+    },
+    {
+      "order": 6, "slug": "production-and-labor", "name": "Production and labor",
+      "need": "As the cost of making things falls, the gains reach people broadly instead of concentrating with whoever coordinates.",
+      "analysisStatus": "drafted", "draft": false,
+      "structures": [
+        { "name": "Worker ownership and cooperative production models", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Floor security mechanisms and the universal free floor food model", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Open coordination infrastructure for physical production", "status": "needed", "forms": null, "captureRisk": null }
+      ]
+    },
+    {
+      "order": 7, "slug": "community", "name": "Community",
+      "need": "Institutions that rebuild connection, mutual aid and civic participation.",
+      "analysisStatus": "drafted", "draft": false,
+      "structures": [
+        { "name": "Community land trusts and shared equity models", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Digital community platforms with genuine local governance", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Mutual aid and community resilience networks", "status": "partial", "forms": null, "captureRisk": null }
+      ]
+    },
+    {
+      "order": 8, "slug": "ecology", "name": "Ecology",
+      "need": "Irreplaceable natural systems protected through local, adaptive governance.",
+      "analysisStatus": "drafted", "draft": false,
+      "structures": [
+        { "name": "Community-based natural resource management", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Ecological commons governance frameworks", "status": "needed", "forms": null, "captureRisk": null }
+      ]
+    },
+    {
+      "order": 9, "slug": "energy", "name": "Energy",
+      "need": "Energy cheap, clean and distributed enough to underpin everything else.",
+      "analysisStatus": "drafted", "draft": false,
+      "structures": [
+        { "name": "Distributed renewable energy with storage", "status": "partial", "forms": null, "captureRisk": null },
+        { "name": "Fusion energy", "status": "partial", "forms": null, "captureRisk": null }
+      ]
+    },
+    {
+      "order": 10, "slug": "security-and-defence", "name": "Security and defence",
+      "need": "Safety from violence without concentrating the power to commit it.",
+      "analysisStatus": "to-write", "draft": true,
+      "structures": []
+    },
+    {
+      "order": 11, "slug": "justice-and-conflict-resolution", "name": "Justice and conflict resolution",
+      "need": "Disputes settled cheaply, locally and fairly, with basic rights protected.",
+      "analysisStatus": "to-write", "draft": true,
+      "structures": []
+    },
+    {
+      "order": 12, "slug": "global-coordination-and-borders", "name": "Global coordination and borders",
+      "need": "Shared problems managed across many nested boundaries, without a single center.",
+      "analysisStatus": "to-write", "draft": true,
+      "structures": []
+    }
+  ]
+}

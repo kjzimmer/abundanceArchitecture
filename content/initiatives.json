@@ -1,0 +1,96 @@
+{
+  "note": "Sample records. The four marked 'ours' are Karl's candidate initiatives. Stage, form and 'leaves in common' are Claude's assumptions for all ten. Owners are unnamed. Status logs are empty except for placeholders.",
+  "initiatives": [
+    {
+      "slug": "bitcoin-native-accounting-for-nonprofits",
+      "name": "Bitcoin-native accounting for nonprofits",
+      "whose": "ours", "forms": ["infrastructure-commons"], "domains": ["money"], "stage": "idea",
+      "owner": "[OWNER NAME]",
+      "whatItIs": "An AI-native, bitcoin-only accounting system for nonprofits, so that a small group of them can operate without third-party transactional banking and give others a foundation to build on.",
+      "whyItMatters": "[WHICH ABUNDANCE STRUCTURE THIS HELPS EMERGE, AND HOW]",
+      "leavesInCommon": "Open-source code",
+      "licence": "[LICENCE]",
+      "whatWeAreLearning": "[WHAT HAS EMERGED SO FAR, INCLUDING WHAT DID NOT WORK]",
+      "statusLog": [
+        { "date": "[DATE]", "entry": "[STATUS UPDATE, WRITTEN BY THE OWNER]" },
+        { "date": "[DATE]", "entry": "[MOVED FROM QUESTION TO IDEA]" }
+      ],
+      "draft": true
+    },
+    {
+      "slug": "patient-owned-health-record",
+      "name": "Patient-owned health record",
+      "whose": "ours", "forms": ["infrastructure-commons"], "domains": ["health"], "stage": "idea",
+      "owner": "[OWNER NAME]",
+      "whatItIs": "Building on existing health record projects toward a single patient-owned portal used by every provider the patient authorizes.",
+      "leavesInCommon": "An open standard",
+      "draft": true
+    },
+    {
+      "slug": "vital-signs-development",
+      "name": "Vital Signs development",
+      "whose": "ours", "forms": ["knowledge-commons"], "domains": ["information-and-knowledge"], "stage": "idea",
+      "owner": "[OWNER NAME]",
+      "whatItIs": "[WHAT IT IS]",
+      "leavesInCommon": "Open data and methods",
+      "draft": true
+    },
+    {
+      "slug": "the-learn-commons",
+      "name": "The Learn commons",
+      "whose": "ours", "forms": ["knowledge-commons"], "domains": ["education", "information-and-knowledge"], "stage": "idea",
+      "owner": "[OWNER NAME]",
+      "whatItIs": "A knowledge commons for abundance: what is known, how confidently, and how to learn it, starting with holism.",
+      "leavesInCommon": "Open learning material",
+      "draft": true
+    },
+    {
+      "slug": "colorado-acequias",
+      "name": "Colorado acequias",
+      "whose": "watching", "forms": ["resource-commons"], "domains": ["ecology"], "stage": "running",
+      "whatItIs": "[WHAT IT IS]",
+      "leavesInCommon": "Shared irrigation water",
+      "draft": true
+    },
+    {
+      "slug": "open-food-network",
+      "name": "Open Food Network",
+      "whose": "watching", "forms": ["infrastructure-commons"], "domains": ["production-and-labor"], "stage": "running",
+      "whatItIs": "[WHAT IT IS]",
+      "leavesInCommon": "Open-source software",
+      "draft": true
+    },
+    {
+      "slug": "btcpay-server",
+      "name": "BTCPay Server",
+      "whose": "watching", "forms": ["infrastructure-commons"], "domains": ["money"], "stage": "running",
+      "whatItIs": "[WHAT IT IS]",
+      "leavesInCommon": "Open-source software",
+      "draft": true
+    },
+    {
+      "slug": "direct-primary-care",
+      "name": "Direct primary care",
+      "whose": "watching", "forms": ["enterprise"], "domains": ["health"], "stage": "running",
+      "whatItIs": "[WHAT IT IS]",
+      "leavesInCommon": "[TO ASSESS]",
+      "draft": true
+    },
+    {
+      "slug": "citizens-assemblies",
+      "name": "Citizens' assemblies",
+      "whose": "watching", "forms": ["public"], "domains": ["governance"], "stage": "running",
+      "whatItIs": "[WHAT IT IS]",
+      "leavesInCommon": "[TO ASSESS]",
+      "draft": true
+    },
+    {
+      "slug": "mutual-aid-networks",
+      "name": "Mutual aid networks",
+      "whose": "watching", "forms": ["civic"], "domains": ["community"], "stage": "running",
+      "whatItIs": "[WHAT IT IS]",
+      "leavesInCommon": "[TO ASSESS]",
+      "draft": true
+    }
+  ]
+}

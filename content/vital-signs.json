@@ -1,0 +1,61 @@
+{
+  "note": "The first four are the signs proposed for launch in a separate metrics chat. Karl has not confirmed the set, and none has a reading yet. Do not show any number. Definitions, methods and cadence are placeholders.",
+  "signs": [
+    {
+      "slug": "time-prices-of-commodities",
+      "name": "Time prices of commodities",
+      "basis": "A more frequent version of the Simon Abundance Index",
+      "domains": ["production-and-labor"],
+      "status": "in-development",
+      "definition": "[DEFINITION]",
+      "reading": null,
+      "cadence": "[HOW OFTEN IT IS READ]",
+      "draft": true
+    },
+    {
+      "slug": "human-flourishing",
+      "name": "Human flourishing",
+      "basis": "The flourishing study identified in the metrics chat",
+      "domains": ["community", "health"],
+      "status": "in-development",
+      "definition": "[DEFINITION]",
+      "reading": null,
+      "cadence": "[HOW OFTEN IT IS READ]",
+      "draft": true
+    },
+    {
+      "slug": "time-prices-of-essentials",
+      "name": "Time prices of essentials",
+      "basis": "Housing, health care, education and energy, which the commodity index leaves out",
+      "domains": ["production-and-labor", "health", "education", "energy"],
+      "status": "in-development",
+      "definition": "[DEFINITION]",
+      "reading": null,
+      "cadence": "[HOW OFTEN IT IS READ]",
+      "draft": true
+    },
+    {
+      "slug": "centralization-readings",
+      "name": "Centralization readings",
+      "basis": "Readings for one domain to begin with. The domain is not yet chosen.",
+      "domains": [],
+      "status": "in-development",
+      "definition": "[DEFINITION]",
+      "reading": null,
+      "cadence": "[HOW OFTEN IT IS READ]",
+      "draft": true
+    },
+    {
+      "slug": "prices-in-hard-money-terms",
+      "name": "Prices in hard-money terms",
+      "basis": "FreeMarketWatch, a separate site",
+      "domains": ["money"],
+      "status": "live-elsewhere",
+      "externalUrl": "https://freemarketwatch.world/dashboard",
+      "definition": "[DEFINITION]",
+      "reading": null,
+      "cadence": "Data updated daily, according to the FreeMarketWatch site",
+      "draft": true
+    }
+  ]
+}

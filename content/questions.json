@@ -1,0 +1,73 @@
+{
+  "note": "All nine are Claude's drafts, written from questions Karl has already recorded as open in the book project. Karl has not reviewed the wording. The three answer fields are placeholders for every question.",
+  "answerPlaceholders": {
+    "whatWeThinkSoFar": "[WHAT WE THINK SO FAR]",
+    "whatWeDontKnow": "[WHAT WE DON'T KNOW]",
+    "whatWouldChangeOurMind": "[WHAT WOULD CHANGE OUR MIND]"
+  },
+  "questions": [
+    {
+      "slug": "global-problems-many-centers",
+      "question": "Can truly global problems, such as climate change, pandemics and the development of AI, be managed by many centers without a single authority?",
+      "domains": ["global-coordination-and-borders", "governance"],
+      "from": "Open Items list: polycentric global coordination, recorded as the most important open question",
+      "draft": true
+    },
+    {
+      "slug": "rights-without-a-strong-center",
+      "question": "How are minority rights and basic protections kept in place when there is no strong central authority to enforce them?",
+      "domains": ["justice-and-conflict-resolution", "governance"],
+      "from": "Open Items list: rights protection in polycentric systems",
+      "draft": true
+    },
+    {
+      "slug": "purpose-after-survival",
+      "question": "What are people for when survival is no longer the problem that organizes their lives?",
+      "domains": ["community", "education"],
+      "from": "Open Items list: human purpose after the survival constraint is lifted",
+      "draft": true
+    },
+    {
+      "slug": "does-scarcity-thinking-fade",
+      "question": "Does scarcity thinking fade once people trust that their basic needs are secure?",
+      "domains": ["production-and-labor", "community"],
+      "from": "The behavioral hypothesis behind the floor security design, recorded as central but empirically open",
+      "draft": true
+    },
+    {
+      "slug": "a-floor-without-a-permanent-institution",
+      "question": "Can a guaranteed floor, such as free basic food, be provided without creating an institution that works to keep itself necessary?",
+      "domains": ["production-and-labor", "governance"],
+      "from": "Open Items list: floor security design gaps; Dialectical Register entry I-8B",
+      "draft": true
+    },
+    {
+      "slug": "is-sound-money-enough",
+      "question": "Is sound money necessary for abundance, sufficient for it, or neither?",
+      "domains": ["money"],
+      "from": "The essay \"Sound Money Is Not Enough\"; Dialectical Register entry I-8A",
+      "draft": true
+    },
+    {
+      "slug": "who-coordinates-near-free-production",
+      "question": "As the cost of producing things approaches zero, who will coordinate that capability: a few platforms, or many open ones?",
+      "domains": ["production-and-labor", "information-and-knowledge"],
+      "from": "Abundance Structures v0.3: open coordination infrastructure for physical production",
+      "draft": true
+    },
+    {
+      "slug": "borders-in-abundance",
+      "question": "Does abundance make borders matter less, or does a polycentric world simply have more boundaries, nested inside one another?",
+      "domains": ["global-coordination-and-borders"],
+      "from": "Project planning chat, October 2026",
+      "draft": true
+    },
+    {
+      "slug": "security-in-the-nuclear-era",
+      "question": "In the nuclear era, can security be provided by many centers, or does it require some form of global union?",
+      "domains": ["security-and-defence", "global-coordination-and-borders"],
+      "from": "Project planning chat, October 2026: the challenge from republican security theory",
+      "draft": true
+    }
+  ]
+}

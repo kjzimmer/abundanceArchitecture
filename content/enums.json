@@ -1,0 +1,54 @@
+{
+  "forms": [
+    { "id": "resource-commons", "label": "Resource commons", "description": "A shared resource that can be used up, governed by the people who depend on it." },
+    { "id": "knowledge-commons", "label": "Knowledge commons", "description": "Shared knowledge, data or methods that anyone may use and a community maintains." },
+    { "id": "infrastructure-commons", "label": "Infrastructure commons", "description": "Shared tools: open-source software, open standards and protocols." },
+    { "id": "enterprise", "label": "Enterprise", "description": "A business or cooperative whose incentives are aligned with the outcome it sells." },
+    { "id": "public", "label": "Public", "description": "Provided or convened through government at any level." },
+    { "id": "civic", "label": "Civic", "description": "Voluntary associations and mutual aid." }
+  ],
+  "formsNote": "Claude's synthesis, not a published scheme. A record may carry more than one form.",
+
+  "initiativeStages": [
+    { "id": "question", "order": 1, "label": "Question", "description": "Something open, worth acting on." },
+    { "id": "idea", "order": 2, "label": "Idea", "description": "A possible way to act on it." },
+    { "id": "proposal", "order": 3, "label": "Proposal", "description": "Written up, with a named owner." },
+    { "id": "small-test", "order": 4, "label": "Small test", "description": "Tried for real, at small scale." },
+    { "id": "running", "order": 5, "label": "Running", "description": "Operating, with status from its owner." },
+    { "id": "reported-or-retired", "order": 6, "label": "Reported or retired", "description": "What it taught us." }
+  ],
+
+  "whose": [
+    { "id": "ours", "label": "Ours" },
+    { "id": "watching", "label": "Watching" }
+  ],
+
+  "structureStatuses": [
+    { "id": "exists", "label": "Exists", "description": "Functioning at meaningful scale." },
+    { "id": "partial", "label": "Partial", "description": "Exists in limited form; insufficient scope, scale or design maturity." },
+    { "id": "needed", "label": "Needed", "description": "The need is clear; an adequate structure does not yet exist." },
+    { "id": "speculative", "label": "Speculative", "description": "Potentially needed; the requirement is not yet fully defined or demonstrated." }
+  ],
+
+  "evidentiaryStatuses": [
+    { "id": "established", "label": "Established evidence", "description": "Well documented in the research." },
+    { "id": "extension", "label": "Reasonable extension", "description": "Follows from the evidence, but not shown directly." },
+    { "id": "speculation", "label": "Speculation", "description": "Our own conjecture, labelled as such." }
+  ],
+  "evidentiaryStatusesNote": "The three levels are the book's. The one-line descriptions are Claude's wording. The status attaches to a claim, not to a source.",
+
+  "analysisStatuses": [
+    { "id": "drafted", "label": "Analysis drafted" },
+    { "id": "to-write", "label": "Analysis to write" }
+  ],
+
+  "vitalSignStatuses": [
+    { "id": "in-development", "label": "In development" },
+    { "id": "live", "label": "Live" },
+    { "id": "live-elsewhere", "label": "Live on another site" }
+  ],
+
+  "sourceKinds": ["Book", "Journal article", "Working paper", "Expert assessment", "Data source"],
+
+  "howRead": ["In full", "Summary only"]
+}

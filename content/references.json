@@ -1,0 +1,83 @@
+{
+  "note": "Seven sources to start the list. Every claim's evidence status is null: Karl has not rated them. 'howRead' is null where nobody has confirmed whether the source was read in full. The first three are cited on Home. Most were read by Claude in summary only.",
+  "references": [
+    {
+      "slug": "mullainathan-shafir-2013",
+      "shortCitation": "Mullainathan and Shafir, Scarcity: Why Having Too Little Means So Much (2013)",
+      "citation": "Mullainathan, S. and Shafir, E. (2013). Scarcity: Why Having Too Little Means So Much.",
+      "kind": "Book", "url": null, "howRead": null,
+      "domains": [],
+      "claims": [
+        { "claim": "When survival is in question, attention narrows to the immediate.", "citedOn": ["/"], "status": null, "note": "Check the replication record of this research before rating it as established evidence." }
+      ]
+    },
+    {
+      "slug": "ryan-deci-2000",
+      "shortCitation": "Ryan and Deci, Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being (2000)",
+      "citation": "Ryan, R. and Deci, E. (2000). Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being. American Psychologist.",
+      "kind": "Journal article", "url": null, "howRead": null,
+      "domains": [],
+      "claims": [
+        { "claim": "People do their best work when they have autonomy, competence and connection.", "citedOn": ["/"], "status": null, "note": "Claude chose this source for the claim. Karl to confirm." }
+      ]
+    },
+    {
+      "slug": "ostrom-1990",
+      "shortCitation": "Ostrom, Governing the Commons (1990)",
+      "citation": "Ostrom, E. (1990). Governing the Commons. Cambridge University Press.",
+      "kind": "Book", "url": null, "howRead": null,
+      "domains": ["governance", "ecology"],
+      "claims": [
+        { "claim": "Communities can govern shared resources well, under the right conditions, without central direction.", "citedOn": ["/"], "status": null, "note": "Claude chose this source for the claim. Karl to confirm." }
+      ]
+    },
+    {
+      "slug": "ostrom-2009",
+      "shortCitation": "Ostrom, A Polycentric Approach for Coping with Climate Change (2009)",
+      "citation": "Ostrom, E. (2009). A Polycentric Approach for Coping with Climate Change. World Bank Policy Research Working Paper.",
+      "kind": "Working paper",
+      "url": "https://openknowledge.worldbank.org/entities/publication/afe3b3e9-96e5-580e-a71e-882dfc4e9421",
+      "howRead": "Summary only",
+      "domains": ["global-coordination-and-borders", "ecology"],
+      "claims": [
+        { "claim": "Action on a shared global problem need not wait for a single global agreement.", "citedOn": [], "status": null }
+      ]
+    },
+    {
+      "slug": "keohane-victor-2011",
+      "shortCitation": "Keohane and Victor, The Regime Complex for Climate Change (2011)",
+      "citation": "Keohane, R. and Victor, D. (2011). The Regime Complex for Climate Change. Perspectives on Politics.",
+      "kind": "Journal article",
+      "url": "https://www.belfercenter.org/publication/regime-complex-climate-change-summary",
+      "howRead": "Summary only",
+      "domains": ["global-coordination-and-borders"],
+      "claims": [
+        { "claim": "Loosely linked institutions can govern a global problem, though the climate example scores low on the authors' own tests.", "citedOn": [], "status": null }
+      ]
+    },
+    {
+      "slug": "coyne-goodman-2020",
+      "shortCitation": "Coyne and Goodman, Polycentric Defense (2020)",
+      "citation": "Coyne, C. and Goodman, N. (2020). Polycentric Defense. The Independent Review.",
+      "kind": "Journal article",
+      "url": "https://www.independent.org/wp-content/uploads/tir/2020/09/tir_25_2_08_coyne.pdf",
+      "howRead": "Summary only",
+      "domains": ["security-and-defence"],
+      "claims": [
+        { "claim": "Defence is not purely a public good, and many dispersed providers already supply parts of it.", "citedOn": [], "status": null }
+      ]
+    },
+    {
+      "slug": "mach-2019",
+      "shortCitation": "Mach and others, Climate as a risk factor for armed conflict (2019)",
+      "citation": "Mach, K. and others (2019). Climate as a risk factor for armed conflict. Nature.",
+      "kind": "Expert assessment",
+      "url": "https://www.prio.org/publications/11405",
+      "howRead": "Summary only",
+      "domains": ["security-and-defence"],
+      "claims": [
+        { "claim": "Weak development and limited state capacity influence conflict far more than climate does.", "citedOn": [], "status": null }
+      ]
+    }
+  ]
+}

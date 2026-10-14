@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Domain page wireframe: Health</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#1A1D23}a:hover{color:#1D4ED8}
+</style>
+</helmet>
+<div id="top" style="background:#F3F4F6; color:#1A1D23; font-family:'IBM Plex Sans', system-ui, sans-serif; font-size:16px; line-height:1.55">
+
+<header style="background:#FFFFFF; border-bottom:1px solid #C9CED8">
+<div style="max-width:1120px; margin:0 auto; padding:14px 24px; display:flex; flex-wrap:wrap; align-items:center; gap:8px 28px">
+<a href="Main.dc.html" style="font-weight:600; font-size:17px; text-decoration:none; min-height:44px; display:inline-flex; align-items:center; color:#1A1D23">Abundance Architecture</a>
+<nav aria-label="Main" style="display:flex; flex-wrap:wrap; gap:0 4px; flex:1 1 480px">
+<a href="Domains.dc.html" aria-current="page" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; font-weight:600; text-decoration:none; border-bottom:2px solid #1A1D23">Domains</a>
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Questions</a>
+<a href="Learn.dc.html" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Learn</a>
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Vital Signs</a>
+<a href="Initiatives.dc.html" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Initiatives</a>
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Book</a>
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Report</a>
+</nav>
+<div style="display:flex; align-items:center; gap:8px">
+<sc-if value="{{ isVisitor }}" hint-placeholder-val="{{ true }}">
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 10px; font-size:15px; text-decoration:none">Sign in</a>
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 18px; font-size:15px; font-weight:500; text-decoration:none; background:#1A1D23; color:#FFFFFF; border-radius:4px">Join</a>
+</sc-if>
+<sc-if value="{{ isMember }}" hint-placeholder-val="{{ false }}">
+<a href="#top" style="display:inline-flex; align-items:center; min-height:44px; padding:0 14px; font-size:15px; font-weight:500; text-decoration:none; border:1px solid #1D4ED8; color:#1D3FAE; background:#EEF3FE; border-radius:4px">Member home</a>
+</sc-if>
+</div>
+</div>
+</header>
+
+<main style="max-width:1120px; margin:0 auto; padding:32px 24px 72px">
+
+<nav aria-label="Breadcrumb" style="font-size:14px; color:#4A5160; display:flex; flex-wrap:wrap; gap:0 8px; align-items:center">
+<a href="Main.dc.html" style="min-height:44px; display:inline-flex; align-items:center; color:#4A5160">Home</a>
+<span aria-hidden="true">/</span>
+<a href="Domains.dc.html" style="min-height:44px; display:inline-flex; align-items:center; color:#4A5160">Domains</a>
+<span aria-hidden="true">/</span>
+<span>Health</span>
+</nav>
+
+<h1 style="margin:4px 0 0; font-size:40px; line-height:1.2; font-weight:600">Health</h1>
+<div style="margin-top:16px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:#4A5160">What this area needs</div>
+<p style="margin:6px 0 0; font-size:19px; line-height:1.6; max-width:780px">An incentive architecture in which producing health, not managing disease events, is the main activity of health systems, and in which people have real capacity to make informed decisions about their own health.</p>
+
+<nav aria-label="On this page" style="margin-top:20px; display:flex; flex-wrap:wrap; gap:8px">
+<a href="#analysis" style="font-size:15px; text-decoration:none; border:1px solid #8A93A3; border-radius:22px; padding:0 14px; min-height:44px; display:inline-flex; align-items:center; background:#FFFFFF">The analysis</a>
+<a href="#structures" style="font-size:15px; text-decoration:none; border:1px solid #8A93A3; border-radius:22px; padding:0 14px; min-height:44px; display:inline-flex; align-items:center; background:#FFFFFF">Structures</a>
+<a href="#records" style="font-size:15px; text-decoration:none; border:1px solid #8A93A3; border-radius:22px; padding:0 14px; min-height:44px; display:inline-flex; align-items:center; background:#FFFFFF">Questions, signs, initiatives, learning</a>
+</nav>
+
+<div style="margin-top:32px; display:flex; flex-wrap:wrap; gap:32px 40px; align-items:flex-start">
+
+<div style="flex:999 1 560px; min-width:0; display:flex; flex-direction:column; gap:40px">
+
+<section id="analysis">
+<h2 style="margin:0; font-size:24px; line-height:1.3; font-weight:600">The analysis</h2>
+<div style="margin-top:12px; display:flex; flex-direction:column; gap:20px">
+<div>
+<h3 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">How it works today</h3>
+<p style="margin:6px 0 0; font-size:17px; line-height:1.6">A health system organized around treating disease more than building health. <span style="color:#4A5160">[SUMMARY OF THE HIDDEN TIDE IN THIS DOMAIN]</span></p>
+</div>
+<div>
+<h3 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">What abundance would look like here</h3>
+<p style="margin:6px 0 0; font-size:17px; line-height:1.6; color:#4A5160">[WHAT CHANGES FOR AN ORDINARY PERSON WHEN THE STRUCTURE CHANGES]</p>
+</div>
+<div>
+<h3 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">What stands in the way</h3>
+<p style="margin:6px 0 0; font-size:17px; line-height:1.6; color:#4A5160">[THE INCENTIVES THAT KEEP THE PRESENT ARRANGEMENT IN PLACE]</p>
+</div>
+<div>
+<h3 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">What we don't know</h3>
+<p style="margin:6px 0 0; font-size:17px; line-height:1.6; color:#4A5160">[WHERE THE EVIDENCE RUNS OUT, AND THE STRONGEST OBJECTION]</p>
+</div>
+</div>
+<a href="#top" style="margin-top:8px; font-weight:500; text-decoration:underline; text-underline-offset:3px; min-height:44px; display:inline-flex; align-items:center">Read the full analysis</a>
+<a href="References.dc.html" style="margin:8px 0 0 24px; font-weight:500; text-decoration:underline; text-underline-offset:3px; min-height:44px; display:inline-flex; align-items:center">[N] references for this domain</a>
+</section>
+
+<section id="structures">
+<h2 style="margin:0; font-size:24px; line-height:1.3; font-weight:600">Structures</h2>
+<p style="margin:4px 0 0; font-size:15px; color:#4A5160">What exists, what exists in part, and what has yet to be built.</p>
+<div style="margin-top:12px; background:#FFFFFF; border:1px solid #C9CED8; border-radius:4px; overflow-x:auto">
+<div style="min-width:700px">
+<div style="display:grid; grid-template-columns:minmax(170px, 1.5fr) minmax(120px, 1fr) minmax(80px, 0.6fr) minmax(190px, 1.9fr); gap:16px; padding:12px 16px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:#4A5160; background:#F3F4F6">
+<div>Structure</div>
+<div>Form</div>
+<div>Status</div>
+<div>Main capture risk</div>
+</div>
+<div style="display:grid; grid-template-columns:minmax(170px, 1.5fr) minmax(120px, 1fr) minmax(80px, 0.6fr) minmax(190px, 1.9fr); gap:16px; padding:14px 16px; border-top:1px solid #C9CED8; font-size:15px; line-height:1.5">
+<div style="font-weight:600">Direct primary care and value-based care</div>
+<div>Enterprise</div>
+<div>Partial</div>
+<div style="color:#4A5160">Growth pressure. A practice that starts billing insurance gives up the incentive that defines it.</div>
+</div>
+<div style="display:grid; grid-template-columns:minmax(170px, 1.5fr) minmax(120px, 1fr) minmax(80px, 0.6fr) minmax(190px, 1.9fr); gap:16px; padding:14px 16px; border-top:1px solid #C9CED8; font-size:15px; line-height:1.5">
+<div style="font-weight:600">Open prevention knowledge</div>
+<div>Knowledge commons</div>
+<div>Partial</div>
+<div style="color:#4A5160">Wellness-industry capture. Low-quality information travels through the same channels as sound guidance.</div>
+</div>
+</div>
+</div>
+<div style="margin-top:10px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:#4A5160">Form is one of: Resource commons · Knowledge commons · Infrastructure commons · Enterprise · Public · Civic</div>
+<div style="margin-top:4px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:#4A5160">Status is one of: Exists · Partial · Needed · Speculative</div>
+</section>
+
+<section id="records">
+<h2 style="margin:0; font-size:24px; line-height:1.3; font-weight:600">In this domain</h2>
+<p style="margin:4px 0 0; font-size:15px; color:#4A5160">Listed automatically from the four collections.</p>
+<div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start">
+
+<div style="flex:1 1 300px; background:#FFFFFF; border:1px solid #C9CED8; border-radius:4px; padding:20px">
+<h3 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">Questions</h3>
+<a href="#top" style="font-size:15px; min-height:44px; display:flex; align-items:center">[QUESTION FROM THE REGISTER]</a>
+<a href="#top" style="font-size:15px; min-height:44px; display:flex; align-items:center; border-top:1px solid #C9CED8">[QUESTION FROM THE REGISTER]</a>
+</div>
+
+<div style="flex:1 1 300px; background:#FFFFFF; border:1px solid #C9CED8; border-radius:4px; padding:20px">
+<h3 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">Vital Signs</h3>
+<a href="#top" style="font-size:15px; min-height:44px; display:flex; align-items:center">[HEALTH SIGN]</a>
+<div style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:#4A5160">[LATEST READING OR DEVELOPMENT STATUS]</div>
+</div>
+
+<div style="flex:1 1 300px; background:#FFFFFF; border:1px solid #C9CED8; border-radius:4px; padding:20px">
+<h3 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">Initiatives</h3>
+<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:0 12px">
+<a href="Initiatives.dc.html" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">Patient-owned health record</a>
+<span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:#4A5160">Ours · Idea</span>
+</div>
+<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:0 12px; border-top:1px solid #C9CED8">
+<a href="Initiatives.dc.html" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">Direct primary care</a>
+<span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:#4A5160">Watching · Running</span>
+</div>
+<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:0 12px; border-top:1px solid #C9CED8">
+<a href="Initiatives.dc.html" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">Fasten Health</a>
+<span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:#4A5160">Watching · Running</span>
+</div>
+<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:0 12px; border-top:1px solid #C9CED8">
+<a href="Initiatives.dc.html" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">Cochrane</a>
+<span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:#4A5160">Watching · Running</span>
+</div>
+</div>
+
+<div style="flex:1 1 300px; border:1px dashed #6B7483; border-radius:4px; padding:20px; color:#4A5160">
+<h3 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">Learn</h3>
+<p style="margin:8px 0 0; font-size:15px; line-height:1.5">The health path: what is known, how confidently, and how to learn it. After first launch.</p>
+</div>
+
+</div>
+</section>
+
+</div>
+
+<aside style="flex:1 1 280px; min-width:0; display:flex; flex-direction:column; gap:16px">
+
+<div style="background:#FFFFFF; border:1px solid #1A1D23; border-radius:4px; padding:20px">
+<h2 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">State of this analysis</h2>
+<p style="margin:8px 0 0; font-size:15px; line-height:1.5">Drafted. <span style="color:#4A5160">Last revised [DATE].</span></p>
+<p style="margin:8px 0 0; font-size:15px; line-height:1.5; color:#4A5160">In the book: [STAGE AND CHAPTER]</p>
+</div>
+
+<sc-if value="{{ isVisitor }}" hint-placeholder-val="{{ true }}">
+<div style="border:1px dashed #1D4ED8; border-radius:4px; padding:20px; background:#EEF3FE; color:#1D3FAE">
+<div style="display:flex; gap:10px; align-items:center">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+<h2 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">Comment on this analysis</h2>
+</div>
+<p style="margin:8px 0 0; font-size:15px; line-height:1.5">Members can comment on the working draft. After first launch.</p>
+<a href="#top" style="color:#1D3FAE; font-weight:600; min-height:44px; display:inline-flex; align-items:center">Become a member</a>
+</div>
+</sc-if>
+<sc-if value="{{ isMember }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px dashed #1D4ED8; border-radius:4px; padding:20px; background:#EEF3FE; color:#1D3FAE">
+<h2 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">Comment on this analysis</h2>
+<p style="margin:8px 0 0; font-size:15px; line-height:1.5">Open the working draft and add your comments. After first launch.</p>
+<a href="#top" style="margin-top:12px; display:inline-flex; align-items:center; min-height:48px; padding:0 20px; background:#1D4ED8; color:#FFFFFF; border-radius:4px; font-weight:500; text-decoration:none">Open the working draft</a>
+</div>
+</sc-if>
+
+<div style="background:#FFFFFF; border:1px solid #C9CED8; border-radius:4px; padding:20px">
+<h2 style="margin:0; font-size:17px; line-height:1.4; font-weight:600">Neighbouring domains</h2>
+<a href="Domains.dc.html" style="font-size:15px; min-height:44px; display:flex; align-items:center">Information and knowledge</a>
+<a href="Domains.dc.html" style="font-size:15px; min-height:44px; display:flex; align-items:center; border-top:1px solid #C9CED8">Community</a>
+<a href="Domains.dc.html" style="font-size:15px; min-height:44px; display:flex; align-items:center; border-top:1px solid #C9CED8">Money</a>
+</div>
+
+</aside>
+
+</div>
+
+<div style="margin-top:40px; padding-top:16px; border-top:1px solid #C9CED8; display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px 24px">
+<a href="Domains.dc.html" style="font-weight:500; min-height:44px; display:inline-flex; align-items:center">All twelve domains</a>
+<a href="Domains.dc.html" style="font-weight:500; min-height:44px; display:inline-flex; align-items:center">Next: Education</a>
+</div>
+
+</main>
+
+<footer style="background:#FFFFFF; border-top:1px solid #C9CED8">
+<div style="max-width:1120px; margin:0 auto; padding:40px 24px; display:flex; flex-wrap:wrap; gap:24px 56px; justify-content:space-between; align-items:center">
+<div style="flex:1 1 280px">
+<div style="font-weight:600">Abundance Architecture</div>
+<div style="color:#4A5160; font-size:15px; margin-top:4px">A public inquiry into human flourishing</div>
+</div>
+<nav aria-label="Footer" style="display:flex; flex-wrap:wrap; gap:0 20px; align-items:center">
+<a href="#top" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">About</a>
+<a href="#top" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">Ask a question</a>
+<a href="References.dc.html" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">References</a>
+<a href="#top" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">Licence</a>
+<a href="https://freemarketwatch.world" style="font-size:15px; min-height:44px; display:inline-flex; align-items:center">FreeMarketWatch.world</a>
+</nav>
+</div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"viewer":{"editor":"enum","options":["Visitor","Member"],"default":"Visitor"},"$preview":{"width":1280,"height":2060}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const member = (this.props.viewer ?? 'Visitor') === 'Member';
+    return { isMember: member, isVisitor: !member };
+  }
+}
+</script>
+</body>
+</html>
