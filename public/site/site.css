@@ -256,7 +256,7 @@ p { margin-bottom: 1.2rem; color: var(--ink-mid); }
 }
 /* Non-breaking space keeps the arrow on the link's last line */
 .text-link::after { content: '\00a0\2192'; text-decoration: none; display: inline; }
-.section-links { display: flex; flex-wrap: wrap; gap: 0 1.75rem; margin: 1rem 0 0; }
+.section-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 1.75rem; margin: 1rem 0 0; }
 
 /* ── Cards ────────────────────────────────────────────────────────────────── */
 .cards { display: grid; gap: 1rem; margin: 2.5rem 0; }
@@ -406,6 +406,81 @@ p { margin-bottom: 1.2rem; color: var(--ink-mid); }
   .opening { padding-top: 3rem; padding-bottom: 3rem; }
   .membership { padding: 1.4rem; }
 }
+
+/* ── Record pages: shared ─────────────────────────────────────────────────── */
+.breadcrumb ol { list-style: none; display: flex; flex-wrap: wrap; gap: 0 0.5rem; margin-bottom: 0.75rem; }
+.breadcrumb li { font-family: var(--sans); font-size: 0.75rem; color: var(--ink-light); }
+.breadcrumb li + li::before { content: '/'; margin-right: 0.5rem; color: var(--rule-strong); }
+.breadcrumb a, .breadcrumb span { color: var(--ink-light); display: inline-block; padding: 0.6rem 0; }
+.intro { font-size: 1.1rem; max-width: 38em; }
+.hint { font-family: var(--sans); font-size: 0.8rem; color: var(--ink-light); margin: -0.5rem 0 1rem; }
+.legend { font-family: var(--sans); font-size: 0.72rem; color: var(--ink-light); margin: 0.4rem 0 0; }
+.chip-dashed { border-style: dashed; border-color: var(--ink-light); background: transparent; }
+.callout {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1rem;
+  background: var(--card); border: 1px solid var(--rule); border-left: 3px solid var(--accent);
+  border-radius: 3px; padding: 0.6rem 1.25rem; margin: 1.5rem 0 0;
+}
+.callout .card-label { margin: 0; }
+.callout a { font-weight: 500; display: inline-block; padding: 0.5rem 0; }
+
+.domain-cards { list-style: none; }
+.domain-cards h2 { font-size: 1.25rem; margin: 0 0 0.4rem; }
+.domain-cards h2 a { color: var(--ink); text-decoration: none; }
+.domain-cards h2 a:hover { color: var(--accent); text-decoration: underline; }
+.domain-cards p:last-child { margin: 0.5rem 0 0; }
+.domain-number { font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--ink-light); margin: 0; }
+
+.need { font-size: 1.2rem; line-height: 1.6; color: var(--ink); max-width: 36em; }
+.pills { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 0; }
+.pills a {
+  display: inline-flex; align-items: center; min-height: 40px; padding: 0 1rem;
+  border: 1px solid var(--rule-strong); border-radius: 999px; background: var(--card);
+  font-family: var(--sans); font-size: 0.78rem; color: var(--ink); text-decoration: none;
+}
+.pills a:hover { border-color: var(--accent); color: var(--accent); }
+
+.with-aside { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 2.5rem 3rem; margin-top: 2.5rem; align-items: start; }
+.main-col > section + section { margin-top: 3rem; }
+.main-col h2 { margin-top: 0; }
+.main-col h3 { margin-top: 1.4rem; }
+@media (max-width: 900px) { .with-aside { grid-template-columns: minmax(0, 1fr); } }
+
+.panel { background: var(--card); border: 1px solid var(--rule); border-radius: 3px; padding: 1.25rem 1.4rem; }
+.panel + .panel { margin-top: 1rem; }
+.panel h2 { font-size: 1.05rem; font-weight: 500; margin: 0 0 0.6rem; display: flex; align-items: center; gap: 0.5rem; }
+.panel p { font-size: 0.95rem; margin-bottom: 0.6rem; }
+.panel p:last-child { margin-bottom: 0; }
+.panel-members { background: var(--member-light); border: 1px dashed var(--member); color: var(--member); }
+.panel-members p { color: var(--member); }
+.panel-members a { color: var(--member); font-weight: 500; display: inline-block; padding: 0.4rem 0; }
+
+.table-scroll { overflow-x: auto; background: var(--card); border: 1px solid var(--rule); border-radius: 3px; }
+.data-table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 0.92rem; line-height: 1.5; }
+.data-table th, .data-table td { text-align: left; vertical-align: top; padding: 0.8rem 1rem; border-top: 1px solid var(--rule); }
+.data-table thead th {
+  border-top: 0; background: #f4f1ea;
+  font-family: var(--sans); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light);
+}
+.data-table tbody th { font-weight: 500; }
+
+.record-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+.record-group { background: var(--card); border: 1px solid var(--rule); border-radius: 3px; padding: 1.1rem 1.3rem; }
+.record-group h3 { margin: 0 0 0.4rem; }
+.record-group-later { background: transparent; border-style: dashed; border-color: var(--ink-light); }
+.record-group-later .after-launch { margin-bottom: 0.5rem; }
+.record-list { list-style: none; }
+.record-list li { padding: 0.55rem 0; border-top: 1px solid var(--rule); line-height: 1.45; }
+.record-list li:first-child { border-top: 0; }
+.record-list a { display: inline-block; }
+.record-list .meta { display: block; font-family: var(--sans); font-size: 0.72rem; color: var(--ink-light); margin-top: 0.15rem; }
+.list-empty { margin: 0.25rem 0 0; }
+
+.page-foot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem;
+  margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+}
+.page-foot a { font-family: var(--sans); font-size: 0.85rem; font-weight: 500; display: inline-block; padding: 0.6rem 0; }
 
 /* ── Owner-only flags page ───────────────────────────────────────────────── */
 .flag-group h2 { font-size: 1.25rem; }

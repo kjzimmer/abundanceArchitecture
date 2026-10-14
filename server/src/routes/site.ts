@@ -9,6 +9,7 @@ import { renderPage } from '../site/layout';
 import { notFoundPage, PageBody, signInPage, stubPage } from '../site/pages/common';
 import { flagsPage } from '../site/pages/flags';
 import { homePage } from '../site/pages/home';
+import { domainPage, domainsPage } from '../site/pages/domains';
 
 export function createSiteRouter(): Router {
   // Load now so invalid content fails startup (and the deploy) instead of a page request
@@ -37,8 +38,11 @@ export function createSiteRouter(): Router {
 
   // Built stage by stage; stubs until then (brief §10)
   page('/', () => homePage(c));
-  page('/domains', () => stubPage('Domains'));
-  page('/domains/:slug', (req) => (c.domain(slug(req)) ? stubPage(c.domain(slug(req))!.name) : null));
+  page('/domains', () => domainsPage(c));
+  page('/domains/:slug', (req) => {
+    const d = c.domain(slug(req));
+    return d ? domainPage(c, d) : null;
+  });
   page('/questions', () => stubPage('Questions'));
   page('/questions/:slug', (req) => (c.question(slug(req)) ? stubPage('Question') : null));
   page('/learn', () => stubPage('Learn'));

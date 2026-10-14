@@ -54,6 +54,9 @@ export interface Domain extends Flagged {
   analysis?: DomainAnalysis;
   neighbouringDomains?: string[];
   neighbouringDomainsNote?: string;
+  /** Side panel "State of this analysis" (placeholders until set) */
+  lastRevised?: string | null;
+  inTheBook?: string | null;
   structures: Structure[];
 }
 

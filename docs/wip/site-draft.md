@@ -39,7 +39,13 @@ routes, data model and content rules; this file records the plan and decisions m
 - **Stage 4 (Home):** ✅ 2026-10-14. Copy moved to `content/home.json` (71 strings machine-checked verbatim against
   the brief's copy, kept at `site-draft/home-copy.md`). `site/citation.ts` = the shared Source note (`<details>`:
   in place, keyboard + touch, no JS). Screenshots checked at 1280px and 390px (no overflow)
-- **Next: stage 5** — Domains + the domain page (structures table, computed questions/signs/initiatives, side panel)
+- **Stage 5 (Domains + domain page):** ✅ 2026-10-14. `site/pages/domains.ts`, shared `site/ui.ts` (breadcrumb,
+  enum labels, record lists). Domain page: need (`needFull` if present), four-part analysis, structures table,
+  computed questions/signs/initiatives, learning placeholder, side panel (state, members-only comment, neighbours),
+  next-domain link. New optional domain fields `lastRevised`, `inTheBook` (placeholders until set). Wireframe-only
+  examples not in the seed (Fasten Health, Cochrane) are not shown. References link goes to
+  `/references?domain=<slug>` (filter built in stage 7)
+- **Next: stage 6** — Initiatives register + initiative page; Questions; Vital Signs; Related panel
 - `incoming/` emptied 2026-10-14 (no `_assessment.md`: a feature brief, not a standards transition)
 - Also pending (unrelated): Karl's prod test of PR #30 (groups); `docs/groups-deployed` not yet merged to main
 
