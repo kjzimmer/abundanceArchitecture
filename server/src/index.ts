@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
@@ -15,6 +15,8 @@ import inboxRouter from './routes/inbox';
 import docsRouter from './routes/docs';
 import groupsRouter from './routes/groups';
 import sharePagesRouter from './routes/sharePages';
+import { createSiteRouter } from './routes/site';
+import { reviewSecretConfigured } from './site/review';
 import { startNewsletterQueue } from './jobs/newsletterQueue';
 import { resendWebhookHandler } from './routes/webhooks';
 import { inboundEmailHandler } from './routes/inbound';
@@ -44,6 +46,23 @@ const formLimiter = rateLimit({ ...limiterDefaults, max: 10 });
 const loginLimiter = rateLimit({ ...limiterDefaults, max: 10 });
 const linkLimiter = rateLimit({ ...limiterDefaults, max: 30 });
 const shareLimiter = rateLimit({ ...limiterDefaults, max: 120 }); // /s/<token> browsing + downloads
+
+// Site draft (docs/wip/site-draft.md): only with SITE_MODE=draft (staging). Unset = the teaser, unchanged.
+// Mounted before express.static so "/" is the new Home. The whole host is kept out of search engines.
+if (process.env.SITE_MODE === 'draft') {
+  if (!reviewSecretConfigured()) {
+    console.error('SITE_MODE=draft but REVIEW_LINK_SECRET is missing or short: every draft page will be refused');
+  }
+  app.use((_req: Request, res: Response, next: NextFunction) => {
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    next();
+  });
+  app.get('/robots.txt', (_req: Request, res: Response) => {
+    res.type('text/plain').send('User-agent: *\nDisallow: /\n');
+  });
+  app.use('/r', linkLimiter);
+  app.use(createSiteRouter());
+}
 
 // Compiled output is server/dist/index.js — public/ is two levels up
 app.use(express.static(path.join(__dirname, '..', '..', 'public')));

@@ -25,8 +25,15 @@ routes, data model and content rules; this file records the plan and decisions m
   position). Unanswered question fields take `answerPlaceholders`. Current warnings (seed gaps, not bugs):
   `centralization-readings`, `mullainathan-shafir-2013` and `ryan-deci-2000` have no domain tag; no question is
   tagged `health`
-- **Next: stage 3** — `SITE_MODE=draft` routing, layout (menu, footer, banner), signed reviewer links + cookie
-  gate, noindex/robots
+- **Stage 3 (layout, menu, footer, banner, access, no-index):** ✅ 2026-10-14. `routes/site.ts` (mounted before
+  `express.static` only when `SITE_MODE=draft`), `middleware/reviewGate.ts`, `site/review.ts` (HMAC tokens),
+  `site/layout.ts`, `site/html.ts` (auto-escaping `html` template; `text()` renders `[…]`/null as `.ph`
+  placeholders), `site/pages/` (flags, sign-in, stubs), `public/site/site.css|js`. `npm run review:link`.
+  Locally tested: no cookie → 403 private page; forged/revoked token → 403; owner sees `/review/flags`, reviewer
+  gets 404; unknown slugs 404; `X-Robots-Tag` + `robots.txt` disallow; with `SITE_MODE` unset `/` is still the
+  teaser and no draft routes exist. Stubs remain for every page built in stages 4–8
+- **Karl, staging vars for stage 3:** `SITE_MODE=draft`, `REVIEW_LINK_SECRET` (32+ chars). Then make his owner link
+- **Next: stage 4** — Home from `content/home.md` verbatim, with the three citation notes
 - `incoming/` emptied 2026-10-14 (no `_assessment.md`: a feature brief, not a standards transition)
 - Also pending (unrelated): Karl's prod test of PR #30 (groups); `docs/groups-deployed` not yet merged to main
 

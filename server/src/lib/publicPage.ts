@@ -23,9 +23,11 @@ interface PageInput {
   clearSubscribedFlag?: boolean;
   // Extra links under the content, e.g. "Manage preferences"
   links?: { href: string; label: string }[];
+  // Omit the "Return to …" link (e.g. the site draft's private page, where / is gated)
+  noHomeLink?: boolean;
 }
 
-export function renderPublicPage({ title, heading, message, form, customHtml, clearSubscribedFlag, links = [] }: PageInput): string {
+export function renderPublicPage({ title, heading, message, form, customHtml, clearSubscribedFlag, links = [], noHomeLink }: PageInput): string {
   const clearScript = clearSubscribedFlag
     ? `<script>try { localStorage.removeItem(${JSON.stringify(brand.subscribedStorageKey)}); } catch (e) {}</script>`
     : '';
@@ -36,6 +38,8 @@ export function renderPublicPage({ title, heading, message, form, customHtml, cl
         <input type="hidden" name="t" value="${escapeHtml(form.token)}">
         <button type="submit">${escapeHtml(form.button)}</button>
       </form>`
+    : noHomeLink
+    ? ''
     : `<a class="home" href="/">Return to ${escapeHtml(brand.domain)}</a>`;
   const linksHtml = links.length
     ? `<p class="links">${links.map((l) => `<a href="${escapeHtml(l.href)}">${escapeHtml(l.label)}</a>`).join(' · ')}</p>`
