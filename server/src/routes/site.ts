@@ -6,7 +6,10 @@ import { Router, Request, Response } from 'express';
 import { content } from '../content/load';
 import { acceptReviewLink, ownerOnly, reviewerOf, reviewGate } from '../middleware/reviewGate';
 import { renderPage } from '../site/layout';
-import { notFoundPage, PageBody, signInPage, stubPage } from '../site/pages/common';
+import { notFoundPage, PageBody, signInPage } from '../site/pages/common';
+import {
+  aboutPage, askPage, bookPage, joinPage, learnPage, licencePage, reportPage,
+} from '../site/pages/sections';
 import { flagsPage } from '../site/pages/flags';
 import { homePage } from '../site/pages/home';
 import { domainPage, domainsPage } from '../site/pages/domains';
@@ -40,7 +43,6 @@ export function createSiteRouter(): Router {
   router.get('/r/:token', acceptReviewLink);
   router.get('/review/flags', reviewGate, ownerOnly, (req, res) => send(req, res, flagsPage(c)));
 
-  // Built stage by stage; stubs until then (brief §10)
   page('/', () => homePage(c));
   page('/domains', () => domainsPage(c));
   page('/domains/:slug', (req) => {
@@ -52,7 +54,7 @@ export function createSiteRouter(): Router {
     const q = c.question(slug(req));
     return q ? questionPage(c, q) : null;
   });
-  page('/learn', () => stubPage('Learn'));
+  page('/learn', () => learnPage(c));
   page('/vital-signs', () => signsPage(c));
   page('/vital-signs/:slug', (req) => {
     const s = c.sign(slug(req));
@@ -63,17 +65,17 @@ export function createSiteRouter(): Router {
     const i = c.initiative(slug(req));
     return i ? initiativePage(c, i) : null;
   });
-  page('/book', () => stubPage('Book'));
-  page('/report', () => stubPage('Report'));
-  page('/join', () => stubPage('Join'));
+  page('/book', () => bookPage(c));
+  page('/report', () => reportPage(c));
+  page('/join', () => joinPage(c));
   page('/references', (req) => referencesPage(c, req.query));
   page('/references/:slug', (req) => {
     const r = c.reference(slug(req));
     return r ? referencePage(c, r) : null;
   });
-  page('/about', () => stubPage('About'));
-  page('/licence', () => stubPage('Licence'));
-  page('/ask', () => stubPage('Ask a question'));
+  page('/about', () => aboutPage(c));
+  page('/licence', () => licencePage(c));
+  page('/ask', () => askPage(c));
   page('/sign-in', () => signInPage());
 
   return router;

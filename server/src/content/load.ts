@@ -6,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import type {
-  Citation, Claim, Domain, Enums, FlagEntry, Home, Initiative, Learn, Question, Reference, VitalSign,
+  Citation, Claim, Domain, Enums, FlagEntry, Home, Initiative, Learn, Pages, Question, Reference, VitalSign,
 } from './types';
 
 // Same depth from src/content (tsx) and dist/content (compiled): repo root is three levels up
@@ -28,6 +28,7 @@ export interface Content {
   references: Reference[];
   learn: Learn;
   home: Home;
+  pages: Pages;
   domain(slug: string): Domain | undefined;
   question(slug: string): Question | undefined;
   sign(slug: string): VitalSign | undefined;
@@ -72,6 +73,7 @@ export function loadContent(): Content {
   }>('references.json');
   const learn = readJson<Learn>('learn.json');
   const home = readJson<Home>('home.json');
+  const pages = readJson<Pages>('pages.json');
 
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -248,6 +250,7 @@ export function loadContent(): Content {
   fileFlag('references.json', referencesFile.note);
   fileFlag('learn.json', learn.note);
   fileFlag('home.json', home.note);
+  fileFlag('pages.json', pages.note);
 
   const recordFlag = (collection: string, label: string, href: string, r: { draft?: boolean; note?: string }, extraNote?: string) => {
     const note = [r.note, extraNote].filter(Boolean).join(' ') || null;
@@ -274,6 +277,7 @@ export function loadContent(): Content {
     references,
     learn,
     home,
+    pages,
     domain: bySlug(domains),
     question: bySlug(questions),
     sign: bySlug(signs),

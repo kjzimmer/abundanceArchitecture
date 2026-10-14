@@ -57,7 +57,16 @@ routes, data model and content rules; this file records the plan and decisions m
   "Cited on" (computed by `content.citedOn()` from Home/question/sign citations, merged with the seed's `citedOn`)
   and evidence status; per source: how we read it, "Open the source" (placeholder when no URL). Reference page adds
   a Related panel. Verified: all three Home citation notes link to reference pages that list Home as cited on
-- **Next: stage 8** — Learn, Book, Report, Join, About, Licence (+ the `/ask` question form)
+- **Stage 8 (Learn, Book, Report, Join, About, Licence, Ask):** ✅ 2026-10-14. `site/pages/sections.ts`; copy in
+  new `content/pages.json` (About/Ask/Report reuse live-teaser wording; Join reuses Home part 4). Forms post JSON
+  via `public/site/site.js` with Turnstile: Ask → existing `/api/contact` (Inbox), Report → existing
+  `/api/subscribe` (double opt-in; staging redirects the email to Karl), Join → new `/api/site/join`
+  (`routes/siteForms.ts` behind the reviewer gate → `services/SiteDraftService.ts`: Inbox conversation
+  "Founding member interest" + membership of the auto-created "Founding member interest" group). Learn: Ask box,
+  answer modes and feedback buttons visibly disabled ("After first launch"); 3 video + 1 podcast placeholders.
+  New UI wording of mine for Karl to check: Join "No payment is taken here. This records your interest.", button
+  "Register interest", success "Thank you. Your interest is recorded."
+- **Next: stage 9** — "Comment on this page" reviewer feedback on every page + a note for Karl on editing records
 - `incoming/` emptied 2026-10-14 (no `_assessment.md`: a feature brief, not a standards transition)
 - Also pending (unrelated): Karl's prod test of PR #30 (groups); `docs/groups-deployed` not yet merged to main
 

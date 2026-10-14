@@ -1,0 +1,35 @@
+{
+  "note": "Copy for the short pages. About, Ask and Report reuse wording already on the live teaser (public/index.html); Join reuses Home part 4 (content/home.json). Bracketed text is a placeholder.",
+  "about": {
+    "eyebrow": "A public inquiry into human flourishing",
+    "paragraphs": [
+      "Human flourishing requires more than sound money, more than good technology, and more than good intentions. It requires deliberate choices about how the systems governing daily human life are built — and those choices are being made right now, largely without public deliberation, with consequences that will be very difficult to reverse. This is a long-term inquiry into that architecture: what it is, how it fails, and what it would take to build it well.",
+      "The inquiry begins with a book — Abundance Architecture, in development — and extends through the sites, the conversation, and the public dialog that follows. The goal is a conversation serious enough to match the scale of what is at stake."
+    ],
+    "more": "[WHO IS BEHIND THE PROJECT, AND HOW TO REACH US]"
+  },
+  "ask": {
+    "intro": "A question, a pushback, a point of contact — all welcome. This is a conversation, not a broadcast."
+  },
+  "report": {
+    "intro": "Once a month: what moved, what changed, what we got wrong.",
+    "archiveHeading": "Archive",
+    "archiveEmpty": "[NO ISSUES YET. THE FIRST REPORT IS STILL TO BE WRITTEN]",
+    "signupHeading": "Follow the report",
+    "signupText": "This is a long-term project. Essays, updates, and invitations to dialog will be shared as the inquiry develops."
+  },
+  "book": {
+    "seriesTitle": "Abundance Architecture",
+    "seriesDescription": "[DESCRIPTION OF THE SERIES]",
+    "essays": ["[ESSAY TITLE]", "[ESSAY TITLE]", "[ESSAY TITLE]"]
+  },
+  "join": {
+    "waysIn": "[TWO WAYS IN: DUES OR CONTRIBUTED WORK. TIERS AND PRICE STILL TO BE DECIDED]",
+    "foundingHeading": "Founding members",
+    "foundingText": "[WHAT FOUNDING MEMBERSHIP MEANS]",
+    "noPayments": "No payment is taken here. This records your interest."
+  },
+  "licence": {
+    "text": "[LICENCE FOR THE COMMONS MATERIAL: NOT YET CHOSEN]"
+  }
+}

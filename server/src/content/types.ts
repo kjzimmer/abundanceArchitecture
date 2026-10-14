@@ -234,6 +234,17 @@ export interface Home {
   };
 }
 
+/** content/pages.json: copy for the short pages */
+export interface Pages {
+  note?: string;
+  about: { eyebrow: string; paragraphs: string[]; more: string };
+  ask: { intro: string };
+  report: { intro: string; archiveHeading: string; archiveEmpty: string; signupHeading: string; signupText: string };
+  book: { seriesTitle: string; seriesDescription: string; essays: string[] };
+  join: { waysIn: string; foundingHeading: string; foundingText: string; noPayments: string };
+  licence: { text: string };
+}
+
 /** A record or file awaiting Karl's edit, for the owner-only flags page */
 export interface FlagEntry {
   collection: string;

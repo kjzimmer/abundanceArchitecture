@@ -16,6 +16,7 @@ import docsRouter from './routes/docs';
 import groupsRouter from './routes/groups';
 import sharePagesRouter from './routes/sharePages';
 import { createSiteRouter } from './routes/site';
+import siteFormsRouter from './routes/siteForms';
 import { reviewSecretConfigured } from './site/review';
 import { startNewsletterQueue } from './jobs/newsletterQueue';
 import { resendWebhookHandler } from './routes/webhooks';
@@ -61,6 +62,7 @@ if (process.env.SITE_MODE === 'draft') {
     res.type('text/plain').send('User-agent: *\nDisallow: /\n');
   });
   app.use('/r', linkLimiter);
+  app.use('/api/site', formLimiter, siteFormsRouter);
   app.use(createSiteRouter());
 }
 
