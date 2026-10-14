@@ -45,7 +45,14 @@ routes, data model and content rules; this file records the plan and decisions m
   next-domain link. New optional domain fields `lastRevised`, `inTheBook` (placeholders until set). Wireframe-only
   examples not in the seed (Fasten Health, Cochrane) are not shown. References link goes to
   `/references?domain=<slug>` (filter built in stage 7)
-- **Next: stage 6** — Initiatives register + initiative page; Questions; Vital Signs; Related panel
+- **Stage 6 (Initiatives, Questions, Vital Signs, Related panel):** ✅ 2026-10-14. `site/pages/initiatives.ts`,
+  `questions.ts`, `signs.ts`; `relatedPanel()` + filter helpers in `site/ui.ts`. Register filters are a GET form
+  (work without JS, shareable URLs; JS auto-submits selects). Initiative page: tags, six-step stage tracker, status
+  log, members-only discussion/working group. Tables become labelled cards at phone width. Omitted the wireframe
+  line "Nothing is listed without a named owner" (false: all seed owners are unnamed). Questions intro = site map
+  wording; Vital Signs intro = Home card wording. Vital sign "basis" is shown on the sign page; two bases mention
+  internal chats ("metrics chat") — Karl to reword if unwanted
+- **Next: stage 7** — References (+ `?domain=` filter) and the reference page; citation notes already exist
 - `incoming/` emptied 2026-10-14 (no `_assessment.md`: a feature brief, not a standards transition)
 - Also pending (unrelated): Karl's prod test of PR #30 (groups); `docs/groups-deployed` not yet merged to main
 

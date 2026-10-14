@@ -88,14 +88,14 @@ export function domainPage(c: Content, d: Domain): PageBody {
         <h2>Structures</h2>
         <p class="hint">What exists, what exists in part, and what has yet to be built.</p>
         ${d.structures.length ? html`<div class="table-scroll">
-          <table class="data-table">
+          <table class="data-table stack">
             <thead><tr><th scope="col">Structure</th><th scope="col">Form</th><th scope="col">Status</th><th scope="col">Main capture risk</th></tr></thead>
             <tbody>
               ${d.structures.map((s) => html`<tr>
                 <th scope="row">${s.name}</th>
-                <td>${formLabels(c, s.forms)}</td>
-                <td>${enumLabel(c.enums.structureStatuses, s.status)}</td>
-                <td>${text(s.captureRisk, '[CAPTURE RISK]')}</td>
+                <td data-label="Form">${formLabels(c, s.forms)}</td>
+                <td data-label="Status">${enumLabel(c.enums.structureStatuses, s.status)}</td>
+                <td data-label="Main capture risk">${text(s.captureRisk, '[CAPTURE RISK]')}</td>
               </tr>`)}
             </tbody>
           </table>

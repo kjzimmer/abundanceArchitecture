@@ -10,6 +10,9 @@ import { notFoundPage, PageBody, signInPage, stubPage } from '../site/pages/comm
 import { flagsPage } from '../site/pages/flags';
 import { homePage } from '../site/pages/home';
 import { domainPage, domainsPage } from '../site/pages/domains';
+import { initiativePage, initiativesPage } from '../site/pages/initiatives';
+import { questionPage, questionsPage } from '../site/pages/questions';
+import { signPage, signsPage } from '../site/pages/signs';
 
 export function createSiteRouter(): Router {
   // Load now so invalid content fails startup (and the deploy) instead of a page request
@@ -43,13 +46,22 @@ export function createSiteRouter(): Router {
     const d = c.domain(slug(req));
     return d ? domainPage(c, d) : null;
   });
-  page('/questions', () => stubPage('Questions'));
-  page('/questions/:slug', (req) => (c.question(slug(req)) ? stubPage('Question') : null));
+  page('/questions', (req) => questionsPage(c, req.query));
+  page('/questions/:slug', (req) => {
+    const q = c.question(slug(req));
+    return q ? questionPage(c, q) : null;
+  });
   page('/learn', () => stubPage('Learn'));
-  page('/vital-signs', () => stubPage('Vital Signs'));
-  page('/vital-signs/:slug', (req) => (c.sign(slug(req)) ? stubPage(c.sign(slug(req))!.name) : null));
-  page('/initiatives', () => stubPage('Initiatives'));
-  page('/initiatives/:slug', (req) => (c.initiative(slug(req)) ? stubPage(c.initiative(slug(req))!.name) : null));
+  page('/vital-signs', () => signsPage(c));
+  page('/vital-signs/:slug', (req) => {
+    const s = c.sign(slug(req));
+    return s ? signPage(c, s) : null;
+  });
+  page('/initiatives', (req) => initiativesPage(c, req.query));
+  page('/initiatives/:slug', (req) => {
+    const i = c.initiative(slug(req));
+    return i ? initiativePage(c, i) : null;
+  });
   page('/book', () => stubPage('Book'));
   page('/report', () => stubPage('Report'));
   page('/join', () => stubPage('Join'));

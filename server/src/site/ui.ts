@@ -4,6 +4,7 @@
 import type { Content } from '../content/load';
 import type { EnumItem, Initiative, Question, VitalSign } from '../content/types';
 import { html, Html, ph, text } from './html';
+import { lockIcon } from './layout';
 
 export function breadcrumb(items: { label: string; href?: string }[]): Html {
   return html`<nav class="breadcrumb" aria-label="Breadcrumb"><ol>
@@ -54,6 +55,60 @@ export function initiativeList(c: Content, list: Initiative[]): Html {
     <a href="/initiatives/${i.slug}">${i.name}</a>
     <span class="meta">${enumLabel(c.enums.whose, i.whose)} · ${enumLabel(c.enums.initiativeStages, i.stage)}</span>
   </li>`)}</ul>`;
+}
+
+/** A single query-string value. Repeated keys (hidden current value + clicked button) resolve to the last */
+export function queryValue(query: Record<string, unknown>, key: string): string {
+  const v = query[key];
+  const last = Array.isArray(v) ? v[v.length - 1] : v;
+  return typeof last === 'string' ? last.trim() : '';
+}
+
+export function selectFilter(
+  id: string, label: string, name: string, allLabel: string,
+  options: { value: string; label: string }[], current: string,
+): Html {
+  return html`<div class="filter-field">
+  <label for="${id}">${label}</label>
+  <select id="${id}" name="${name}" data-autosubmit>
+    <option value="">${allLabel}</option>
+    ${options.map((o) => html`<option value="${o.value}"${o.value === current ? html` selected` : ''}>${o.label}</option>`)}
+  </select>
+</div>`;
+}
+
+export function domainOptions(c: Content): { value: string; label: string }[] {
+  return c.domains.map((d) => ({ value: d.slug, label: d.name }));
+}
+
+/** "Members can …" notice with the lock, linking to Join (member actions are inactive in the draft) */
+export function membersNotice(textLabel: string, linkLabel = 'Join'): Html {
+  return html`<p class="members-notice"><span class="members-only-inline">${lockIcon}${textLabel}</span> <a href="/join">${linkLabel}</a></p>`;
+}
+
+/**
+ * Related panel on every record page (brief §8): questions, vital signs, initiatives and learning material
+ * sharing a domain (or, for initiatives, a form) with the record. Computed, never hand-maintained.
+ */
+export function relatedPanel(
+  c: Content,
+  tags: { domains?: string[]; forms?: string[] },
+  exclude: { slug: string },
+): Html {
+  const r = c.related(tags, exclude);
+  const domainNames = (tags.domains ?? []).map((s) => c.domain(s)?.name ?? s);
+  const basis = [
+    domainNames.length ? `the ${domainNames.join(' or ')} domain${domainNames.length > 1 ? 's' : ''}` : '',
+    tags.forms?.length ? 'the same form' : '',
+  ].filter(Boolean).join(' or ');
+  return html`<div class="panel related">
+  <h2>Related</h2>
+  ${basis ? html`<p class="hint">Records sharing ${basis}</p>` : html`<p class="hint">${ph('[NO DOMAIN TAG YET]')}</p>`}
+  <h3>Questions</h3>${questionList(r.questions)}
+  <h3>Vital Signs</h3>${signList(c, r.signs)}
+  <h3>Initiatives</h3>${initiativeList(c, r.initiatives)}
+  <h3>Learn</h3>${noneYet('[LEARNING MATERIAL, AFTER FIRST LAUNCH]')}
+</div>`;
 }
 
 /** Learning material has no collection yet (the Learn commons comes after first launch) */

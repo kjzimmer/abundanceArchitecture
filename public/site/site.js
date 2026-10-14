@@ -9,4 +9,11 @@
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
   }
+
+  // Register filters: apply a select as soon as it changes (the Apply button covers no-JS)
+  document.querySelectorAll('select[data-autosubmit]').forEach(function (select) {
+    select.addEventListener('change', function () {
+      if (select.form) select.form.submit();
+    });
+  });
 })();
