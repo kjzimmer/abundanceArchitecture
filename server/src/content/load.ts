@@ -34,6 +34,8 @@ export interface Content {
   initiative(slug: string): Initiative | undefined;
   reference(slug: string): Reference | undefined;
   citation(key: string): Citation | undefined;
+  /** Site paths citing this claim: the claim's own `citedOn` plus every citation actually used on a page */
+  citedOn(reference: Reference, claim: Claim): string[];
   /** Records sharing a domain (any collection) or a form (initiatives). Never hand-maintained */
   related(tags: { domains?: string[]; forms?: string[] }, exclude?: { slug: string }): Related;
   /** Records and files flagged draft or carrying a note (owner-only view) */
@@ -199,6 +201,21 @@ export function loadContent(): Content {
   for (const s of signs) for (const k of s.sources ?? []) if (!citation(k)) errors.push(`vital-signs/${s.slug}: unknown citation "${k}"`);
   for (const e of home.whatAbundanceIs.evidence) if (!citation(e.cite)) errors.push(`home: unknown citation "${e.cite}"`);
 
+  // Where each claim is cited, computed from the pages that cite it
+  const usedOn = new Map<string, Set<string>>();
+  const use = (key: string, pagePath: string) => {
+    const cite = citation(key);
+    if (!cite) return;
+    const id = `${cite.reference.slug}#${cite.claim.id}`;
+    if (!usedOn.has(id)) usedOn.set(id, new Set());
+    usedOn.get(id)!.add(pagePath);
+  };
+  for (const e of home.whatAbundanceIs.evidence) use(e.cite, '/');
+  for (const q of questions) for (const k of q.sources ?? []) use(k, `/questions/${q.slug}`);
+  for (const s of signs) for (const k of s.sources ?? []) use(k, `/vital-signs/${s.slug}`);
+  const citedOn = (r: Reference, claim: Claim) =>
+    [...new Set([...claim.citedOn, ...(usedOn.get(`${r.slug}#${claim.id}`) ?? [])])];
+
   if (errors.length) {
     throw new Error(`Site content is invalid:\n  - ${errors.join('\n  - ')}`);
   }
@@ -263,6 +280,7 @@ export function loadContent(): Content {
     initiative: bySlug(initiatives),
     reference,
     citation,
+    citedOn,
     related,
     flags,
     warnings,

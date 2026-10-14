@@ -52,7 +52,12 @@ routes, data model and content rules; this file records the plan and decisions m
   line "Nothing is listed without a named owner" (false: all seed owners are unnamed). Questions intro = site map
   wording; Vital Signs intro = Home card wording. Vital sign "basis" is shown on the sign page; two bases mention
   internal chats ("metrics chat") — Karl to reword if unwanted
-- **Next: stage 7** — References (+ `?domain=` filter) and the reference page; citation notes already exist
+- **Stage 7 (References + citation notes):** ✅ 2026-10-14. `site/pages/references.ts`. Evidence levels explained
+  from `enums.json`; filters: domain (incl. "Across domains" = untagged), kind, evidence status, search. Per claim:
+  "Cited on" (computed by `content.citedOn()` from Home/question/sign citations, merged with the seed's `citedOn`)
+  and evidence status; per source: how we read it, "Open the source" (placeholder when no URL). Reference page adds
+  a Related panel. Verified: all three Home citation notes link to reference pages that list Home as cited on
+- **Next: stage 8** — Learn, Book, Report, Join, About, Licence (+ the `/ask` question form)
 - `incoming/` emptied 2026-10-14 (no `_assessment.md`: a feature brief, not a standards transition)
 - Also pending (unrelated): Karl's prod test of PR #30 (groups); `docs/groups-deployed` not yet merged to main
 

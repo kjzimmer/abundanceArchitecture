@@ -13,6 +13,7 @@ import { domainPage, domainsPage } from '../site/pages/domains';
 import { initiativePage, initiativesPage } from '../site/pages/initiatives';
 import { questionPage, questionsPage } from '../site/pages/questions';
 import { signPage, signsPage } from '../site/pages/signs';
+import { referencePage, referencesPage } from '../site/pages/references';
 
 export function createSiteRouter(): Router {
   // Load now so invalid content fails startup (and the deploy) instead of a page request
@@ -65,8 +66,11 @@ export function createSiteRouter(): Router {
   page('/book', () => stubPage('Book'));
   page('/report', () => stubPage('Report'));
   page('/join', () => stubPage('Join'));
-  page('/references', () => stubPage('References'));
-  page('/references/:slug', (req) => (c.reference(slug(req)) ? stubPage('Reference') : null));
+  page('/references', (req) => referencesPage(c, req.query));
+  page('/references/:slug', (req) => {
+    const r = c.reference(slug(req));
+    return r ? referencePage(c, r) : null;
+  });
   page('/about', () => stubPage('About'));
   page('/licence', () => stubPage('Licence'));
   page('/ask', () => stubPage('Ask a question'));

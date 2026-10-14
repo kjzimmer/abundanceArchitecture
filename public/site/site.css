@@ -568,6 +568,21 @@ p { margin-bottom: 1.2rem; color: var(--ink-mid); }
 .facts { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1rem; margin: 0.5rem 0; font-size: 0.92rem; }
 .facts dt { font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); padding-top: 0.2rem; }
 
+/* ── References ───────────────────────────────────────────────────────────── */
+.evidence-levels { list-style: none; margin: 1.5rem 0; }
+.reference-list { display: grid; gap: 1rem; }
+.reference { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 1rem 2rem; }
+@media (max-width: 760px) { .reference { grid-template-columns: minmax(0, 1fr); } }
+.reference .meta { margin: 0 0 0.35rem; }
+.reference h2 { font-size: 1.1rem; line-height: 1.45; margin: 0 0 0.75rem; }
+.reference h2 a { color: var(--ink); text-decoration: none; }
+.reference h2 a:hover { color: var(--accent); text-decoration: underline; }
+.label-inline { font-family: var(--sans); font-size: 0.78rem; font-weight: 500; color: var(--ink-light); }
+.reference-facts .facts { grid-template-columns: 1fr; gap: 0.1rem; margin: 0 0 0.75rem; }
+.reference-facts .facts dd { margin-bottom: 0.4rem; }
+.claim { margin-bottom: 1rem; }
+.claim-text { font-size: 1.1rem; color: var(--ink); }
+
 /* ── Owner-only flags page ───────────────────────────────────────────────── */
 .flag-group h2 { font-size: 1.25rem; }
 .flag-group .count { font-family: var(--sans); font-size: 0.75rem; color: var(--ink-light); }
