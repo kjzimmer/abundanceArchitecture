@@ -18,6 +18,15 @@ routes, data model and content rules; this file records the plan and decisions m
   changes meanwhile go to prod directly as before (and get rebased into `feat/site-draft`). Staging becomes the
   pre-prod gate for every change only after the draft is live. Fallback for an urgent staged fix: point staging at
   the fix branch briefly, then back (reviewer links + file content survive)
+- **Stage 2 (content mechanism, data model, seed import):** ✅ 2026-10-14. `content/*.json` (seed verbatim) +
+  `server/src/content/` (`types.ts`, `load.ts`: validation, lookups, `related()`, `citation()`, flags).
+  `npm run content:check` validates locally; the server validates the same way at startup. Citation keys:
+  `<reference-slug>` (single-claim reference) or `<reference-slug>#<claim-id>` (claim id defaults to its 1-based
+  position). Unanswered question fields take `answerPlaceholders`. Current warnings (seed gaps, not bugs):
+  `centralization-readings`, `mullainathan-shafir-2013` and `ryan-deci-2000` have no domain tag; no question is
+  tagged `health`
+- **Next: stage 3** — `SITE_MODE=draft` routing, layout (menu, footer, banner), signed reviewer links + cookie
+  gate, noindex/robots
 - `incoming/` emptied 2026-10-14 (no `_assessment.md`: a feature brief, not a standards transition)
 - Also pending (unrelated): Karl's prod test of PR #30 (groups); `docs/groups-deployed` not yet merged to main
 

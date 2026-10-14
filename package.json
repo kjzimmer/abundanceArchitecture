@@ -11,7 +11,8 @@
     "start": "cd server && npm run start",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
-    "seed:admin": "npx tsx server/src/scripts/seed-admin.ts"
+    "seed:admin": "npx tsx server/src/scripts/seed-admin.ts",
+    "content:check": "npx tsx server/src/scripts/check-content.ts"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
