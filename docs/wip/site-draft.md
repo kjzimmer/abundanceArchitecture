@@ -5,6 +5,29 @@
 Seed data and Home copy now live in `content/` at the repo root. The brief is authoritative for scope, pages,
 routes, data model and content rules; this file records the plan and decisions made against it.*
 
+## Resume here (fresh session)
+
+*Updated 2026-10-14.* The draft is fully built (all 9 brief stages) and live on staging. **Karl is doing a full
+walkthrough and will bring many questions and comments.** Next session: start from his feedback, log it in
+"Review feedback" below, then plan changes with him before editing. Nothing here is blocked.
+
+- **See it:** https://draft.abundancearchitecture.world with Karl's owner link (lost link → regenerate:
+  `railway run --environment staging --service abundanceArchitecture npm run review:link -- --name "Karl Zimmer" --email karl@abundancearchitecture.world --owner`)
+- **Code map:** `content/*.json` (all records + copy; guide in `content/README.md`) → `server/src/content/load.ts`
+  (validation, lookups, related, citations) → `server/src/routes/site.ts` (pages) → `server/src/site/pages/*.ts`
+  (one file per section) + `site/layout.ts`, `site/ui.ts`, `site/html.ts`, `site/citation.ts`;
+  forms: `routes/siteForms.ts` → `services/SiteDraftService.ts`; styles/JS: `public/site/`
+- **Verify locally:** `npm run content:check`; server with `SITE_MODE=draft REVIEW_LINK_SECRET=<32+ chars>
+  EMAIL_MODE=log` + a link from `npm run review:link`
+- **Workflow:** commit to `feat/site-draft` and push → staging redeploys (~2 min). Never merge to `main` until Karl
+  says so
+
+## Review feedback (Karl)
+
+*Log Karl's questions and comments here as they come, with what was decided and done.*
+
+- (none yet)
+
 ## Status
 
 - **Stage 1 (findings + plan):** approved by Karl 2026-10-14. All four decisions below made
