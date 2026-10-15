@@ -22,6 +22,15 @@ walkthrough and will bring many questions and comments.** Next session: start fr
 - **Workflow:** commit to `feat/site-draft` and push → staging redeploys (~2 min). Never merge to `main` until Karl
   says so
 
+## Reviewer links issued
+
+*Revoke one by adding the email to staging's `REVIEW_REVOKED`.*
+
+| Reviewer | Email | Role | Issued |
+|---|---|---|---|
+| Karl Zimmer | karl@abundancearchitecture.world | owner | 2026-10-14 |
+| Hans Prahl | hans.t.prahl@gmail.com | reviewer | 2026-10-15 |
+
 ## Review feedback (Karl)
 
 *Log Karl's questions and comments here as they come, with what was decided and done.*
