@@ -28,7 +28,8 @@
       "kind": "Book", "url": null, "howRead": null,
       "domains": ["governance", "ecology"],
       "claims": [
-        { "claim": "Communities can govern shared resources well, under the right conditions, without central direction.", "citedOn": ["/"], "status": null, "note": "Claude chose this source for the claim. Karl to confirm." }
+        { "claim": "Communities can govern shared resources well, under the right conditions, without central direction.", "citedOn": ["/"], "status": null, "note": "Claude chose this source for the claim. Karl to confirm." },
+        { "claim": "Communities governing shared resources themselves have often matched or outperformed central management.", "citedOn": ["/"], "status": null }
       ]
     },
     {
@@ -77,6 +78,26 @@
       "domains": ["security-and-defence"],
       "claims": [
         { "claim": "Weak development and limited state capacity influence conflict far more than climate does.", "citedOn": [], "status": null }
+      ]
+    },
+    {
+      "slug": "hayek-1945",
+      "shortCitation": "Hayek, The Use of Knowledge in Society (1945)",
+      "citation": "Hayek, F. A. (1945). The Use of Knowledge in Society. American Economic Review, 35(4).",
+      "kind": "Journal article", "url": null, "howRead": null,
+      "domains": ["governance", "production-and-labor"],
+      "claims": [
+        { "claim": "The information needed to run a complex system is spread among the people in it. No center can gather it all.", "citedOn": ["/"], "status": null }
+      ]
+    },
+    {
+      "slug": "scott-1998",
+      "shortCitation": "Scott, Seeing Like a State (1998)",
+      "citation": "Scott, J. C. (1998). Seeing Like a State: How Certain Schemes to Improve the Human Condition Have Failed. Yale University Press.",
+      "kind": "Book", "url": null, "howRead": null,
+      "domains": ["governance"],
+      "claims": [
+        { "claim": "Large schemes that simplified complex realities in order to control them have repeatedly failed.", "citedOn": ["/"], "status": null }
       ]
     }
   ]

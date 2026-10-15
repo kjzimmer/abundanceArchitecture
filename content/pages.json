@@ -1,12 +1,31 @@
 {
-  "note": "Copy for the short pages. About, Ask and Report reuse wording already on the live teaser (public/index.html); Join reuses Home part 4 (content/home.json). Bracketed text is a placeholder.",
+  "note": "Copy for the short pages. About is from Karl's 15 Oct update (docs/wip/site-draft/UPDATE_2026-10-15_home_about.md). Ask and Report reuse wording already on the live teaser (public/index.html); Join reuses Home part 4 (content/home.json). Bracketed text is a placeholder.",
   "about": {
-    "eyebrow": "A public inquiry into human flourishing",
-    "paragraphs": [
-      "Human flourishing requires more than sound money, more than good technology, and more than good intentions. It requires deliberate choices about how the systems governing daily human life are built — and those choices are being made right now, largely without public deliberation, with consequences that will be very difficult to reverse. This is a long-term inquiry into that architecture: what it is, how it fails, and what it would take to build it well.",
-      "The inquiry begins with a book — Abundance Architecture, in development — and extends through the sites, the conversation, and the public dialog that follows. The goal is a conversation serious enough to match the scale of what is at stake."
+    "intro": "Abundance Architecture is a meeting place for understanding complex systems: it gathers the research, the expertise and the conversations, and uses AI to weave them into understanding anyone can learn from and act on.",
+    "sections": [
+      {
+        "heading": "Why now",
+        "paragraphs": [
+          "For the first time, we have both the science of complex adaptive systems and tools able to hold and connect knowledge at the scale those systems demand.",
+          "The shift from centralized, reductionist thinking to distributed, holistic thinking will not happen through one book or one institution. It needs a commons where that understanding can emerge, built on what we know today and the conversations we have here."
+        ]
+      },
+      {
+        "heading": "How understanding grows here",
+        "paragraphs": [
+          "Nothing on this site is a finished answer. Understanding grows the way complex systems do: from many contributions, tested against evidence, and revised as we learn. Questions are kept open in public. Claims are labelled by how well the evidence supports them. Disagreement is recorded, not smoothed away."
+        ]
+      },
+      {
+        "heading": "Who is behind it",
+        "paragraphs": ["[ABOUT THE AUTHOR AND CONTRIBUTORS]"]
+      }
     ],
-    "more": "[WHO IS BEHIND THE PROJECT, AND HOW TO REACH US]"
+    "links": [
+      { "label": "The open questions", "href": "/questions" },
+      { "label": "Learn", "href": "/learn" },
+      { "label": "Become a member", "href": "/join" }
+    ]
   },
   "ask": {
     "intro": "A question, a pushback, a point of contact — all welcome. This is a conversation, not a broadcast."

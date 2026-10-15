@@ -35,7 +35,17 @@ walkthrough and will bring many questions and comments.** Next session: start fr
 
 *Log Karl's questions and comments here as they come, with what was decided and done.*
 
-- (none yet)
+- **2026-10-15 Home + About copy update** (Karl's brief:
+  [site-draft/UPDATE_2026-10-15_home_about.md](site-draft/UPDATE_2026-10-15_home_about.md)). Done:
+  new Home purpose statement; new part 2 heading, paragraph, three cited points (`points` + `leadIn` in
+  `home.json`, rendered by `home.ts`) before the unchanged cards; About replaced (`pages.json` → `about.intro`,
+  `sections`, `links`; "Who is behind it" stays a placeholder). References: added `hayek-1945`, `scott-1998`
+  (appended, so existing numbering is unchanged) and a second claim on `ostrom-1990`. Knock-on: part 1's card now
+  cites `ostrom-1990#1` (a bare slug is ambiguous once a reference has two claims). Short citations for the two
+  new references follow the existing "Author, Title (year)" pattern (derived from Karl's table, not invented).
+  Purpose statement font scaled down a step so the longer statement keeps the question near the fold. Verified:
+  29 copy strings verbatim; before/after render of every page shows only Home, About, References and the
+  references count on Governance / Production and labor changed
 
 ## Status
 

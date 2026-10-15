@@ -201,7 +201,11 @@ export function loadContent(): Content {
   // Citation keys used by records must resolve
   for (const q of questions) for (const k of q.sources ?? []) if (!citation(k)) errors.push(`questions/${q.slug}: unknown citation "${k}"`);
   for (const s of signs) for (const k of s.sources ?? []) if (!citation(k)) errors.push(`vital-signs/${s.slug}: unknown citation "${k}"`);
-  for (const e of home.whatAbundanceIs.evidence) if (!citation(e.cite)) errors.push(`home: unknown citation "${e.cite}"`);
+  const homeCites = [
+    ...home.whatAbundanceIs.evidence.map((e) => e.cite),
+    ...(home.whyItIsntArriving.points ?? []).map((p) => p.cite),
+  ];
+  for (const k of homeCites) if (!citation(k)) errors.push(`home: unknown citation "${k}"`);
 
   // Where each claim is cited, computed from the pages that cite it
   const usedOn = new Map<string, Set<string>>();
@@ -212,7 +216,7 @@ export function loadContent(): Content {
     if (!usedOn.has(id)) usedOn.set(id, new Set());
     usedOn.get(id)!.add(pagePath);
   };
-  for (const e of home.whatAbundanceIs.evidence) use(e.cite, '/');
+  for (const k of homeCites) use(k, '/');
   for (const q of questions) for (const k of q.sources ?? []) use(k, `/questions/${q.slug}`);
   for (const s of signs) for (const k of s.sources ?? []) use(k, `/vital-signs/${s.slug}`);
   const citedOn = (r: Reference, claim: Claim) =>

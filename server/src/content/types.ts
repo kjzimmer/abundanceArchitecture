@@ -207,6 +207,10 @@ export interface Home {
     label: string;
     heading: string;
     body: string[];
+    /** Cited points after the opening paragraph; `source` is the label of the citation note */
+    points?: { label: string; text: string; source: string; cite: string }[];
+    /** Line introducing the cards */
+    leadIn?: string;
     cards: { title: string; text: string }[];
     after: string[];
     boxed: string;
@@ -237,7 +241,11 @@ export interface Home {
 /** content/pages.json: copy for the short pages */
 export interface Pages {
   note?: string;
-  about: { eyebrow: string; paragraphs: string[]; more: string };
+  about: {
+    intro: string;
+    sections: { heading: string; paragraphs: string[] }[];
+    links: HomeLink[];
+  };
   ask: { intro: string };
   report: { intro: string; archiveHeading: string; archiveEmpty: string; signupHeading: string; signupText: string };
   book: { seriesTitle: string; seriesDescription: string; essays: string[] };

@@ -77,6 +77,13 @@ export function homePage(c: Content): PageBody {
     ${partLabel(2, p2.label)}
     <h2 id="part-2">${p2.heading}</h2>
     <div class="measure">${paras(p2.body)}</div>
+    ${p2.points?.length ? html`<ul class="cited-points">
+      ${p2.points.map((pt) => html`<li>
+        <p><strong>${pt.label}</strong> ${pt.text}</p>
+        ${citationNote(c, pt.cite, pt.source)}
+      </li>`)}
+    </ul>` : ''}
+    ${p2.leadIn ? html`<p class="lead-in">${p2.leadIn}</p>` : ''}
     <div class="cards cards-3">
       ${p2.cards.map((card) => html`<div class="card">
         <p class="card-label">${card.title}</p>

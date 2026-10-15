@@ -1,7 +1,7 @@
 {
-  "note": "Copy transcribed verbatim from the brief's home.md (docs/wip/site-draft/home-copy.md). Edit the copy here. Bracketed preview labels are placeholders from the wireframe.",
+  "note": "Copy transcribed verbatim from the brief's home.md (docs/wip/site-draft/home-copy.md), with the purpose statement and the opening of part 2 replaced by the 15 Oct update (docs/wip/site-draft/UPDATE_2026-10-15_home_about.md). Edit the copy here. Bracketed preview labels are placeholders from the wireframe.",
   "opening": {
-    "purpose": "A public inquiry into human flourishing, applying what we now know about complex adaptive systems.",
+    "purpose": "Abundance Architecture is a meeting place for understanding complex systems: it gathers the research, the expertise and the conversations, and uses AI to weave them into understanding anyone can learn from and act on.",
     "question": "Why does the future feel smaller in an age of unprecedented possibility?",
     "paragraphs": [
       "We can do more than any generation before us. We produce more, know more, and reach each other more easily. Yet for most people the sense of scarcity has not lifted. The phone is faster. The anxiety is the same.",
@@ -30,7 +30,7 @@
     "evidence": [
       { "label": "Research on scarcity", "claim": "When survival is in question, attention narrows to the immediate.", "cite": "mullainathan-shafir-2013" },
       { "label": "Research on motivation", "claim": "People do their best work when they have autonomy, competence and connection.", "cite": "ryan-deci-2000" },
-      { "label": "Research on shared resources", "claim": "Communities can govern them well, under the right conditions, without central direction.", "cite": "ostrom-1990" }
+      { "label": "Research on shared resources", "claim": "Communities can govern them well, under the right conditions, without central direction.", "cite": "ostrom-1990#1" }
     ],
     "closing": "Abundance lengthens the horizon.",
     "links": [
@@ -39,10 +39,16 @@
   },
   "whyItIsntArriving": {
     "label": "Why it isn't arriving",
-    "heading": "The problem is not the people. It is the structure.",
+    "heading": "We manage living systems as if they were machines.",
     "body": [
-      "Money, health, food, knowledge and governance are living systems. They stay healthy the way ecosystems do: through many centers, local knowledge, and honest feedback. We have increasingly managed them the other way, from the center and one part at a time, as if the parts were separate."
+      "For two centuries we have solved problems by breaking them into parts and directing them from the center. For machines, that works. For living systems such as economies, health, communities and ecologies, it repeatedly fails, and we now understand why."
     ],
+    "points": [
+      { "label": "Knowledge.", "text": "The information needed to run a complex system is spread among the people in it. No center can gather it all.", "source": "Source: Hayek 1945", "cite": "hayek-1945" },
+      { "label": "History.", "text": "Large schemes that simplified complex realities in order to control them have repeatedly failed.", "source": "Source: Scott 1998", "cite": "scott-1998" },
+      { "label": "Field evidence.", "text": "Communities governing shared resources themselves have often matched or outperformed central management.", "source": "Source: Ostrom 1990", "cite": "ostrom-1990#2" }
+    ],
+    "leadIn": "The pattern shows up wherever we look:",
     "cards": [
       { "title": "Health", "text": "A health system organized around treating disease more than building health." },
       { "title": "Money", "text": "Money that quietly rewards debt over patience." },

@@ -175,10 +175,10 @@ export function joinPage(c: Content): PageBody {
 export function aboutPage(c: Content): PageBody {
   const a = c.pages.about;
   return simple('About', [{ label: 'About' }], html`
-  <p class="eyebrow">${a.eyebrow}</p>
   <h1>About</h1>
-  ${a.paragraphs.map((p) => html`<p>${p}</p>`)}
-  <p>${text(a.more)}</p>`);
+  <p class="intro">${a.intro}</p>
+  ${a.sections.map((s) => html`<h2>${s.heading}</h2>${s.paragraphs.map((p) => html`<p>${text(p)}</p>`)}`)}
+  <p class="section-links">${a.links.map((l) => html`<a class="text-link" href="${l.href}">${l.label}</a>`)}</p>`);
 }
 
 export function licencePage(c: Content): PageBody {
