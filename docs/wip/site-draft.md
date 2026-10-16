@@ -7,9 +7,15 @@ routes, data model and content rules; this file records the plan and decisions m
 
 ## Resume here (fresh session)
 
-*Updated 2026-10-14.* The draft is fully built (all 9 brief stages) and live on staging. **Karl is doing a full
-walkthrough and will bring many questions and comments.** Next session: start from his feedback, log it in
-"Review feedback" below, then plan changes with him before editing. Nothing here is blocked.
+*Updated 2026-10-16.* The draft is fully built (all 9 brief stages) and live on staging. Since then: Karl's
+15 Oct Home/About copy update is applied (see "Review feedback"), and Hans Prahl has a reviewer link (comments
+arrive as `[AA Review]` emails). **Karl is doing a full walkthrough and will bring many questions and comments.**
+Next session: start from his feedback (or a new update brief in `incoming/`), log it in "Review feedback" below,
+then plan changes with him before editing. Nothing here is blocked.
+
+- **Update briefs:** Karl drops copy/feature updates into `incoming/` as `UPDATE_<date>_<topic>.md`. Apply them
+  (wording exactly, never invent), verify verbatim + before/after page diff, then file the brief in
+  `docs/wip/site-draft/` and log it below. No `_assessment.md` needed for these
 
 - **See it:** https://draft.abundancearchitecture.world with Karl's owner link (lost link → regenerate:
   `railway run --environment staging --service abundanceArchitecture npm run review:link -- --name "Karl Zimmer" --email karl@abundancearchitecture.world --owner`)

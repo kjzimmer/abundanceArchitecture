@@ -44,7 +44,8 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   on branch `feat/site-draft`, live only on Railway `staging` (`draft.abundancearchitecture.world`, `SITE_MODE=draft`,
   signed reviewer links, noindex). All 9 brief stages done. Content as files in `content/` (editing guide:
   `content/README.md`). Plan, decisions, done-criteria: `docs/wip/site-draft.md`. Never merge to main until Karl
-  says the draft is ready. Staging serves only the draft until it ships
+  says the draft is ready. Staging serves only the draft until it ships. 15 Oct Home/About copy update applied;
+  reviewer Hans Prahl has a link. Start the next session from "Resume here" in the wip file
 - Groups + CC/BCC (PR #30, deployed 2026-10-13): spec `docs/wip/email-groups.md`. Multi-recipient
   conversations with reply-all, saved Groups (admin → Groups), "Email this group", conversations filed under
   their group. Awaiting Karl's prod test (group email from karl@ → member reply-all → reply from Inbox)
