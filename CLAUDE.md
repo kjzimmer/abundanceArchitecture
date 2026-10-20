@@ -46,6 +46,11 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   `content/README.md`). Plan, decisions, done-criteria: `docs/wip/site-draft.md`. Never merge to main until Karl
   says the draft is ready. Staging serves only the draft until it ships. 15 Oct Home/About copy update applied;
   reviewer Hans Prahl has a link. Start the next session from "Resume here" in the wip file
+- **Knowledge commons concept demo (started 2026-10-20):** from the `incoming/` briefs (now in
+  `docs/wip/knowledge-commons/`). The commons is a separate repo (`kjzimmer/knowledgeCommons`, local clone next to
+  this one) and Railway project (`knowledgeCommons`, service `livingSystems`). Live Holon (ask mode) + UX with
+  labelled sample data; AA consumes it only via its public interface. Status and next steps: "Resume here" in
+  `docs/wip/knowledge-commons.md`
 - Groups + CC/BCC (PR #30, deployed 2026-10-13): spec `docs/wip/email-groups.md`. Multi-recipient
   conversations with reply-all, saved Groups (admin → Groups), "Email this group", conversations filed under
   their group. Awaiting Karl's prod test (group email from karl@ → member reply-all → reply from Inbox)
