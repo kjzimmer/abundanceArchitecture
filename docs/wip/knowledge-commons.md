@@ -5,25 +5,33 @@
 *Updated 2026-10-20.* Karl approved the plan below (commons in its own repo + Railway project, live Holon ask
 mode, everything else UX with labelled sample data). Briefs filed in [knowledge-commons/](knowledge-commons/).
 
-**Done (commons, local only, not pushed):** repo `C:\Users\karlz\claudeSites\knowledgeCommons`, branch
-`feat/concept-demo`, commit `942bb78`. Content (27 artifacts, 32 entries, 10 questions, agents, growth, demo/),
-web app with every brief §16 page, public interface `/api/v1`, Holon ask mode. `npm run content:check` passes;
-all pages return 200 locally; type-check clean. Structure: `STRUCTURE.md` in that repo.
+**Commons** (repo `kjzimmer/knowledgeCommons`, public; local clone `C:\Users\karlz\claudeSites\knowledgeCommons`;
+branch `feat/concept-demo`, which Railway `livingSystems` (production env) deploys). Content: 27 artifacts,
+32 entries, 10 questions, agents, growth, `demo/` sample data. Web app: every brief §16 page, public interface
+`/api/v1` (read, ask, share, reviewer-links for host sites), Holon ask mode behind a provider interface.
+Address: https://livingsystems-production.up.railway.app (invite-only). Railway vars set: `REVIEW_LINK_SECRET`,
+`PUBLIC_BASE_URL`, `SITE_KEYS` (AA's key), `NODE_ENV`. Steward link: `railway run --service livingSystems npm run
+review:link -- --name "Karl Zimmer" --email karl@abundancearchitecture.world --steward` (from the commons clone).
+Try Holon from the CLI: `railway run --service livingSystems -- bash -c 'DATABASE_URL= npm run ask -- "…"'`.
 
-**Blocked on Karl:**
-1. OK to push to the **public** GitHub repo `kjzimmer/knowledgeCommons`? And which branch Railway's
-   `livingSystems` service should deploy from (shared rule: no direct pushes to main)
-2. Anthropic key isn't scoped to a workspace (API returns 400). Either a workspace-scoped key (recommended, a
-   "Knowledge Commons" workspace with its own spend limit) or set `ANTHROPIC_WORKSPACE_ID` (now supported)
-3. Railway vars still to set: `REVIEW_LINK_SECRET`, `PUBLIC_BASE_URL=https://livingsystems-production.up.railway.app`,
-   `SITE_KEYS`, `NODE_ENV=production`
+**AA** (`feat/site-draft`, staging): Learn opens with the commons (brief §17 text) and asks Holon via
+`CommonsService` → `/api/site/holon/ask`; citation notes show the commons entry (`commonsEntry` on each claim in
+`references.json`) and link through `/commons-link` (the commons issues the reviewer a signed link);
+`global-problems-many-centers` has a sample discussion + position map (`content/discussions.json`,
+`content/facilitation.json`, rendered by `server/src/site/discussion.ts`). Staging vars `COMMONS_URL`,
+`COMMONS_SITE_KEY` set.
 
-**Next:** deploy + live Holon test (`npm run ask -- "…"` via `railway run`), then the AA side on `feat/site-draft`:
-Learn opening (brief §17), Ask via the commons interface, citations → commons entries (map AA reference claims
-to entry ids: hayek-1945→dispersed-knowledge, scott-1998→legibility-schemes-fail, ostrom-1990→
-commons-self-governance + commons-outperform, ostrom-2009→polycentric-climate, keohane-victor-2011→regime-complex,
-coyne-goodman-2020→polycentric-defense, mach-2019→climate-conflict, ryan-deci-2000→autonomy-competence-relatedness,
-mullainathan-shafir-2013→scarcity-narrows-attention), and one sample facilitated question page.
+**Blocked on Karl:** the Anthropic key isn't scoped to a workspace (API 400). Karl is creating a workspace; then
+replace `ANTHROPIC_API_KEY` in Railway (or set `ANTHROPIC_WORKSPACE_ID`). Until then Holon answers fail with
+"Holon could not answer just now".
+
+**Next:** once the key works, run the three example questions in `tests/holon.yaml` and review the answers
+(citations real? objection and unknowns present? "Not from the commons" labelled?), tune Holon's instructions,
+and issue reviewer links. Karl is considering production access: possibly a teaser on production and the demo
+on a staging environment, as AA does.
+
+**Not built (UX only, labelled sample):** curator, auditor, proposal saving/apply, discuss mode, growth loops,
+test harness, monthly ledger commits, AA threads/consent/extraction/consolidation.
 
 ---
 
