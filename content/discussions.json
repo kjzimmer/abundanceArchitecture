@@ -1,0 +1,61 @@
+{
+  "note": "SAMPLE discussions for the concept demo (brief §18–19). Every participant is fictional and every post was written to show how a facilitated question would work. The question was Claude's pick (brief §0 [QUESTION SLUG]); Karl to confirm or choose another.",
+  "discussions": [
+    {
+      "question": "global-problems-many-centers",
+      "pickNote": "Claude's pick for the demo: real disagreement, and the commons already holds entries on it. Karl to confirm.",
+      "thread": [
+        { "n": 1, "author": "Participant A", "kind": "participant", "when": "Oct 14", "text": "Climate is the test case. Thirty years of summits show that without a binding authority, free-riding wins. Many centres is fine for a village fishery, not for the atmosphere." },
+        { "n": 2, "author": "Participant B", "kind": "participant", "when": "Oct 14", "text": "But the binding global treaty never arrived either. Meanwhile cities, states and companies have cut emissions anyway. Waiting for one authority looks like the bigger risk to me." },
+        { "n": 3, "author": "AI facilitator", "kind": "facilitator", "when": "Oct 14", "text": "A and B, you seem to agree that no single binding global agreement has been reached, and to differ on whether action by many centres can add up to enough. Is that what this turns on? Please each confirm or correct." },
+        { "n": 4, "author": "Participant A", "kind": "participant", "when": "Oct 15", "text": "Yes, that's it. And pandemics are the same: no city can run border health on its own." },
+        { "n": 5, "author": "Participant B", "kind": "participant", "when": "Oct 15", "text": "Agreed, that's the crux." },
+        { "n": 6, "author": "Participant C", "kind": "participant", "when": "Oct 15", "text": "Pandemics cut the other way for me. The WHO was weak, but labs and national agencies shared virus sequences openly within days. That looks like many centres working. Separately: AI development sits in a handful of labs, so 'many centres' doesn't describe it at all." },
+        { "n": 7, "author": "AI facilitator", "kind": "facilitator", "when": "Oct 15", "text": "C, the point about AI being concentrated in a few labs matters and is a little different from the coordination question, so I've added it to the parking lot (with a link to your post) so it isn't lost. Back to the crux: what evidence would show whether action by many centres adds up?" },
+        { "n": 8, "author": "Participant B", "kind": "participant", "when": "Oct 16", "text": "Inviting Holon: what does the commons actually hold on this?" },
+        { "n": 9, "author": "Holon (the commons' agent)", "kind": "holon", "when": "Oct 16", "invitedBy": "Participant B", "text": "The commons holds two positions on climate that bear directly on your crux. Ostrom (2009) argues that action at many scales need not wait for a global agreement, because benefits of acting arise locally too [[entry:polycentric-climate]]. Keohane and Victor (2011) describe climate governance as a loose 'regime complex' and judge that it falls short on several of their own criteria [[entry:regime-complex]]. Both entries record the status as contested.\n\nFor local commons, that self-governance can work is recorded as settled [[entry:commons-self-governance]], and the design principles behind long-lasting commons as leaning [[entry:ostrom-design-principles]]. Whether those conditions (trust, monitoring, sanctions) can exist at global scale is exactly what the commons does not know.\n\nThe commons holds no outcome evidence on whether polycentric climate action adds up to what a global agreement would require, and nothing yet on pandemic governance; I've recorded both as gaps. The entries I used are AI-drafted and not yet reviewed." },
+        { "n": 10, "author": "Participant D", "kind": "participant", "when": "Oct 16", "held": true, "text": "" },
+        { "n": 11, "author": "Participant E", "kind": "participant", "when": "Oct 17", "text": "Frankly, 'many centres' sounds like a slogan for avoiding hard global commitments, and this site's whole thesis leans on it. I think it's wishful thinking." }
+      ],
+      "moderationLog": [
+        { "when": "Oct 16", "post": 10, "rung": 3, "action": "Held post 10 for human review: personal attack on other participants. Hidden from others; its author sees it as held. Placed in the moderators' queue." }
+      ],
+      "notActedOn": "Post 11 disagrees sharply with the site's thesis. Disagreement is never a reason to act, so the facilitator did nothing.",
+      "positionMap": {
+        "positions": [
+          {
+            "position": "Truly global problems need a binding central authority; many centres cannot overcome free-riding at that scale.",
+            "holders": ["Participant A (posts 1, 4)", "Participant E (post 11)"],
+            "evidence": [{ "text": "The climate regime complex falls short on several criteria for effectiveness", "commonsEntry": "regime-complex" }],
+            "responses": ["The binding treaty never arrived either (B, post 2)"]
+          },
+          {
+            "position": "Many centres can act now and add up; waiting for one authority is the greater risk.",
+            "holders": ["Participant B (posts 2, 5)", "Participant C (post 6)"],
+            "evidence": [
+              { "text": "Action at many scales need not wait for a global agreement", "commonsEntry": "polycentric-climate" },
+              { "text": "Open sharing of virus sequences during pandemics (not yet sourced)" }
+            ],
+            "responses": ["Pandemics show the opposite: no city can run border health alone (A, post 4)"]
+          },
+          {
+            "position": "Holon's contribution (labelled): the commons holds both positions as contested and lacks outcome evidence.",
+            "holders": ["Holon, the commons' agent (post 9)"],
+            "evidence": [{ "text": "Self-governance of local commons is settled; scaling is unknown", "commonsEntry": "commons-self-governance" }],
+            "responses": []
+          }
+        ],
+        "cruxes": [{ "text": "Whether action by many centres adds up to enough, fast enough, without binding global rules.", "confirmedBy": ["Participant A", "Participant B"], "from": "post 3" }],
+        "openQuestions": [
+          "Is there outcome evidence on whether polycentric climate action matches what a global agreement would require? (posts 7, 9)",
+          "How was the sharing of pandemic virus sequences actually coordinated, and by whom? (post 6)"
+        ],
+        "parkingLot": [{ "text": "AI development is concentrated in a few labs: does 'many centres' describe it at all?", "from": "Participant C, post 6" }]
+      },
+      "toCommons": [
+        { "item": "New question: was the open sharing of pandemic virus sequences a case of polycentric coordination? Attributed to Participant C.", "status": "Accepted by an AA editor and sent through the commons' public interface. Now in the commons' review queue, audited like anyone's." },
+        { "item": "Gap: no outcome evidence on whether polycentric climate action adds up.", "status": "Already recorded by Holon in the commons' gap log." }
+      ]
+    }
+  ]
+}

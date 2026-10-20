@@ -17,10 +17,12 @@ import { initiativePage, initiativesPage } from '../site/pages/initiatives';
 import { questionPage, questionsPage } from '../site/pages/questions';
 import { signPage, signsPage } from '../site/pages/signs';
 import { referencePage, referencesPage } from '../site/pages/references';
+import { commonsUrl, reviewerLink, startCommonsCache } from '../services/CommonsService';
 
 export function createSiteRouter(): Router {
   // Load now so invalid content fails startup (and the deploy) instead of a page request
   const c = content();
+  startCommonsCache();
   const router = Router();
 
   const send = (req: Request, res: Response, page: PageBody, status = 200) => {
@@ -42,6 +44,18 @@ export function createSiteRouter(): Router {
   const slug = (req: Request) => String(req.params.slug);
 
   router.get('/r/:token', acceptReviewLink);
+
+  // Into the commons app: the commons issues a signed link for this reviewer through its public interface
+  router.get('/commons-link', reviewGate, async (req, res) => {
+    const to = typeof req.query.to === 'string' && /^\/(?!\/)[\w\-./]*$/.test(req.query.to) ? req.query.to : '/';
+    const reviewer = reviewerOf(res)!;
+    try {
+      res.redirect(303, await reviewerLink({ name: reviewer.name, email: reviewer.email }, to));
+    } catch (err) {
+      console.error('[commons-link] failed', err instanceof Error ? err.message : err);
+      res.redirect(303, commonsUrl(to) ?? '/learn');
+    }
+  });
   router.get('/review/flags', reviewGate, ownerOnly, (req, res) => send(req, res, flagsPage(c)));
 
   page('/', () => homePage(c));

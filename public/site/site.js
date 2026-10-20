@@ -102,6 +102,80 @@
     });
   });
 
+  // --- Learn: ask Holon through the commons (answer HTML is rendered and escaped by the commons) ---
+  var holonForm = document.getElementById('holon-form');
+  if (holonForm) {
+    var holonInput = document.getElementById('ask-input');
+    var holonThread = document.getElementById('holon-thread');
+    var holonSession = null;
+    var holonBusy = false;
+    var node = function (tag, cls, text) {
+      var n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (text != null) n.textContent = text;
+      return n;
+    };
+    var askHolon = function (question) {
+      question = (question || '').trim();
+      if (holonBusy || !question) return;
+      holonBusy = true;
+      holonInput.value = '';
+      holonThread.appendChild(node('p', 'holon-q', question));
+      var answer = node('div', 'holon-a');
+      answer.appendChild(node('p', 'holon-label', 'Holon (the commons’ agent)'));
+      answer.appendChild(node('p', 'hint', 'Searching the commons…'));
+      holonThread.appendChild(answer);
+      fetch('/api/site/holon/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: question, sessionId: holonSession }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          answer.innerHTML = '';
+          if (!d.success) {
+            answer.className = 'holon-a error';
+            answer.textContent = d.error || 'Holon could not answer just now.';
+            return;
+          }
+          holonSession = d.sessionId;
+          answer.appendChild(node('p', 'holon-label', 'Holon (the commons’ agent)'));
+          var body = node('div', 'holon-body');
+          body.innerHTML = d.html;
+          // Links into the commons go through AA so the reviewer is let in
+          body.querySelectorAll('a[href]').forEach(function (a) {
+            var m = a.getAttribute('href').match(/^https?:\/\/[^/]+(\/(?:entries|questions|artifacts)\/[\w-]+)$/);
+            if (m) a.setAttribute('href', '/commons-link?to=' + encodeURIComponent(m[1]));
+            a.setAttribute('target', '_blank');
+            a.setAttribute('rel', 'noopener');
+          });
+          answer.appendChild(body);
+          answer.appendChild(node('p', 'holon-meta', d.meta + ' · ' + d.entries + ' commons entries cited · asked through the commons’ public interface'));
+          if (d.gaps > 0 && d.sessionId) {
+            var share = node('button', 'button button-outline', 'Share this question with the commons');
+            share.type = 'button';
+            share.addEventListener('click', function () {
+              share.disabled = true;
+              fetch('/api/site/holon/share', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: d.sessionId }) })
+                .then(function (r) { return r.json(); })
+                .then(function (s) { share.textContent = s.success ? 'Shared. Thank you.' : 'Could not share'; });
+            });
+            answer.appendChild(node('p', 'hint', 'The commons could not fully answer this. Holon recorded what was missing, not your words. You can also share the question itself:'));
+            answer.appendChild(share);
+          }
+        })
+        .catch(function () {
+          answer.className = 'holon-a error';
+          answer.textContent = 'Could not reach Holon. Please try again.';
+        })
+        .finally(function () { holonBusy = false; });
+    };
+    holonForm.addEventListener('submit', function (e) { e.preventDefault(); askHolon(holonInput.value); });
+    document.querySelectorAll('.holon-example').forEach(function (b) {
+      b.addEventListener('click', function () { askHolon(b.getAttribute('data-q')); });
+    });
+  }
+
   // Register filters: apply a select as soon as it changes (the Apply button covers no-JS)
   document.querySelectorAll('select[data-autosubmit]').forEach(function (select) {
     select.addEventListener('change', function () {

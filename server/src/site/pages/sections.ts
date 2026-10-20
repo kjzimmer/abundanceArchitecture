@@ -8,6 +8,7 @@ import { html, Html, ph, text } from '../html';
 import { lockIcon } from '../layout';
 import { breadcrumb } from '../ui';
 import type { PageBody } from './common';
+import { commonsConfigured } from '../../services/CommonsService';
 
 interface Field {
   name: string;
@@ -37,44 +38,33 @@ const simple = (title: string, crumbs: { label: string; href?: string }[], body:
 
 export function learnPage(c: Content): PageBody {
   const l = c.learn;
-  const a = l.sampleAnswerLayout;
   const videos = l.media.videos.length ? l.media.videos : [null, null, null];
+  const connected = commonsConfigured();
   return {
     title: 'Learn',
     body: html`<div class="page page-wide">
   ${breadcrumb([{ label: 'Home', href: '/' }, { label: 'Learn' }])}
   <h1>Learn</h1>
-  <p class="intro">${l.intro}</p>
+  <h2 class="commons-name">${text(l.commonsName)}</h2>
+  ${l.opening.map((p, i) => html`<p${i === 0 ? html` class="intro"` : ''}>${p}</p>`)}
 
-  <section class="ask-box" aria-labelledby="ask-heading">
-    <div class="ask-head"><h2 id="ask-heading">Ask</h2><span class="after-launch">After first launch</span></div>
-    <div class="ask-row">
+  <section class="ask-box" aria-labelledby="ask-heading" id="holon">
+    <div class="ask-head"><h2 id="ask-heading">Ask Holon</h2><span class="after-launch">For reviewers</span></div>
+    ${connected ? '' : html`<p class="hint">The commons is not connected on this deployment yet.</p>`}
+    <div class="holon-thread" id="holon-thread" aria-live="polite"></div>
+    <form class="ask-row" id="holon-form" autocomplete="off">
       <label for="ask-input">${l.askLabel}</label>
       <div class="ask-input-row">
-        <input id="ask-input" type="text" placeholder="Ask in your own words" disabled>
-        <button type="button" class="button" disabled>Ask</button>
+        <input id="ask-input" name="question" type="text" maxlength="2000" placeholder="Ask in your own words"${connected ? '' : html` disabled`}>
+        <button type="submit" class="button"${connected ? '' : html` disabled`}>Ask</button>
       </div>
-    </div>
+    </form>
     <p class="label">${l.examplesHeading}</p>
-    <ul class="example-questions">${l.exampleQuestions.map((q) => html`<li>${q}</li>`)}</ul>
-    <p class="label">How to answer</p>
-    <ul class="example-questions">${l.answerModes.map((m) => html`<li>${m}</li>`)}</ul>
-
-    <div class="sample-answer">
-      <p class="label">Sample answer layout</p>
-      <p class="card-label">${a.heading}</p>
-      <p>${text(a.body)}</p>
-      <dl class="facts">
-        <dt>Evidentiary status</dt><dd>${text(a.evidentiaryStatus)}</dd>
-        <dt>Strongest objection</dt><dd>${text(a.strongestObjection)}</dd>
-        <dt>Sources</dt><dd>${a.sources.map((s, i) => html`${i ? html`<br>` : ''}${text(s)}`)}</dd>
-        <dt>Next</dt><dd>${a.next.map((s, i) => html`${i ? html`<br>` : ''}${text(s)}`)}</dd>
-      </dl>
-      <p class="feedback-buttons">${a.feedbackButtons.map((b) => html`<button type="button" class="button button-outline" disabled>${b}</button>`)}</p>
-    </div>
+    <ul class="example-questions">${l.exampleQuestions.map((q) => html`<li><button type="button" class="holon-example" data-q="${q}"${connected ? '' : html` disabled`}>${q}</button></li>`)}</ul>
     <p class="hint">${l.disclosure}</p>
-    <p class="hint">${text(l.limits.visitor)} <span class="members-only-inline">${lockIcon}${l.limits.member}</span></p>
   </section>
+
+  <p class="commons-through"><a class="text-link" href="/commons-link?to=/how-it-works">${l.commonsLink}</a></p>
 
   <section id="media" aria-labelledby="media-heading">
     <h2 id="media-heading">${l.media.heading}</h2>
@@ -94,20 +84,6 @@ export function learnPage(c: Content): PageBody {
       <h3>${l.media.podcastEpisodes[0]?.title ?? ph('[EPISODE TITLE]')}</h3>
       <p>${ph('[LISTEN]')} · ${ph('[TRANSCRIPT]')} · ${ph('[ALL EPISODES]')}</p>
     </div>
-  </section>
-
-  <section aria-labelledby="commons-heading">
-    <h2 id="commons-heading">${l.commons.heading}</h2>
-    <p>${l.commons.intro}</p>
-    <ul class="cards cards-3 commons-cards">
-      ${l.commons.cards.map((card) => html`<li class="card${card.membersOnly ? ' card-members' : ''}">
-        <h3>${card.membersOnly ? html`${lockIcon} ` : ''}${card.title}</h3>
-        <p class="card-text">${text(card.text)}</p>
-        ${card.link
-          ? card.to ? html`<a class="text-link" href="${card.to}">${card.link}</a>` : html`<p>${ph(`[${card.link.toUpperCase()}]`)}</p>`
-          : card.membersOnly ? html`<a href="/join">Become a member</a>` : ''}
-      </li>`)}
-    </ul>
   </section>
 </div>`,
   };

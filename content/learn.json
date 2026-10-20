@@ -1,7 +1,11 @@
 {
-  "note": "Text for the Learn page. The guide is not built in this draft: show the Ask box, example questions and the sample answer layout, marked 'After first launch'. The example questions are Claude's drafts.",
-  "guideEnabled": false,
-  "intro": "Ask in your own words. Behind the answers is an open commons of what is known about abundance, how confidently it is known, and where the evidence runs out.",
+  "note": "Learn is now a window onto the independent knowledge commons (brief: docs/wip/knowledge-commons/Commons_AA_BuildBrief_v0_2.md §17). The opening text is Claude's draft for Karl's edit. The Ask box calls Holon through the commons' public interface. The example questions are Claude's drafts.",
+  "commonsName": "[COMMONS NAME]",
+  "opening": [
+    "A knowledge commons on what we know about living, complex adaptive systems, including human societies, and what helps them flourish.",
+    "Abundance Architecture started it, but it stands on its own: openly licensed, kept in a public repository anyone can copy, run on its own infrastructure, and governed by the people who contribute to it. Abundance Architecture is one place where its knowledge is shared, debated and put to use.",
+    "Ask Holon, the commons' AI agent. Every answer shows its sources, how well the evidence supports each claim, and the strongest objection."
+  ],
   "askLabel": "What would you like to understand?",
   "examplesHeading": "New here? Start with one of these",
   "exampleQuestions": [
@@ -12,35 +16,13 @@
     "Teach me what a complex adaptive system is",
     "What is the strongest argument against this site?"
   ],
-  "answerModes": ["Explain it", "Teach me step by step"],
-  "sampleAnswerLayout": {
-    "heading": "Answer, drawn only from the commons",
-    "body": "[A SHORT EXPLANATION IN PLAIN WORDS, WITH AN EVERYDAY EXAMPLE]",
-    "evidentiaryStatus": "[ESTABLISHED EVIDENCE, REASONABLE EXTENSION OR SPECULATION]",
-    "strongestObjection": "[THE BEST COUNTER-ARGUMENT WE KNOW OF, AND WHO MAKES IT]",
-    "sources": ["[SOURCE 1, WITH THE PASSAGE USED]", "[SOURCE 2, WITH THE PASSAGE USED]"],
-    "next": ["[A SUGGESTED FOLLOW-UP QUESTION]", "Watch: [VIDEO TITLE]"],
-    "feedbackButtons": ["This helped", "This was wrong or unclear"]
-  },
-  "disclosure": "Answers are written by an AI guide from this commons. They can be wrong, so check the sources. When the commons does not cover a question, the guide says so, and the question is logged for us to work on.",
-  "limits": {
-    "visitor": "[N] questions a day without an account.",
-    "member": "Members: more questions and a saved history."
-  },
+  "disclosure": "Answers are written by Holon, the commons' AI agent, from what the commons holds. They can be wrong, so check the sources. When the commons does not cover something, Holon says so and records what was missing, never your words, unless you choose to share your question. Your questions are private and never used to train any model; during this draft they are kept so the commons' stewards can review how Holon behaves.",
+  "commonsLink": "See how the commons works: its agents, costs, funding and every change",
   "media": {
     "heading": "Watch and listen",
     "intro": "The latest videos and episodes. Each has a full transcript in the commons, so the guide can answer from it and point to it.",
     "videos": [],
     "podcastEpisodes": [],
     "emptyNote": "No videos or episodes exist yet. Show three video placeholders and one podcast placeholder as in the wireframe."
-  },
-  "commons": {
-    "heading": "How this commons is kept",
-    "intro": "The guide is only as good as what it draws on, so the rules are public.",
-    "cards": [
-      { "title": "What is in it", "text": "[N] sources, [N] held in full text, [N] transcripts. Full text is held where the licence allows. Otherwise we hold our own summary and a link.", "link": "See every source", "to": "/references" },
-      { "title": "Who decides what goes in", "text": "[THE INCLUSION RULE, INCLUDING HOW WORK THAT DISAGREES WITH US IS TREATED]", "link": "The change log", "to": null },
-      { "title": "Add to it or dispute it", "text": "Members can propose a source or dispute an entry. Disputes are settled by [PROCESS].", "membersOnly": true }
-    ]
   }
 }

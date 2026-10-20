@@ -4,6 +4,7 @@
 import type { Content } from '../../content/load';
 import type { Question } from '../../content/types';
 import { citationNote, evidenceLabel } from '../citation';
+import { discussionAside, discussionSection, positionMap } from '../discussion';
 import { html, ph, text } from '../html';
 import { lockIcon } from '../layout';
 import {
@@ -51,6 +52,7 @@ export function questionsPage(c: Content, query: Record<string, unknown>): PageB
 export function questionPage(c: Content, q: Question): PageBody {
   const next = c.questions[(c.questions.indexOf(q) + 1) % c.questions.length];
   const sources = q.sources ?? [];
+  const discussion = c.discussion(q.slug);
 
   return {
     title: 'Question',
@@ -75,8 +77,11 @@ export function questionPage(c: Content, q: Question): PageBody {
             })}</ul>`
           : html`<p>${ph('[SOURCES]')}</p>`}
       </section>
+      ${discussion ? positionMap(discussion) : ''}
+      ${discussion ? discussionSection(c, discussion) : ''}
     </div>
     <aside class="aside-col">
+      ${discussion ? discussionAside(c, discussion) : ''}
       <div class="panel panel-members">
         <h2>${lockIcon} Help set which questions come next</h2>
         <p>Propose questions and help decide which come next. <span class="after-launch">After first launch</span></p>

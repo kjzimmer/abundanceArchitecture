@@ -4,6 +4,7 @@
 
 import { Router, Request, Response } from 'express';
 import * as SiteDraftService from '../services/SiteDraftService';
+import * as CommonsService from '../services/CommonsService';
 import { verifyTurnstile } from '../lib/turnstile';
 import { clientIp } from '../lib/clientIp';
 import { reviewerOf, reviewGate } from '../middleware/reviewGate';
@@ -68,6 +69,50 @@ router.post('/feedback', (req: Request<unknown, unknown, FeedbackBody>, res: Res
   }
   SiteDraftService.recordReviewComment(reviewer, { path, comment });
   res.status(201).json({ success: true });
+});
+
+// ─── Learn: ask Holon through the commons' public interface (docs/wip/knowledge-commons.md) ──────────────
+
+interface AskBody {
+  question?: string;
+  sessionId?: string | null;
+}
+
+router.post('/holon/ask', async (req: Request<unknown, unknown, AskBody>, res: Response) => {
+  const reviewer = reviewerOf(res)!;
+  const question = typeof req.body.question === 'string' ? req.body.question.trim() : '';
+  if (!question || question.length > 2000) {
+    res.status(400).json({ success: false, error: 'Please type a question (up to 2,000 characters).' });
+    return;
+  }
+  const sessionId = typeof req.body.sessionId === 'string' ? req.body.sessionId : null;
+  try {
+    const r = await CommonsService.askHolon(question, { name: reviewer.name, email: reviewer.email }, sessionId);
+    res.json({
+      success: true,
+      sessionId: r.sessionId,
+      html: r.answer.html,
+      entries: r.cited.entries.length,
+      gaps: r.gaps,
+      meta: `${r.agent.model} · ${r.agent.instructions}`,
+    });
+  } catch (err) {
+    const status = err instanceof CommonsService.CommonsError ? err.status : 502;
+    const message = err instanceof CommonsService.CommonsError && status !== 401 ? err.message : 'Holon could not answer just now.';
+    if (status >= 500 || status === 401) console.error('[site/holon] ask failed', err);
+    res.status(status === 401 ? 502 : status).json({ success: false, error: message });
+  }
+});
+
+router.post('/holon/share', async (req: Request<unknown, unknown, { sessionId?: string }>, res: Response) => {
+  const reviewer = reviewerOf(res)!;
+  try {
+    const ok = await CommonsService.shareQuestion(String(req.body.sessionId ?? ''), { name: reviewer.name, email: reviewer.email });
+    res.json({ success: ok });
+  } catch (err) {
+    console.error('[site/holon] share failed', err);
+    res.status(502).json({ success: false });
+  }
 });
 
 export default router;

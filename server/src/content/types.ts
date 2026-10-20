@@ -119,6 +119,8 @@ export interface Claim {
   /** Enum evidentiaryStatuses; null until Karl rates it */
   status: string | null;
   note?: string;
+  /** The matching claim entry in the knowledge commons (docs/wip/knowledge-commons.md) */
+  commonsEntry?: string;
 }
 
 export interface Reference extends Flagged {
@@ -139,33 +141,57 @@ export interface Citation {
   claim: Claim;
 }
 
-export interface LearnCard {
-  title: string;
-  text: string;
-  link?: string;
-  to?: string | null;
-  membersOnly?: boolean;
+/** content/facilitation.json: AA's own facilitator and conversation norms (brief §18) */
+export interface Facilitation {
+  note?: string;
+  norms: { intro: string; items: string[]; rungs: string[]; never: string };
+  facilitator: { label: string; model: string; instructions: string[] };
+  consent: string;
 }
 
+export interface DiscussionPost {
+  n: number;
+  author: string;
+  kind: 'participant' | 'facilitator' | 'holon';
+  when: string;
+  /** May contain [[entry:id]] citations to the commons (Holon's posts) */
+  text: string;
+  invitedBy?: string;
+  held?: boolean;
+}
+
+export interface MapEvidence {
+  text: string;
+  commonsEntry?: string;
+}
+
+/** A question's discussion and its public memory, the position map (brief §19). Sample data in the demo */
+export interface Discussion {
+  question: string;
+  pickNote?: string;
+  thread: DiscussionPost[];
+  moderationLog: { when: string; post: number; rung: number; action: string }[];
+  notActedOn?: string;
+  positionMap: {
+    positions: { position: string; holders: string[]; evidence: MapEvidence[]; responses: string[] }[];
+    cruxes: { text: string; confirmedBy: string[]; from: string }[];
+    openQuestions: string[];
+    parkingLot: { text: string; from: string }[];
+  };
+  toCommons: { item: string; status: string }[];
+}
+
+/** content/learn.json: Learn is a window onto the independent knowledge commons */
 export interface Learn {
   note?: string;
-  guideEnabled: boolean;
-  intro: string;
+  commonsName: string;
+  /** Opening paragraphs (brief §17), Claude's draft */
+  opening: string[];
   askLabel: string;
   examplesHeading: string;
   exampleQuestions: string[];
-  answerModes: string[];
-  sampleAnswerLayout: {
-    heading: string;
-    body: string;
-    evidentiaryStatus: string;
-    strongestObjection: string;
-    sources: string[];
-    next: string[];
-    feedbackButtons: string[];
-  };
   disclosure: string;
-  limits: { visitor: string; member: string };
+  commonsLink: string;
   media: {
     heading: string;
     intro: string;
@@ -173,7 +199,6 @@ export interface Learn {
     podcastEpisodes: { title: string; url: string; transcript?: string }[];
     emptyNote?: string;
   };
-  commons: { heading: string; intro: string; cards: LearnCard[] };
 }
 
 export interface HomeAction {

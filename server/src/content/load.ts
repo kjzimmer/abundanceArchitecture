@@ -6,7 +6,8 @@
 import fs from 'fs';
 import path from 'path';
 import type {
-  Citation, Claim, Domain, Enums, FlagEntry, Home, Initiative, Learn, Pages, Question, Reference, VitalSign,
+  Citation, Claim, Discussion, Domain, Enums, Facilitation, FlagEntry, Home, Initiative, Learn, Pages, Question, Reference,
+  VitalSign,
 } from './types';
 
 // Same depth from src/content (tsx) and dist/content (compiled): repo root is three levels up
@@ -29,6 +30,9 @@ export interface Content {
   learn: Learn;
   home: Home;
   pages: Pages;
+  facilitation: Facilitation;
+  /** The discussion on a question, if it has one (sample data in the concept demo) */
+  discussion(questionSlug: string): Discussion | undefined;
   domain(slug: string): Domain | undefined;
   question(slug: string): Question | undefined;
   sign(slug: string): VitalSign | undefined;
@@ -74,6 +78,8 @@ export function loadContent(): Content {
   const learn = readJson<Learn>('learn.json');
   const home = readJson<Home>('home.json');
   const pages = readJson<Pages>('pages.json');
+  const facilitation = readJson<Facilitation>('facilitation.json');
+  const discussionsFile = readJson<{ note?: string; discussions: Discussion[] }>('discussions.json');
 
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -222,6 +228,10 @@ export function loadContent(): Content {
   const citedOn = (r: Reference, claim: Claim) =>
     [...new Set([...claim.citedOn, ...(usedOn.get(`${r.slug}#${claim.id}`) ?? [])])];
 
+  for (const d of discussionsFile.discussions) {
+    if (!questions.some((q) => q.slug === d.question)) errors.push(`discussions: unknown question "${d.question}"`);
+  }
+
   if (errors.length) {
     throw new Error(`Site content is invalid:\n  - ${errors.join('\n  - ')}`);
   }
@@ -255,6 +265,8 @@ export function loadContent(): Content {
   fileFlag('learn.json', learn.note);
   fileFlag('home.json', home.note);
   fileFlag('pages.json', pages.note);
+  fileFlag('facilitation.json', facilitation.note);
+  fileFlag('discussions.json', discussionsFile.note);
 
   const recordFlag = (collection: string, label: string, href: string, r: { draft?: boolean; note?: string }, extraNote?: string) => {
     const note = [r.note, extraNote].filter(Boolean).join(' ') || null;
@@ -282,6 +294,8 @@ export function loadContent(): Content {
     learn,
     home,
     pages,
+    facilitation,
+    discussion: (slug: string) => discussionsFile.discussions.find((d) => d.question === slug),
     domain: bySlug(domains),
     question: bySlug(questions),
     sign: bySlug(signs),

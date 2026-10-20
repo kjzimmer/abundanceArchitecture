@@ -8,7 +8,7 @@
       "kind": "Book", "url": null, "howRead": null,
       "domains": [],
       "claims": [
-        { "claim": "When survival is in question, attention narrows to the immediate.", "citedOn": ["/"], "status": null, "note": "Check the replication record of this research before rating it as established evidence." }
+        { "claim": "When survival is in question, attention narrows to the immediate.", "citedOn": ["/"], "status": null, "note": "Check the replication record of this research before rating it as established evidence.", "commonsEntry": "scarcity-narrows-attention" }
       ]
     },
     {
@@ -18,7 +18,7 @@
       "kind": "Journal article", "url": null, "howRead": null,
       "domains": [],
       "claims": [
-        { "claim": "People do their best work when they have autonomy, competence and connection.", "citedOn": ["/"], "status": null, "note": "Claude chose this source for the claim. Karl to confirm." }
+        { "claim": "People do their best work when they have autonomy, competence and connection.", "citedOn": ["/"], "status": null, "note": "Claude chose this source for the claim. Karl to confirm.", "commonsEntry": "autonomy-competence-relatedness" }
       ]
     },
     {
@@ -28,8 +28,8 @@
       "kind": "Book", "url": null, "howRead": null,
       "domains": ["governance", "ecology"],
       "claims": [
-        { "claim": "Communities can govern shared resources well, under the right conditions, without central direction.", "citedOn": ["/"], "status": null, "note": "Claude chose this source for the claim. Karl to confirm." },
-        { "claim": "Communities governing shared resources themselves have often matched or outperformed central management.", "citedOn": ["/"], "status": null }
+        { "claim": "Communities can govern shared resources well, under the right conditions, without central direction.", "citedOn": ["/"], "status": null, "note": "Claude chose this source for the claim. Karl to confirm.", "commonsEntry": "commons-self-governance" },
+        { "claim": "Communities governing shared resources themselves have often matched or outperformed central management.", "citedOn": ["/"], "status": null, "commonsEntry": "commons-outperform" }
       ]
     },
     {
@@ -41,7 +41,7 @@
       "howRead": "Summary only",
       "domains": ["global-coordination-and-borders", "ecology"],
       "claims": [
-        { "claim": "Action on a shared global problem need not wait for a single global agreement.", "citedOn": [], "status": null }
+        { "claim": "Action on a shared global problem need not wait for a single global agreement.", "citedOn": [], "status": null, "commonsEntry": "polycentric-climate" }
       ]
     },
     {
@@ -53,7 +53,7 @@
       "howRead": "Summary only",
       "domains": ["global-coordination-and-borders"],
       "claims": [
-        { "claim": "Loosely linked institutions can govern a global problem, though the climate example scores low on the authors' own tests.", "citedOn": [], "status": null }
+        { "claim": "Loosely linked institutions can govern a global problem, though the climate example scores low on the authors' own tests.", "citedOn": [], "status": null, "commonsEntry": "regime-complex" }
       ]
     },
     {
@@ -65,7 +65,7 @@
       "howRead": "Summary only",
       "domains": ["security-and-defence"],
       "claims": [
-        { "claim": "Defence is not purely a public good, and many dispersed providers already supply parts of it.", "citedOn": [], "status": null }
+        { "claim": "Defence is not purely a public good, and many dispersed providers already supply parts of it.", "citedOn": [], "status": null, "commonsEntry": "polycentric-defense" }
       ]
     },
     {
@@ -77,7 +77,7 @@
       "howRead": "Summary only",
       "domains": ["security-and-defence"],
       "claims": [
-        { "claim": "Weak development and limited state capacity influence conflict far more than climate does.", "citedOn": [], "status": null }
+        { "claim": "Weak development and limited state capacity influence conflict far more than climate does.", "citedOn": [], "status": null, "commonsEntry": "climate-conflict" }
       ]
     },
     {
@@ -87,7 +87,7 @@
       "kind": "Journal article", "url": null, "howRead": null,
       "domains": ["governance", "production-and-labor"],
       "claims": [
-        { "claim": "The information needed to run a complex system is spread among the people in it. No center can gather it all.", "citedOn": ["/"], "status": null }
+        { "claim": "The information needed to run a complex system is spread among the people in it. No center can gather it all.", "citedOn": ["/"], "status": null, "commonsEntry": "dispersed-knowledge" }
       ]
     },
     {
@@ -97,7 +97,7 @@
       "kind": "Book", "url": null, "howRead": null,
       "domains": ["governance"],
       "claims": [
-        { "claim": "Large schemes that simplified complex realities in order to control them have repeatedly failed.", "citedOn": ["/"], "status": null }
+        { "claim": "Large schemes that simplified complex realities in order to control them have repeatedly failed.", "citedOn": ["/"], "status": null, "commonsEntry": "legibility-schemes-fail" }
       ]
     }
   ]

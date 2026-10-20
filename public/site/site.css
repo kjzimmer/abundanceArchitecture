@@ -636,6 +636,45 @@ p { margin-bottom: 1.2rem; color: var(--ink-mid); }
   border: 1px solid var(--rule-strong); border-radius: 999px; padding: 0.35rem 0.9rem;
   font-family: var(--sans); font-size: 0.8rem; color: var(--ink-mid); background: var(--paper);
 }
+.example-questions .holon-example { all: unset; cursor: pointer; }
+.example-questions .holon-example:disabled { cursor: default; }
+.example-questions .holon-example:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.commons-name { margin-top: 0.5rem; }
+.commons-through { margin: -1.5rem 0 3rem; }
+.holon-thread { display: grid; gap: 1rem; margin-top: 1rem; }
+.holon-q { justify-self: end; max-width: 85%; background: var(--paper); border: 1px solid var(--rule-strong); border-radius: 3px; padding: 0.6rem 0.9rem; }
+.holon-a, .post-holon { border-left: 3px solid var(--accent); background: var(--paper); padding: 0.4rem 1.25rem 0.8rem; }
+.holon-a.error { border-left-color: #a33; }
+.holon-label { font-family: var(--sans); font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); margin: 0.6rem 0 0.2rem; }
+.holon-meta { font-family: var(--sans); font-size: 0.75rem; color: var(--ink-mid); border-top: 1px solid var(--rule); padding-top: 0.5rem; margin-top: 0.8rem; }
+.holon-a a.cite, .post-holon a.cite { font-family: var(--sans); font-size: 0.75rem; border: 1px solid var(--rule-strong); border-radius: 999px; padding: 0 0.45rem; text-decoration: none; white-space: nowrap; }
+.holon-a h2, .holon-a h3 { font-size: 1.05rem; margin: 1rem 0 0.3rem; }
+/* Facilitated discussion and position map (sample in the concept demo) */
+.cite-chip { font-family: var(--sans); font-size: 0.75rem; border: 1px solid var(--rule-strong); border-radius: 999px; padding: 0 0.45rem; text-decoration: none; white-space: nowrap; }
+.sample-banner { background: var(--paper); border-left: 3px solid var(--ink-light); padding: 0.6rem 0.9rem; font-family: var(--sans); font-size: 0.85rem; }
+.thread { list-style: none; display: grid; gap: 0.9rem; margin: 1rem 0; }
+.post { background: var(--card); border: 1px solid var(--rule); border-radius: 3px; padding: 0.6rem 1rem; }
+.post p { margin: 0.4rem 0; }
+.post-head { font-family: var(--sans); font-size: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: baseline; }
+.post-n { color: var(--ink-mid); min-width: 1.4rem; }
+.post-author { font-weight: 600; }
+.post-meta { font-family: var(--sans); font-size: 0.75rem; color: var(--ink-mid); }
+.post-badge { font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.03em; text-transform: uppercase; border: 1px solid var(--rule-strong); border-radius: 999px; padding: 0 0.5rem; color: var(--ink-mid); }
+.post-badge-ai { border-style: dashed; }
+.post-badge-holon { border-color: var(--accent); color: var(--accent); }
+.post-facilitator { background: var(--paper); border-style: dashed; }
+.post-holon { border: 1px solid var(--rule); border-left: 3px solid var(--accent); }
+.post-held-note { font-style: italic; color: var(--ink-mid); }
+.reply-box textarea { width: 100%; border: 1px solid var(--rule-strong); border-radius: 3px; padding: 0.5rem; font: inherit; background: #f4f1ea; }
+.consent { display: flex; gap: 0.5rem; align-items: flex-start; font-family: var(--sans); font-size: 0.85rem; margin-bottom: 0.5rem; }
+.actions-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.actions-row .button:disabled { opacity: 0.55; }
+.map-positions { list-style: none; display: grid; gap: 0.75rem; margin: 1rem 0; }
+.map-position { font-weight: 600; margin: 0 0 0.3rem; }
+.map-evidence { margin: 0.4rem 0 0; }
+.map-evidence .label { margin-right: 0.4rem; }
+.discussion-aside details { margin: 0.5rem 0; font-size: 0.9rem; }
+.mod-log { font-size: 0.9rem; }
 .sample-answer { border-left: 3px solid var(--accent); background: var(--paper); padding: 1rem 1.25rem; margin: 1rem 0; }
 .sample-answer .label { margin-bottom: 0.5rem; }
 .feedback-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0 0; }
