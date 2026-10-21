@@ -21,13 +21,13 @@ Try Holon from the CLI: `railway run --service livingSystems -- bash -c 'DATABAS
 `content/facilitation.json`, rendered by `server/src/site/discussion.ts`). Staging vars `COMMONS_URL`,
 `COMMONS_SITE_KEY` set.
 
-**Blocked on Karl:** the Anthropic key isn't scoped to a workspace (API 400). Karl is creating a workspace; then
-replace `ANTHROPIC_API_KEY` in Railway (or set `ANTHROPIC_WORKSPACE_ID`). Until then Holon answers fail with
-"Holon could not answer just now".
+**Holon live (2026-10-20).** Key "knowledge commons", Default workspace scope (Karl can't create workspaces), **expires
+2026-11-19**: renew before then or Holon stops. The three `tests/holon.yaml` questions answered well (real
+citations, recorded statuses with reasons, source independence noted, objection, unknowns; $0.01–0.03 each),
+including one through AA staging → commons interface → Holon.
 
-**Next:** once the key works, run the three example questions in `tests/holon.yaml` and review the answers
-(citations real? objection and unknowns present? "Not from the commons" labelled?), tune Holon's instructions,
-and issue reviewer links. Karl is considering production access: possibly a teaser on production and the demo
+**Next:** Karl reviews answers on the site and decides on reviewer links; tune Holon's instructions from what he
+sees; consider making the answer format a little lighter for short questions. Karl is considering production access: possibly a teaser on production and the demo
 on a staging environment, as AA does.
 
 **Not built (UX only, labelled sample):** curator, auditor, proposal saving/apply, discuss mode, growth loops,
