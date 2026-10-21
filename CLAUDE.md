@@ -49,8 +49,9 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
 - **Knowledge commons concept demo (started 2026-10-20):** from the `incoming/` briefs (now in
   `docs/wip/knowledge-commons/`). The commons is a separate repo (`kjzimmer/knowledgeCommons`, local clone next to
   this one) and Railway project (`knowledgeCommons`, service `livingSystems`). Live Holon (ask mode) + UX with
-  labelled sample data; AA consumes it only via its public interface. Status and next steps: "Resume here" in
-  `docs/wip/knowledge-commons.md`
+  labelled sample data; AA consumes it only via its public interface. Deployed and live (Holon answering) on
+  2026-10-20; AA staging uses it for Learn, citations and a sample facilitated question. Commons work continues
+  in the commons repo (its `CLAUDE.md` + `docs/STATUS.md`); AA's side: `docs/wip/knowledge-commons.md`
 - Groups + CC/BCC (PR #30, deployed 2026-10-13): spec `docs/wip/email-groups.md`. Multi-recipient
   conversations with reply-all, saved Groups (admin → Groups), "Email this group", conversations filed under
   their group. Awaiting Karl's prod test (group email from karl@ → member reply-all → reply from Inbox)

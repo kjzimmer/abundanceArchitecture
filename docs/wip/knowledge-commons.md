@@ -27,8 +27,14 @@ citations, recorded statuses with reasons, source independence noted, objection,
 including one through AA staging → commons interface → Holon.
 
 **Next:** Karl reviews answers on the site and decides on reviewer links; tune Holon's instructions from what he
-sees; consider making the answer format a little lighter for short questions. Karl is considering production access: possibly a teaser on production and the demo
-on a staging environment, as AA does.
+sees; consider making the answer format a little lighter for short questions. Karl is considering production
+access: possibly a teaser on production and the demo on a staging environment, as AA does.
+
+**Where work continues:** future sessions on the commons start **in the commons repo**. Its `CLAUDE.md` and
+`docs/STATUS.md` are the authoritative status, decisions and roadmap from here on, including the agreed design for
+Holon's "make" mode (presentations, educational material, briefings; one agent in two steps, structured output
+rendered by the commons app with PowerPoint/Word/PDF downloads, templates as content, `POST /api/v1/holon/make`
+so AA can offer it). This file covers AA's side only.
 
 **Not built (UX only, labelled sample):** curator, auditor, proposal saving/apply, discuss mode, growth loops,
 test harness, monthly ledger commits, AA threads/consent/extraction/consolidation.
