@@ -2,7 +2,8 @@
 
 ## Resume here
 
-*Updated 2026-10-20.* Karl approved the plan below (commons in its own repo + Railway project, live Holon ask
+*Updated 2026-10-21.* **Start with "Next on AA: showing how people participate" below**: Karl's current focus on
+the AA side, agreed and not yet started. Karl approved the plan below (commons in its own repo + Railway project, live Holon ask
 mode, everything else UX with labelled sample data). Briefs filed in [knowledge-commons/](knowledge-commons/).
 
 **Commons** (repo `kjzimmer/knowledgeCommons`, public; local clone `C:\Users\karlz\claudeSites\knowledgeCommons`;
@@ -38,6 +39,56 @@ so AA can offer it). This file covers AA's side only.
 
 **Not built (UX only, labelled sample):** curator, auditor, proposal saving/apply, discuss mode, growth loops,
 test harness, monthly ledger commits, AA threads/consent/extraction/consolidation.
+
+**Reviewer access (2026-10-21):** Hans and Natalie have AA draft links. They reach the commons draft with the same
+link: after opening it, any commons link on AA (Learn's "See how the commons works…", citation notes, or
+`https://draft.abundancearchitecture.world/commons-link`) gets them a commons reviewer link ("via Abundance
+Architecture", 90 days). Separate commons-only links can be issued for collaborators who come to the commons on
+its own terms. Karl is setting up discussions with both.
+
+## Next on AA: showing how people participate (agreed 2026-10-21, not started)
+
+**Karl's goal:** demonstrate how members come to AA and take part in a dialogue with others, the AI facilitator
+and Holon (when invited), and how the AI reviews and updates the analysis as the discussion proceeds.
+**The demo question stays `global-problems-many-centers`** (Karl confirmed Claude's pick).
+
+**How much is in the brief:** threads, consent, facilitator, Holon invited, extraction after each post, and
+"Propose updates" (AI drafts position-map changes, people endorse or dispute, an AA editor applies) are all in
+brief §18–19. Extensions: "members" (the draft has invited reviewers only; they stand in for members), and drafting
+updates continuously (e.g. every few posts) instead of on an editor's button. That part is fine as an extension.
+AI applying changes without a person is not: it would break the brief's "nothing changes without a person in the
+right role".
+
+**The three layers (Karl's model, refined).** Today all three are crammed onto one question page with one
+thread. Split them:
+
+1. **Layer 1: the question's status.** What we think so far / what we don't know / what would change our mind.
+   AI-drafted from the position map and the evidence, endorsed or disputed by reviewers, applied by an AA editor.
+   Today these are placeholders.
+2. **Layer 2: two things on the question page.**
+   - **The position map**: the question's combined memory *across all threads*: positions (holders, evidence,
+     responses), cruxes, open questions, parking lot, each linked to the posts it came from. Combined so that the
+     same crux reached from two threads shows once, supported from both. Layer 1 is drawn from it.
+   - **The list of threads**: each starts from its own angle and shows two labelled summaries side by side: the
+     **facilitator's** neutral "what the conversation has uncovered" (no view on the subject) and **Holon's**
+     sourced "what the evidence shows" (from the commons, with agreement statuses). They stay separate on purpose:
+     the agent that moderates is never the one taking positions.
+3. **Layer 3: the thread page.** The conversation: people, facilitator, Holon when invited, consent tick, reply.
+   A margin note marks each post that fed the position map ("became crux 1").
+
+**Pages:** question page = layer 1 + position map + thread list ("Join" per thread); thread page = layer 3.
+
+**Build plan:**
+1. **Guided replay first (≈ half a day, recommended for Karl's discussions).** Split the pages as above and add a
+   step-by-step "play" of the sample: a post arrives; the facilitator responds; someone invites Holon; the
+   extraction note appears; the position map gains a position, crux or parking-lot item; AI drafts an update to
+   "What we think so far"; an editor applies it. Scripted, no live AI: free and reliable in a meeting. Likely
+   two or three sample threads on the question so the combined map makes sense. Content stays in
+   `content/discussions.json` (extend the shape for threads, steps and map provenance).
+2. **Live participation later** (brief stages 10–12, slimmed; a few days across both repos): reviewers post for
+   real, invite Holon (discuss mode built in the commons repo, `POST /api/v1/holon/discuss`), "Propose updates"
+   produces real AI-drafted map changes, the facilitator acts only when asked at first. Real token costs and real
+   moderation.
 
 ---
 

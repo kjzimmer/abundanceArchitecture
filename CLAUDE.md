@@ -51,7 +51,9 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   this one) and Railway project (`knowledgeCommons`, service `livingSystems`). Live Holon (ask mode) + UX with
   labelled sample data; AA consumes it only via its public interface. Deployed and live (Holon answering) on
   2026-10-20; AA staging uses it for Learn, citations and a sample facilitated question. Commons work continues
-  in the commons repo (its `CLAUDE.md` + `docs/STATUS.md`); AA's side: `docs/wip/knowledge-commons.md`
+  in the commons repo (its `CLAUDE.md` + `docs/STATUS.md`); AA's side: `docs/wip/knowledge-commons.md`.
+  **Next AA work (agreed 2026-10-21):** show how people participate: split the question page into three layers
+  and add a guided replay of a facilitated discussion. Spec: "Next on AA" in that wip file
 - Groups + CC/BCC (PR #30, deployed 2026-10-13): spec `docs/wip/email-groups.md`. Multi-recipient
   conversations with reply-all, saved Groups (admin → Groups), "Email this group", conversations filed under
   their group. Awaiting Karl's prod test (group email from karl@ → member reply-all → reply from Inbox)
