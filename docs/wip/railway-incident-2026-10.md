@@ -1,5 +1,22 @@
 # Railway security incident: credential rotation (Oct 2026)
 
+## Resume here
+
+*Updated end of 2026-10-22.* The most dangerous outside credentials are dealt with (Resend, Square, AA admin
+locked). Karl stopped for the night. **Start the next session by:**
+
+1. Confirming with Karl which of these he finished on the night of the 22nd: Cloudflare GalleryProvisioning +
+   four analytics tokens deleted; R2 tokens (gallery bucket, `aa-files`) deleted; Anthropic keys `livingSystems`
+   (…NgAA, Organization scope) and `myGalleryWorks` (…ewAA) deleted. Keep `claude_code_key_karl.zimmer_qjoy`
+   (Claude Code's own key, never in Railway). The commons key Railway used (…zwAA) is not in his Console list even
+   with Status = All: either already deleted or in another organization; it expires 2026-11-19 regardless.
+2. Checking Railway: dashboard and builds back? Karl runs `railway login` himself (browser).
+3. Then, in order: database public-networking check (decides whether personal data may have been exposed);
+   gallery WAF rule if builds are still out; rotate internal secrets and create new provider keys; deploy;
+   remove the AA WAF rule after `JWT_SECRET` is rotated; reissue reviewer links (Karl, Hans Prahl, Natalie);
+   review the other sites (HU, FMW, cfeEstimator, Personal Finance).
+4. Afterwards: the post-incident review (last section of this file), which Karl wants to do.
+
 **What happened:** Railway disclosed on 2026-10-21 that customer environment variables were accessed and
 decrypted. Its guidance: revoke all environment variables stored in Railway, review service logs for unusual
 activity. Builds were paused platform-wide (so new values can't be deployed until builds return), Railway is
@@ -127,3 +144,51 @@ revoking it keeps the gallery up (uploads stop until rotation).
 - 2026-10-22: Incident found; Railway CLI signed out; this checklist written.
 - 2026-10-22: Resend keys deleted (all sites). AA WAF rule deployed (IPv6 /64 + IPv4 advised). Square application
   secret and sandbox token replaced; Square API logs, webhooks and seller account clean.
+
+## Post-incident review (to do, with Karl)
+
+Karl's framing (2026-10-22): with many gallery customers or busy sites, this could have been a disaster. The
+review should ask how to make the next provider breach a small event. Observations captured during the response,
+as starting points (not conclusions):
+
+**What made it harder**
+- **No inventory of secrets.** Which keys each site holds, where each comes from and what it can do had to be
+  rebuilt from code and `.env.example` files under time pressure, across seven Railway projects.
+- **Everything in one place.** Every secret for every site lived in one provider; one breach exposed all of them
+  at once, including payments (Square) and email sending (Resend).
+- **Shared and over-broad credentials.** Resend keys were deleted for all sites at once (one action stopped email
+  everywhere). The gallery's Cloudflare token could edit every zone, including other sites' DNS. An
+  Organization-scoped Anthropic key (admin-level) existed for a job that needed a workspace key. A broad
+  "Cloudflare Agent Token" exists with unclear use.
+- **Rotation depended on the breached provider.** New secrets couldn't be deployed while Railway builds were
+  paused, so the only immediate options were revoking (and losing features) or fencing (WAF rules).
+- **Admin panels were open to the internet by default,** protected only by a signing secret stored in the
+  breached provider. The fence (Cloudflare rule) had to be built during the incident, and the services' own
+  `*.up.railway.app` addresses bypass Cloudflare.
+- **Third-party tokens stored in the database in plain form** (the gallery's Square access token), so database
+  exposure would mean payment-account exposure.
+- **Unknowns that decide the severity:** whether databases had public networking on, and what logs exist to tell
+  whether anything was accessed.
+- **Out-of-band access:** the CLI was signed out, the Gmail connector wasn't authorized, and Railway's notices
+  went to email, so the response started from Karl's reading rather than from tooling.
+
+**What went well**
+- Revoking at the provider (Resend, Square, Cloudflare, Anthropic) needed no Railway access and stopped misuse
+  immediately.
+- Square API logs and webhooks gave a clear "not used" answer quickly.
+- Serving gallery images from R2's public URL meant revoking the upload key didn't take the gallery down.
+- Low traffic and few users made breaking features acceptable.
+
+**Ideas to evaluate**
+- A secrets inventory per site (name, provider, scope, what breaks if revoked, how to rotate), kept in each repo
+  without the values, plus a short incident runbook. Could be a shared doc across the FoA sites.
+- Least privilege by default: one key per site and per environment; workspace-scoped keys; zone-scoped Cloudflare
+  tokens; no admin-level keys in apps.
+- Admin panels behind an identity layer that doesn't depend on the host (e.g. Cloudflare Access), and remove the
+  public `*.up.railway.app` domains.
+- Encrypt stored third-party tokens with a key held outside the database, or avoid storing them.
+- Check and document database public networking; turn it off where unused.
+- A secrets manager outside the hosting provider, or at least the ability to rotate without a fresh build.
+- Alerts: provider status pages and security notices to a monitored channel; spend alerts at Anthropic and
+  Resend; Square notifications.
+- Customer communication: what to tell gallery customers or subscribers if data may have been exposed, and when.
