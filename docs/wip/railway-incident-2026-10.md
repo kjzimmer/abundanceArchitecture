@@ -239,3 +239,34 @@ as starting points (not conclusions):
 
 - Containment took one evening, with a fair amount of time spent finding dashboard screens and reconstructing
   which site used which credential.
+
+## Recovery log (from 2026-10-22, day 2)
+
+- **Builds:** Railway restored builds for Pro and Enterprise first (22 Oct 12:30 UTC); Hobby, Free and Trial still
+  pending. A test rotation on AA staging set the variable but no deploy ran, so Karl's projects are on a tier
+  still waiting. Plan (option 3): stage everything now, deploy when builds return. Railway has published rotation
+  guides; no post-mortem yet.
+- **JWT secrets staged (unique per site and environment, generated in the shell, never printed),
+  `--skip-deploys`:** AA production, AA staging, mdFineArt, healthUnveiled, FMW `web`, cfeEstimator. Each
+  service needs a redeploy when builds return (`railway redeploy` or the dashboard). Rotation logs everyone out
+  once; passwords stay the same.
+- **Passwords to change (precaution, databases were public; hashes may have been copied):** admin accounts on AA,
+  the gallery, HU, FMW, cfeEstimator, and any reused elsewhere. The gallery additionally has an unused
+  **`ADMIN_PASSWORD` in plain text in Railway**: change the gallery admin password; delete the variable (Karl to OK).
+- **Variable inventory, all services (names only, 2026-10-22):**
+
+| Service | Secrets beyond DATABASE_URL | Notes |
+|---|---|---|
+| AA prod | JWT, RESEND, RESEND_WEBHOOK, INBOUND_WEBHOOK, TURNSTILE_SECRET, R2, CF_ANALYTICS | |
+| AA staging | JWT, RESEND, TURNSTILE_SECRET, REVIEW_LINK_SECRET, COMMONS_SITE_KEY, CF_ANALYTICS | |
+| mdFineArt | JWT, ADMIN_PASSWORD, ANTHROPIC, CF_API_TOKEN, CF_ANALYTICS, R2, RESEND, SQUARE_APP_SECRET | |
+| myGalleryWorks-business | RESEND | |
+| healthUnveiled | JWT, CF_ANALYTICS | |
+| FMW web | JWT, CF_ANALYTICS, COINGECKO_API_KEY, FRED_API_KEY | data APIs, low value |
+| cfeEstimator | JWT, ANTHROPIC | Anthropic key already dead (401) |
+| personal_finance | **PLAID_SECRET**, **CLERK_SECRET_KEY**, ANTHROPIC | Anthropic key dead (401); **Plaid + Clerk urgent** |
+| livingSystems (commons) | ANTHROPIC, REVIEW_LINK_SECRET, SITE_KEYS | |
+
+- **Personal Finance (urgent, found day 2):** Plaid secret + public database (likely holding Plaid access tokens)
+  could allow reading connected bank accounts. Rotate the Plaid secret and Clerk secret key; check Plaid activity
+  and Clerk users.
