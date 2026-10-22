@@ -2,8 +2,9 @@
 
 ## Resume here
 
-*Updated end of 2026-10-22.* The most dangerous outside credentials are dealt with (Resend, Square, AA admin
-locked). Karl stopped for the night. **Start the next session by:**
+*Updated end of 2026-10-22.* **Containment is complete.** Every outside credential that was in Railway is
+revoked, all databases are private, Square is clean, and all three admin panels are locked to Karl's IP. What
+remains needs Railway builds (rotation and deploys), then the After Action Review Karl wants. Status by step:
 
 1. ☑ Confirmed by Karl, night of 2026-10-22: Cloudflare GalleryProvisioning + four analytics tokens deleted; R2
    tokens (gallery bucket, `aa-files`) deleted; Anthropic keys `livingSystems` (…NgAA, Organization scope) and
@@ -23,10 +24,21 @@ locked). Karl stopped for the night. **Start the next session by:**
    gallery customers / AA subscribers is Karl's decision (few users; record the reasoning in the review).
    Check script (prints no secrets): `scratchpad/dbcheck.sh` from the 2026-10-22 session; it links each project
    from a scratch folder and classifies `RAILWAY_TCP_PROXY_DOMAIN` / `DATABASE_URL` hosts.
-4. Then, in order: gallery WAF rule if builds are still out; rotate internal secrets and create new provider keys; deploy;
-   remove the AA WAF rule after `JWT_SECRET` is rotated; reissue reviewer links (Karl, Hans Prahl, Natalie);
-   review the other sites (HU, FMW, cfeEstimator, Personal Finance).
-5. Afterwards: the post-incident review (last section of this file), which Karl wants to do.
+4. ☑ (2026-10-22) Admin panels locked by Cloudflare custom rules ("Lock admin during Railway incident"), each
+   allowing only Karl's IPv6 /64 and IPv4: **abundancearchitecture.world** (admin path list, see section 2),
+   **melodydebenedictis.com** and **mygalleryworks.com** (gallery: block any `Authorization: Bearer` request,
+   since its admin API is header-authenticated). Melody's IP was not added (she should treat the gallery admin as
+   offline until rotation, or add her IP). Remove all three rules after the `JWT_SECRET`s are rotated.
+5. ☐ **When Railway builds return** (still paused at 2026-10-22 03:00 UTC), project by project, gallery first:
+   generate and set new internal secrets (`JWT_SECRET`, webhook secrets incl. the AA Worker's, Turnstile,
+   review-link secrets, AA's commons site key, database passwords); Karl creates new provider keys (Resend per site,
+   R2 per bucket, Anthropic for the commons and gallery, Cloudflare analytics per site, gallery provisioning only
+   if needed, Square app secret already new); deploy and test each site; remove the three admin-lock rules;
+   reissue reviewer links (Karl, Hans Prahl, Natalie); review HU, FMW, cfeEstimator and Personal Finance code for
+   any other providers.
+6. ☐ Decide whether to notify gallery customers / AA subscribers (see step 3).
+7. ☐ **After Action Review** with Karl: the last section of this file ("Post-incident review") holds the timeline
+   material, observations and ideas gathered during the response.
 
 **What happened:** Railway disclosed on 2026-10-21 that customer environment variables were accessed and
 decrypted. Its guidance: revoke all environment variables stored in Railway, review service logs for unusual
@@ -209,3 +221,21 @@ as starting points (not conclusions):
   template's default). Public by default turned a secrets leak into a possible data leak.
 - Postgres logs kept about a week and didn't record successful logins, so "was data read?" can't be answered.
   Consider enabling connection logging and longer log retention or export.
+
+### Response timeline (for the After Action Review)
+
+| When (Karl's time, 2026-10-21/22) | What |
+|---|---|
+| 21 Oct, 07:24 UTC | Railway starts investigating; dashboard, API and CLI unavailable from 09:28 UTC; builds paused |
+| 21 Oct, 22:10 UTC | Railway publishes its security notice: revoke all environment variables |
+| Evening 22 Oct | Karl raises it in this session; CLI found signed out; secrets inventory rebuilt from code |
+| | Resend: all keys deleted (all sites) |
+| | AA admin locked by Cloudflare rule (WAF menu renamed "Security rules": took some finding) |
+| | Square: app secret + sandbox token replaced; API logs, webhooks, seller account clean |
+| | Cloudflare tokens reviewed: GalleryProvisioning + 4 analytics tokens deleted; R2 tokens deleted |
+| | Anthropic: Organization-scoped and gallery keys deleted; Claude Code key kept |
+| | Railway login restored; 7 of 8 databases found publicly reachable; proxies removed; logs checked |
+| | Gallery admin locked on melodydebenedictis.com and mygalleryworks.com; all rules allow IPv6 /64 + IPv4 |
+
+- Containment took one evening, with a fair amount of time spent finding dashboard screens and reconstructing
+  which site used which credential.
