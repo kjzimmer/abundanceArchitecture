@@ -12,12 +12,21 @@ locked). Karl stopped for the night. **Start the next session by:**
    gone; it expires 2026-11-19 regardless. **Effect until rotation:** no email on any site, no Holon, no gallery AI
    features or image uploads, no AA shared-document viewing, no analytics pages. Public sites and gallery images
    stay up.
-2. Checking Railway: dashboard and builds back? Karl runs `railway login` himself (browser).
-3. Then, in order: database public-networking check (decides whether personal data may have been exposed);
-   gallery WAF rule if builds are still out; rotate internal secrets and create new provider keys; deploy;
+2. ☑ Railway CLI logged in again (Karl, 2026-10-22).
+3. ☑ Database public networking (2026-10-22): **7 of 8 Postgres databases had a public TCP proxy** (AA production,
+   AA staging, gallery, health Unveiled, Free Market Watch, cfeEstimator, Personal Finance; only knowledgeCommons
+   was private). Every app connects over the private network and all local dev uses localhost, so Karl removed
+   all seven proxies; re-check confirmed all private. **Logs** (`railway logs --service Postgres`, about 15–22 Oct
+   retained; three were empty, probably restarted when the proxy was removed): no failed password attempts
+   anywhere; automated scanner probes on the gallery (16 Oct), FMW (15–16 Oct) and AA staging (15–21 Oct).
+   Postgres does not log successful logins here, so **no evidence of access, but not proof**. Whether to tell
+   gallery customers / AA subscribers is Karl's decision (few users; record the reasoning in the review).
+   Check script (prints no secrets): `scratchpad/dbcheck.sh` from the 2026-10-22 session; it links each project
+   from a scratch folder and classifies `RAILWAY_TCP_PROXY_DOMAIN` / `DATABASE_URL` hosts.
+4. Then, in order: gallery WAF rule if builds are still out; rotate internal secrets and create new provider keys; deploy;
    remove the AA WAF rule after `JWT_SECRET` is rotated; reissue reviewer links (Karl, Hans Prahl, Natalie);
    review the other sites (HU, FMW, cfeEstimator, Personal Finance).
-4. Afterwards: the post-incident review (last section of this file), which Karl wants to do.
+5. Afterwards: the post-incident review (last section of this file), which Karl wants to do.
 
 **What happened:** Railway disclosed on 2026-10-21 that customer environment variables were accessed and
 decrypted. Its guidance: revoke all environment variables stored in Railway, review service logs for unusual
@@ -87,7 +96,7 @@ admin panel) a WAF rule like the one above. Resend keys for all sites were delet
 AA's Postgres holds subscribers, contact messages, the People CRM, conversations and bcrypt hashes of admin
 passwords. The commons' Postgres holds reviewers' private Holon sessions and emails.
 
-- ☐ In each Postgres service, check whether **public networking (TCP proxy)** is on (a `DATABASE_PUBLIC_URL`
+- ☑ (2026-10-22, see Resume here) In each Postgres service, check whether **public networking (TCP proxy)** is on (a `DATABASE_PUBLIC_URL`
   variable exists). If it is, the leaked password allowed direct access from the internet: treat the data as
   potentially exposed. Turn public networking off if nothing needs it (the apps use the private network).
 - ☐ Rotate each database password once the dashboard and builds are back (Railway's Postgres credentials, then
@@ -194,3 +203,9 @@ as starting points (not conclusions):
 - Alerts: provider status pages and security notices to a monitored channel; spend alerts at Anthropic and
   Resend; Square notifications.
 - Customer communication: what to tell gallery customers or subscribers if data may have been exposed, and when.
+
+### Added to the review, 2026-10-22
+- 7 of 8 databases were reachable from the internet although no app or local setup needed it (the Postgres
+  template's default). Public by default turned a secrets leak into a possible data leak.
+- Postgres logs kept about a week and didn't record successful logins, so "was data read?" can't be answered.
+  Consider enabling connection logging and longer log retention or export.
