@@ -2,7 +2,22 @@
 
 ## Resume here
 
-*Updated end of 2026-10-22.* **Containment is complete.** Every outside credential that was in Railway is
+*Updated 2026-10-22, day 2 (Karl stepped away mid-recovery).* **Next session, in this order:**
+
+1. **Personal Finance (urgent, not yet done):** Karl rotates the Plaid secret and the Clerk secret key, checks Plaid
+   activity and Clerk users, and says whose bank accounts are connected (decides severity). Then stage the new
+   values on `personal_finance` (Karl pastes them into Railway himself, or sets them via the CLI without echoing).
+2. **Gallery:** Karl changes the gallery admin password and OKs deleting the unused plain-text `ADMIN_PASSWORD`
+   variable on `mdFineArt`.
+3. **Check Railway builds for Hobby** (status.railway.com). When back: redeploy the six services with staged JWTs,
+   stage + deploy the rest (see step 5 below and the Recovery log), remove the three admin-lock rules, reissue
+   reviewer links.
+4. **Restructure this file into Karl's review sections** (agreed day 2): what happened at Railway; what of ours was
+   exposed; containment; what attackers did (known); what they may have done (unknowable); countermeasures;
+   what Railway will do (post-mortem pending); what we will do. Plus: detection, decisions and why, impact and
+   communication, verification, follow-ups with owners and dates. Keep the checklist as an appendix.
+
+*Status at end of day 1 (2026-10-22 night):* **Containment is complete.** Every outside credential that was in Railway is
 revoked, all databases are private, Square is clean, and all three admin panels are locked to Karl's IP. What
 remains needs Railway builds (rotation and deploys), then the After Action Review Karl wants. Status by step:
 
