@@ -5,11 +5,13 @@
 *Updated end of 2026-10-22.* The most dangerous outside credentials are dealt with (Resend, Square, AA admin
 locked). Karl stopped for the night. **Start the next session by:**
 
-1. Confirming with Karl which of these he finished on the night of the 22nd: Cloudflare GalleryProvisioning +
-   four analytics tokens deleted; R2 tokens (gallery bucket, `aa-files`) deleted; Anthropic keys `livingSystems`
-   (…NgAA, Organization scope) and `myGalleryWorks` (…ewAA) deleted. Keep `claude_code_key_karl.zimmer_qjoy`
-   (Claude Code's own key, never in Railway). The commons key Railway used (…zwAA) is not in his Console list even
-   with Status = All: either already deleted or in another organization; it expires 2026-11-19 regardless.
+1. ☑ Confirmed by Karl, night of 2026-10-22: Cloudflare GalleryProvisioning + four analytics tokens deleted; R2
+   tokens (gallery bucket, `aa-files`) deleted; Anthropic keys `livingSystems` (…NgAA, Organization scope) and
+   `myGalleryWorks` (…ewAA) deleted. Kept `claude_code_key_karl.zimmer_qjoy` (Claude Code's own key, never in
+   Railway). The commons key Railway used (…zwAA) is not in his Console list even with Status = All: treated as
+   gone; it expires 2026-11-19 regardless. **Effect until rotation:** no email on any site, no Holon, no gallery AI
+   features or image uploads, no AA shared-document viewing, no analytics pages. Public sites and gallery images
+   stay up.
 2. Checking Railway: dashboard and builds back? Karl runs `railway login` himself (browser).
 3. Then, in order: database public-networking check (decides whether personal data may have been exposed);
    gallery WAF rule if builds are still out; rotate internal secrets and create new provider keys; deploy;
@@ -132,10 +134,10 @@ revoking it keeps the gallery up (uploads stop until rotation).
 
 ## Plan for the night of 2026-10-22 (Karl, minimal)
 
-- ☐ Delete GalleryProvisioning and the four analytics tokens
-- ☐ Delete the R2 tokens for the gallery bucket and `aa-files` (new ones later)
-- ☐ Delete the Anthropic keys (commons, gallery)
-- ☐ Optional: gallery WAF rule
+- ☑ Delete GalleryProvisioning and the four analytics tokens
+- ☑ Delete the R2 tokens for the gallery bucket and `aa-files` (new ones later)
+- ☑ Delete the Anthropic keys (commons, gallery)
+- ☐ Optional: gallery WAF rule (not done)
 - Next day / when builds return: database public-networking check, rotate internal secrets, create new provider
   keys, deploy, reissue reviewer links
 
