@@ -40,8 +40,9 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   signature setting + Worker var, deploying the app before the Worker
 
 **URGENT, in flight: Railway security incident (2026-10-21).** Railway disclosed that customer environment
-variables were decrypted; every secret in every Railway project is presumed exposed. Rotation is partly done and
-waits on Railway builds. Start from "Resume here" in `docs/wip/railway-incident-2026-10.md`, which also holds the
+variables were decrypted; every secret in every Railway project is presumed exposed. Contained 2026-10-22
+(outside credentials revoked, databases made private, admin panels locked to Karl's IP); rotation and deploys wait
+on Railway builds, then an After Action Review. Start from "Resume here" in `docs/wip/railway-incident-2026-10.md`, which also holds the
 post-incident review Karl wants to do.
 
 **In flight:**
