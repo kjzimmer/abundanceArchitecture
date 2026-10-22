@@ -39,6 +39,11 @@ HealthUnveiled.world — together the Future of Abundance (FoA) suite.
   `Conversation.mailbox`. Worker deployed with `APP_LOCAL_PARTS = "hello,karl"`. Adding a mailbox = brand.ts +
   signature setting + Worker var, deploying the app before the Worker
 
+**URGENT, in flight: Railway security incident (2026-10-21).** Railway disclosed that customer environment
+variables were decrypted; every secret in every Railway project is presumed exposed. Rotation is partly done and
+waits on Railway builds. Start from "Resume here" in `docs/wip/railway-incident-2026-10.md`, which also holds the
+post-incident review Karl wants to do.
+
 **In flight:**
 - **Site draft (built 2026-10-14, in Karl's review):** new multi-page site from the brief in `docs/wip/site-draft/`,
   on branch `feat/site-draft`, live only on Railway `staging` (`draft.abundancearchitecture.world`, `SITE_MODE=draft`,
