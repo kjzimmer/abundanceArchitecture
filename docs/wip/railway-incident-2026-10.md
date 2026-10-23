@@ -299,3 +299,14 @@ as starting points (not conclusions):
 - Email recovery under way: one Resend key per service, sending-only, limited to its domain (AA production, AA
   staging → abundancearchitecture.world; gallery, myGalleryWorks business → mygalleryworks.com); Karl pastes keys
   straight into Railway. Then AA's Resend webhook signing secret and the inbound Worker secret, deploy, test.
+- **Resend recovered (day 3):** new sending-only keys, one per service, each limited to its domain, pasted by Karl
+  straight into Railway (auto-deployed): AA production and AA staging (abundancearchitecture.world);
+  `mdFineArt` gallery app and `myGalleryWorks-business` (mygalleryworks.com). Keys are per app, not per
+  gallery: the gallery app is multi-tenant. HU, FMW, cfeEstimator, Personal Finance have no Resend key (by design
+  for now). Staging verified: a test reviewer comment produced an `[AA Review]` email accepted by Resend.
+- **Follow-ups noted:** (1) reviewer comments exist only as emails: consider pointing staging's comment
+  notifications at hello@ so they land in production's admin Inbox (test self-domain handling first), rather than
+  staging writing to production's database; (2) a real staging subdomain in Resend when staging is formalized;
+  (3) if galleries later send from their own domains, the platform key needs domain-management rights: design
+  that deliberately.
+- Still to rotate for AA email: Resend webhook signing secret (prod), inbound Worker secret (Railway + Worker).
