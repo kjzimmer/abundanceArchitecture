@@ -285,3 +285,17 @@ as starting points (not conclusions):
 - **Personal Finance (urgent, found day 2):** Plaid secret + public database (likely holding Plaid access tokens)
   could allow reading connected bank accounts. Rotate the Plaid secret and Clerk secret key; check Plaid activity
   and Clerk users.
+
+### Day 3 (2026-10-23)
+
+- Railway builds restored for all tiers (22 Oct 23:22 UTC). Railway: redeploying pre-incident deployments fails,
+  so each service needs a **fresh build** (`railway redeploy --from-source`); pre-incident API/CLI tokens were
+  invalidated. Preliminary incident report promised, not yet published.
+- Before deploying, checked each service's last deployed commit against its branch head on GitHub: all identical,
+  so fresh builds shipped no new code.
+- **JWT rotation live** on all six services (AA staging, AA production, mdFineArt, healthUnveiled, FMW, cfeEstimator):
+  fresh builds succeeded, every site responds. All old sessions invalid; same passwords.
+- cfeEstimator has four public `*.up.railway.app` domains: clean up (review item).
+- Email recovery under way: one Resend key per service, sending-only, limited to its domain (AA production, AA
+  staging → abundancearchitecture.world; gallery, myGalleryWorks business → mygalleryworks.com); Karl pastes keys
+  straight into Railway. Then AA's Resend webhook signing secret and the inbound Worker secret, deploy, test.
