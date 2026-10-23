@@ -2,20 +2,23 @@
 
 ## Resume here
 
-*Updated 2026-10-22, day 2 (Karl stepped away mid-recovery).* **Next session, in this order:**
+*Updated 2026-10-23 afternoon (day 3). Karl is back tonight.* **Done today:** JWT rotation live on all six services;
+Resend recovered (four new per-service keys); admin access restored on every site and the Cloudflare admin locks
+deleted; review links and the AA↔commons key rotated, new links in
+`C:\Users\karlz\claudeSites\review-links-2026-10-23.txt` for Karl to send to Hans and Natalie.
 
-1. **Personal Finance (urgent, not yet done):** Karl rotates the Plaid secret and the Clerk secret key, checks Plaid
-   activity and Clerk users, and says whose bank accounts are connected (decides severity). Then stage the new
-   values on `personal_finance` (Karl pastes them into Railway himself, or sets them via the CLI without echoing).
-2. **Gallery:** Karl changes the gallery admin password and OKs deleting the unused plain-text `ADMIN_PASSWORD`
-   variable on `mdFineArt`.
-3. **Check Railway builds for Hobby** (status.railway.com). When back: redeploy the six services with staged JWTs,
-   stage + deploy the rest (see step 5 below and the Recovery log), remove the three admin-lock rules, reissue
-   reviewer links.
-4. **Restructure this file into Karl's review sections** (agreed day 2): what happened at Railway; what of ours was
-   exposed; containment; what attackers did (known); what they may have done (unknowable); countermeasures;
-   what Railway will do (post-mortem pending); what we will do. Plus: detection, decisions and why, impact and
-   communication, verification, follow-ups with owners and dates. Keep the checklist as an appendix.
+**Start tonight with:**
+1. Karl: send Hans and Natalie their new links, then delete the links file. Confirm the AA admin **test email**
+   (Email → Send test email) and the staging test comment (`[AA Review] /learn`) both arrived.
+2. **Personal Finance (still urgent, not done):** Plaid secret + Clerk secret key; check Plaid activity and Clerk users;
+   whose bank accounts are connected?
+3. AA email secrets: Resend webhook signing secret (Karl rotates in Resend, pastes into AA production
+   `RESEND_WEBHOOK_SECRET`); inbound secret (Claude sets Railway + Cloudflare Worker together via wrangler).
+4. Gallery: change admin password; OK to delete the plain-text `ADMIN_PASSWORD` variable on `mdFineArt`.
+5. Remaining keys (features still off): R2 (gallery uploads, AA shared docs), Anthropic (commons Holon, gallery
+   AI), Cloudflare analytics per site, Turnstile secret (AA prod + staging), database passwords, FMW CoinGecko/FRED;
+   precautionary admin password changes; cfeEstimator's extra Railway domains.
+6. Restructure this file into Karl's review sections, then the **After Action Review**.
 
 *Status at end of day 1 (2026-10-22 night):* **Containment is complete.** Every outside credential that was in Railway is
 revoked, all databases are private, Square is clean, and all three admin panels are locked to Karl's IP. What
@@ -319,3 +322,10 @@ as starting points (not conclusions):
 - **Follow-ups noted:** (4) a "sign out everywhere" action (revoke all refresh tokens) for rotation runbooks;
   (5) move the platform admin to its own myGalleryWorks address with a second factor before onboarding customers
   (Karl agrees; fine for now).
+- **Review links and AA↔commons key rotated (day 3):** new unique `REVIEW_LINK_SECRET` on AA staging and on the
+  commons, and a new AA site key (one value set as AA staging `COMMONS_SITE_KEY` and in the commons' `SITE_KEYS`);
+  generated in the shell, never printed. Checked deployed commit = branch head first (no code shipped), then fresh
+  builds of AA staging and the commons: both SUCCESS. Verified: old AA link cookie refused (403); new owner link
+  works; AA → commons link-through works with the new key; new commons steward link works (Sessions opens).
+  New links for Karl (AA owner + commons steward), Hans Prahl and Natalie (natalie@nrhythm.co) are in
+  `C:\Users\karlz\claudeSites\review-links-2026-10-23.txt` (outside any repo): Karl sends them and deletes the file.

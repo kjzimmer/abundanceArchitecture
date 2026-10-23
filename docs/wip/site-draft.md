@@ -34,8 +34,13 @@ then plan changes with him before editing. Nothing here is blocked.
 
 | Reviewer | Email | Role | Issued |
 |---|---|---|---|
-| Karl Zimmer | karl@abundancearchitecture.world | owner | 2026-10-14 |
-| Hans Prahl | hans.t.prahl@gmail.com | reviewer | 2026-10-15 |
+| Karl Zimmer | karl@abundancearchitecture.world | owner | 2026-10-14; **reissued 2026-10-23** |
+| Hans Prahl | hans.t.prahl@gmail.com | reviewer | 2026-10-15; **reissued 2026-10-23** |
+| Natalie | natalie@nrhythm.co | reviewer | **2026-10-23** (had an earlier link, date not recorded) |
+
+*2026-10-23: `REVIEW_LINK_SECRET` rotated after the Railway incident, so every earlier link stopped working. The
+new links were written to `C:\Users\karlz\claudeSites\review-links-2026-10-23.txt` (outside the repo) for Karl to
+send; he deletes the file afterwards.*
 
 ## Review feedback (Karl)
 
