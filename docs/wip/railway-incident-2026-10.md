@@ -310,3 +310,12 @@ as starting points (not conclusions):
   (3) if galleries later send from their own domains, the platform key needs domain-management rights: design
   that deliberately.
 - Still to rotate for AA email: Resend webhook signing secret (prod), inbound Worker secret (Railway + Worker).
+- **Admin access restored (day 3):** Karl deleted all three Cloudflare admin-lock rules after JWT rotation (his
+  Starlink IPv6 prefix and shared IPv4 had changed overnight, so the lock blocked him: IP allow-lists fit badly
+  with Starlink). AA admin: logout + password login works. AA silently re-logged in first because its 7-day
+  refresh token is a random value checked against a hash in the database, not signed with `JWT_SECRET` (expected,
+  safe). Gallery admin and platform admin (`melodydebenedictis.com/app-admin`, gated by `isAppAdmin` in the JWT)
+  work. `mygalleryworks.com` is the business page (no admin).
+- **Follow-ups noted:** (4) a "sign out everywhere" action (revoke all refresh tokens) for rotation runbooks;
+  (5) move the platform admin to its own myGalleryWorks address with a second factor before onboarding customers
+  (Karl agrees; fine for now).
